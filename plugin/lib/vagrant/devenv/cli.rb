@@ -1,7 +1,7 @@
 require 'thor'
 
-require Vagrant.source_root.join("plugins/commands/up/command")
-require Vagrant.source_root.join("plugins/commands/destroy/command")
+require_relative './core.rb'
+
 
 
 module Vagrant
@@ -14,33 +14,13 @@ module Vagrant
                 option :provision, :type => :boolean
                 desc "up <name>", "Create a development environment"
                 def up(name)
-                    ENV["VAGRANT_DEVENV"] = "1"
-                    ENV["VAGRANT_DEVENV_MACHINE_NAME"] = name
-
-                    command = [name]
-                    if options[:provision]
-                        command.push "--provision"
-                    end
-
-                    env = self.vagrant_environment 
-
-                    return VagrantPlugins::CommandUp::Command.new(command, env).execute
+                    Vagrant::Devenv::Core.new(self.vagrant_home_path).create(name, provision: options[:provision])
                 end
                 
                 option :force, :type => :boolean
                 desc "destroy <name>", "Destroy a devenv"
                 def destroy(name)
-                    ENV["VAGRANT_DEVENV"] = "1"
-                    ENV["VAGRANT_DEVENV_MACHINE_NAME"] = name
-
-                    command = [name]
-                    if options[:force]
-                        command.push "--force"
-                    end
-
-                    env = self.vagrant_environment 
-
-                    return VagrantPlugins::CommandDestroy::Command.new(command, env).execute
+                    Vagrant::Devenv::Core.new(self.vagrant_home_path).destroy(name, force: options[:force])
                 end
 
                 desc "list", "List devenvs"

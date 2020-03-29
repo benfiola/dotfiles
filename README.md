@@ -19,7 +19,7 @@ While this is generally designed to accommodate my personal tastes and desired c
 
 `vagrant devenv destroy <name>`
 
-## List environments created through `vagrant-devenv`
+## List development environments
 
 `vagrant devenv status`
 
