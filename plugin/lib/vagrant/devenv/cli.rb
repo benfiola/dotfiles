@@ -9,7 +9,6 @@ module Vagrant
         module CLI
             class Main < Thor
                 class_option :vagrant_home_path, :hide => true, :type => :string, :required => true
-                class_option :vagrant_environment, :hide => true
 
                 option :provision, :type => :boolean
                 desc "up <name>", "Create a development environment"
@@ -31,17 +30,6 @@ module Vagrant
                 no_commands do
                     def vagrant_home_path
                         self.options["vagrant_home_path"]
-                    end
-
-                    def vagrant_environment
-                        Vagrant::Environment.new({
-                            home_path: self.vagrant_home_path,
-                            ui_class: Vagrant::UI::Basic
-                        })
-                    end
-
-                    def exit_on_failure?
-                        true
                     end
                 end
             end
