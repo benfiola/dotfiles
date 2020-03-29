@@ -7,9 +7,7 @@ Gem::Specification.new do |spec|
     spec.version = Vagrant::Devenv::VERSION
     spec.authors = ["Ben Fiola"]
     spec.summary = %q{Vagrant plugin that will bootstrap development environment VMs.}
-    spec.files = Dir.chdir(File.expand_path('..', __FILE__)) do
-        `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-    end
+    spec.files = Dir['lib/*.rb'] + Dir['lib/**/*.rb']
     spec.require_paths = ["lib"]
     spec.add_dependency "thor", "~> 1.0", ">= 1.0.1"
     spec.add_development_dependency "bundler", "~> 1.17"

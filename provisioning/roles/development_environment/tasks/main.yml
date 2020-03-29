@@ -7,6 +7,7 @@
 - import_tasks: kubernetes.yml
 - import_tasks: mdns.yml
 - import_tasks: nodenv.yml
+- import_tasks: oh-my-zsh.yml
 - import_tasks: pycharm.yml
 - import_tasks: pyenv.yml
 - import_tasks: qemu.yml
