@@ -1,6 +1,10 @@
+require "pathname"
+require "pstore"
+
 require Vagrant.source_root.join("plugins/commands/up/command")
 require Vagrant.source_root.join("plugins/commands/destroy/command")
 
+require_relative './version';
 
 module Vagrant
     module Devenv
@@ -10,8 +14,37 @@ module Vagrant
                     home_path: home_path,
                     ui_class: Vagrant::UI::Basic
                 })
+                @store = PStore.new(
+                    Pathname.new(home_path).join("vagrant-devenv.store").to_s,
+                    thread_safe: true
+                )
+                @store.transaction do
+                    @store[:version] ||= Vagrant::Devenv::VERSION
+                    @store[:machines] ||= {}
+                end
             end
 
+            def stored_environments
+                @store.transaction(read_only: true) do
+                    return @store[:machines]
+                end
+            end
+
+            def add_to_store(environment)
+                @store.transaction do
+                    @store[:machines][:"#{environment}"] = {
+                        :name => environment,
+                        :version => Vagrant::Devenv::VERSION
+                    }
+                end
+            end
+
+            def remove_from_store(environment)
+                @store.transaction do
+                    @store[:machines].delete(:"#{environment}")
+                end
+            end
+            
             def create(name, provision: false)
                 ENV["VAGRANT_DEVENV"] = "1"
                 ENV["VAGRANT_DEVENV_MACHINE_NAME"] = name
@@ -21,7 +54,8 @@ module Vagrant
                     command.push "--provision"
                 end
 
-                return VagrantPlugins::CommandUp::Command.new(command, @env).execute
+                VagrantPlugins::CommandUp::Command.new(command, @env).execute
+                self.add_to_store(name)
             end
 
             def destroy(name, force: false)
@@ -33,7 +67,14 @@ module Vagrant
                     command.push "--force"
                 end
 
-                return VagrantPlugins::CommandDestroy::Command.new(command, @env).execute
+                VagrantPlugins::CommandDestroy::Command.new(command, @env).execute
+                self.remove_from_store(name)
+            end
+
+            def list
+                self.stored_environments.values.each do |value|
+                    @env.ui.info("#{value[:name]} (#{value[:version]})")
+                end
             end
         end
     end
