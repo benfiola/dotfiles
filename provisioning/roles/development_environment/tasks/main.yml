@@ -1,17 +1,185 @@
 ---
-- import_tasks: clion.yml
-- import_tasks: cplusplus.yml
-- import_tasks: docker.yml
-- import_tasks: git.yml
-- import_tasks: google_chrome.yml
-- import_tasks: kubernetes.yml
-- import_tasks: mdns.yml
-- import_tasks: nodenv.yml
-- import_tasks: oh-my-zsh.yml
-- import_tasks: pycharm.yml
-- import_tasks: pyenv.yml
-- import_tasks: qemu.yml
-- import_tasks: zsh.yml
-- import_tasks: user.yml
-- import_tasks: spotify.yml
-- import_tasks: unity.yml
+- name: Add GPG keys
+  apt_key: url={{item}} state=present
+  become: true
+  with_items:
+    # docker
+    - https://download.docker.com/linux/ubuntu/gpg
+    # spotify
+    - https://download.spotify.com/debian/pubkey.gpg
+
+- name: Add repositories
+  apt_repository: state=present repo={{item}}
+  become: true
+  with_items:
+    # docker
+    - deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+    # spotify
+    - deb http://repository.spotify.com stable non-free
+
+- name: Update apt-cache
+  apt: update_cache=yes
+  become: true
+
+- name: Install packages (pkg) via apt
+  become: true
+  apt:
+    state: present 
+    pkg:
+      # c++
+      - g++
+      # docker
+      - docker-ce
+      # git
+      - git
+      # mdns
+      - avahi-daemon
+      # pyenv
+      - make 
+      - build-essential 
+      - libssl-dev 
+      - zlib1g-dev 
+      - libbz2-dev 
+      - libreadline-dev 
+      - libsqlite3-dev 
+      - wget 
+      - curl 
+      - llvm 
+      - libncurses5-dev 
+      - xz-utils 
+      - tk-dev 
+      - libxml2-dev 
+      - libxmlsec1-dev 
+      - libffi-dev 
+      - liblzma-dev
+      # qemu
+      - qemu-kvm 
+      - libvirt-daemon-system 
+      - libvirt-clients 
+      - bridge-utils
+      # spotify
+      - spotify-client
+      # vim
+      - vim
+      # zsh
+      - zsh
+      # google-chrome
+      - gdebi-core
+
+- name: Install packages (deb) via apt
+  become: true
+  apt: deb={{item}} state=present
+  with_items:
+    # google-chrome
+    - https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+# user
+- name: Create user {{user}}
+  user: name={{user}} password={{password|password_hash('sha512', 'salt')}} create_home=yes state=present shell=/usr/bin/zsh
+  become: true
+
+# user
+- name: Add user "{{user}}" to sudoers
+  become: true
+  lineinfile:
+    path: /etc/sudoers.d/{{user}}
+    line: '{{user}} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+
+- name: Create folders and files
+  file: path={{item.path}} state={{item.state}} mode={{item.mode | default(omit)}} owner={{item.owner | default(omit)}} group={{item.group | default(omit)}} 
+  become: true
+  become_user: "{{item.owner | default(omit)}}"
+  with_items:
+    # nodenv
+    - {path: /opt/nodenv, state: directory, mode: '777'}
+    # pyenv
+    - {path: /opt/pyenv, state: directory, mode: '777'}
+    # pycharm
+    - {path: /opt/pycharm, state: directory, mode: '777'}
+    # clion
+    - {path: /opt/clion, state: directory, mode: '777'}
+    # unity
+    - {path: /opt/unity, state: directory, mode: '777'}
+    # user
+    - {path: "/home/{{user}}/.oh-my-zsh", owner: "{{user}}", state: directory}
+    - {path: "/home/{{user}}/.zshrc", owner: "{{user}}", state: touch}
+    - {path: "/home/{{user}}/.local/share/applications", owner: "{{user}}", state: directory}
+    - {path: "/home/{{user}}/.config/tilix/schemes", owner: "{{user}}", state: directory}
+
+- name: Extract archives
+  unarchive: src={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}} creates={{item.creates | default(omit)}} remote_src=yes extra_opts=--strip-components=1
+  become: true
+  become_user: "{{item.owner | default(omit)}}"
+  with_items:
+    # clion
+    - {url: "https://download.jetbrains.com/cpp/CLion-2019.3.2.tar.gz", path: /opt/clion, mode: '755', creates: "/opt/clion/bin/clion.sh"}
+    # pycharm
+    - {url: "https://download.jetbrains.com/python/pycharm-professional-2019.3.1.tar.gz", path: /opt/pycharm, creates: "/opt/pycharm/bin/pycharm.sh", mode: '755'}
+
+- name: Download files
+  get_url: url={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}}
+  become: true
+  become_user: "{{item.owner | default(omit)}}"
+  with_items:
+    # unity
+    - {url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage", mode: '755', path: /opt/unity/UnityHub.AppImage}
+    # kubernetes
+    - {url: "https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl", path: /usr/local/bin/kubectl, mode: '755'}
+    - {url: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64", path: /usr/local/bin/minikube, mode: '755'}
+  
+- name: Clone repositories
+  git: repo={{item.url}} dest={{item.path}}
+  become: true
+  become_user: "{{item.owner | default(omit)}}"
+  with_items:
+    # nodenv (root first)
+    - {url: "https://github.com/nodenv/nodenv.git", path: /opt/nodenv}
+    - {url: "https://github.com/nodenv/node-build.git", path: /opt/nodenv/plugins/node-build}
+    # pyenv (root first)
+    - {url: "https://github.com/pyenv/pyenv.git", path: /opt/pyenv}
+    - {url: "https://github.com/pyenv/pyenv-virtualenv", path: /opt/pyenv/plugins/pyenv-virtualenv}
+    # user
+    - {url: "https://github.com/ohmyzsh/ohmyzsh.git", path: "/home/{{user}}/.oh-my-zsh", owner: "{{user}}"}
+
+- name: Copy local files
+  copy: src={{item.src}} dest={{item.dest}} owner={{item.owner | default(omit)}} group={{item.group | default(omit)}} mode={{item.mode | default(omit)}}
+  become: true
+  become_user: "{{item.owner | default(omit)}}"
+  with_items:
+    # unity
+    - {src: unity.png, dest: /opt/unity/unity.png, mode: '644'}
+    # clion
+    - {src: clion.desktop, dest: "/home/{{user}}/.local/share/applications/clion.desktop", owner: '{{user}}'}
+    # pycharm
+    - {src: pycharm.desktop, dest: "/home/{{user}}/.local/share/applications/pycharm.desktop", owner: '{{user}}'}
+    # unity
+    - {src: unity.desktop, dest: "/home/{{user}}/.local/share/applications/unity.desktop", owner: '{{user}}'}
+    # user
+    - {src: theme_tilix.json, dest: "/home/{{user}}/.config/tilix/schemes/theme_tilix.json", owner: '{{user}}'}
+    - {src: ben.zsh-theme, dest: "/home/{{user}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{user}}'}
+
+- name: Add blocks to existing files
+  become: true
+  blockinfile:
+    path: "{{item.dest}}"
+    marker: "# {mark} {{item.src}}"
+    block: "{{ lookup('file', '../files/{{item.src}}') }}"
+  with_items:
+    # pyenv
+    - {src: block_pyenv.zshrc, dest: "/home/{{user}}/.zshrc"}
+    # nodenv
+    - {src: block_nodenv.zshrc, dest: "/home/{{user}}/.zshrc"}
+    # user
+    - {src: block_oh-my-zsh.zshrc, dest: "/home/{{user}}/.zshrc"}
+  
+- name: Start services
+  systemd: name={{item}} state=started enabled=yes
+  with_items:
+    # docker
+    - docker
+    # mdns
+    - avahi-daemon
