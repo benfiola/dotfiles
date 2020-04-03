@@ -65,6 +65,8 @@
       - zsh
       # google-chrome
       - gdebi-core
+      # user
+      - dconf-editor
 
 - name: Install packages (deb) via apt
   become: true
@@ -175,7 +177,29 @@
     - {src: block_nodenv.zshrc, dest: "/home/{{user}}/.zshrc"}
     # user
     - {src: block_oh-my-zsh.zshrc, dest: "/home/{{user}}/.zshrc"}
-  
+
+- name: Run commands
+  become: true
+  become_user: "{{item.user | default(omit)}}"
+  command:
+    cmd: "{{item.cmd}}"
+  with_items:
+    # user
+    - {cmd: "dbus-launch dconf write /org/gnome/desktop/interface/gtk-theme \"'Pocillo'\"", user: "{{user}}"}
+    - {cmd: "dbus-launch dconf write /com/solus-project/budgie-panel/dark-theme true", user: "{{user}}"}
+    - {cmd: "timedatectl set-timezone America/Los_Angeles"}
+    - {cmd: "dbus-launch dconf write /system/locale/region '\"en_US.UTF-8\"'", user: "{{user}}"}
+    - {cmd: "update-locale LANG='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_ADDRESS='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_NUMERIC='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_TIME='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_MONETARY='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_PAPER='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_NAME='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_TELEPHONE='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_MEASUREMENT='\"en_US.UTF-8\"'"}
+    - {cmd: "update-locale LC_IDENTIFICATION='\"en_US.UTF-8\"'"}
+
 - name: Start services
   systemd: name={{item}} state=started enabled=yes
   with_items:
@@ -183,3 +207,6 @@
     - docker
     # mdns
     - avahi-daemon
+
+
+dbus-launch dconf write /system/locale/region '"en_US.UTF-8"'
