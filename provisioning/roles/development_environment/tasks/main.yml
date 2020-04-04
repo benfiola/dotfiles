@@ -107,9 +107,10 @@
     # unity
     - {path: /opt/unity, state: directory, mode: '777'}
     # user
+    - {path: "/usr/share/applications", state: directory}
     - {path: "/home/{{user}}/.oh-my-zsh", owner: "{{user}}", state: directory}
     - {path: "/home/{{user}}/.zshrc", owner: "{{user}}", state: touch}
-    - {path: "/home/{{user}}/.local/share/applications", owner: "{{user}}", state: directory}
+    - {path: "/home/{{user}}/.config/plank/dock1/launchers", owner: "{{user}}", state: directory}
     - {path: "/home/{{user}}/.config/tilix/schemes", owner: "{{user}}", state: directory}
 
 - name: Extract archives
@@ -152,17 +153,21 @@
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
-    # unity
-    - {src: unity.png, dest: /opt/unity/unity.png, mode: '644'}
     # clion
-    - {src: clion.desktop, dest: "/home/{{user}}/.local/share/applications/clion.desktop", owner: '{{user}}'}
+    - {src: file.clion.desktop, dest: "/usr/share/applications/clion.desktop"}
+    - {src: file.clion.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/clion.dockitem", owner: '{{user}}'}
     # pycharm
-    - {src: pycharm.desktop, dest: "/home/{{user}}/.local/share/applications/pycharm.desktop", owner: '{{user}}'}
+    - {src: file.pycharm.desktop, dest: "/usr/share/applications/pycharm.desktop"}
+    - {src: file.pycharm.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/pycharm.dockitem", owner: '{{user}}'}
     # unity
-    - {src: unity.desktop, dest: "/home/{{user}}/.local/share/applications/unity.desktop", owner: '{{user}}'}
+    - {src: file.unity.png, dest: /opt/unity/unity.png, mode: '644'}
+    - {src: file.unity.desktop, dest: "/usr/share/applications/unity.desktop"}
+    - {src: file.unity.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/unity.dockitem", owner: '{{user}}'}
     # user
-    - {src: theme_tilix.json, dest: "/home/{{user}}/.config/tilix/schemes/theme_tilix.json", owner: '{{user}}'}
-    - {src: ben.zsh-theme, dest: "/home/{{user}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{user}}'}
+    - {src: file.theme_tilix.json, dest: "/home/{{user}}/.config/tilix/schemes/theme_tilix.json", owner: '{{user}}'}
+    - {src: file.ben.zsh-theme, dest: "/home/{{user}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{user}}'}
+    - {src: file.tilix.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/tilix.dockitem", owner: '{{user}}'}
+
 
 - name: Add blocks to existing files
   become: true
@@ -172,11 +177,11 @@
     block: "{{ lookup('file', '../files/{{item.src}}') }}"
   with_items:
     # pyenv
-    - {src: block_pyenv.zshrc, dest: "/home/{{user}}/.zshrc"}
+    - {src: block.pyenv.zshrc, dest: "/home/{{user}}/.zshrc"}
     # nodenv
-    - {src: block_nodenv.zshrc, dest: "/home/{{user}}/.zshrc"}
+    - {src: block.nodenv.zshrc, dest: "/home/{{user}}/.zshrc"}
     # user
-    - {src: block_oh-my-zsh.zshrc, dest: "/home/{{user}}/.zshrc"}
+    - {src: block.ohmyzsh.zshrc, dest: "/home/{{user}}/.zshrc"}
 
 - name: Run commands
   become: true
@@ -207,6 +212,4 @@
     - docker
     # mdns
     - avahi-daemon
-
-
-dbus-launch dconf write /system/locale/region '"en_US.UTF-8"'
+  
