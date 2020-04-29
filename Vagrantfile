@@ -1,9 +1,5 @@
-def devenv_machine_name
-    ENV.fetch("VAGRANT_DEVENV_MACHINE_NAME", :default)
-end
-
 Vagrant.configure("2") do |config|
-    config.vm.define devenv_machine_name do |subconfig|
+    config.vm.define :default do |subconfig|
         subconfig.vm.box = "pristine/ubuntu-budgie-19.10"
         subconfig.vm.box_version = "1.0.0"
 
@@ -17,7 +13,7 @@ Vagrant.configure("2") do |config|
             # ansible.verbose = "-vvvv"
             ansible.version = "2.9.6"
             ansible.groups = {
-                "development_environment" => [devenv_machine_name]
+                "development_environment" => [:default]
             }
         end
 

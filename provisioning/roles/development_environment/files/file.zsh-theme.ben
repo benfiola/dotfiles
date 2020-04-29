@@ -9,19 +9,24 @@ function prompt_git() {
     if [ "$IN_WORK_TREE" = "true" ] || [ "$IN_DIR" = "true" ]; then
         # in git repository
         # find branch name, determine color of branch display.
-        DIRTY_FILES=$(command git status --porcelain --ignore-submodules -unormal)
-        BRANCH=$(command git symbolic-ref --short HEAD)
-
+        DIRTY_FILES=$(command git status --porcelain --ignore-submodules -unormal 2>/dev/null || echo "")
+        BRANCH=$(command git symbolic-ref --short HEAD 2>/dev/null || echo "")
+        COMMIT=$(git log -n 1 --format="%h" 2>/dev/null || echo "")
+        
         # assume dirty
         COLOR="%{$fg_bold[red]%}"
-       
+
         if [ -z "$DIRTY_FILES" ]; then
             # no dirty files
             COLOR="%{$fg_bold[green]%}"
         fi
-     
+
+        if [ -z "$BRANCH" ]; then
+            BRANCH="detached"
+        fi
+
         # print git prompt
-        echo -n " ${COLOR}[git::${BRANCH}]%{$reset_color%}"
+        echo -n " ${COLOR}[git::${BRANCH}(${COMMIT})]%{$reset_color%}"
     else
         # print nothing   
         echo -n ""

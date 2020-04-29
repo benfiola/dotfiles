@@ -5,8 +5,6 @@
   with_items:
     # docker
     - https://download.docker.com/linux/ubuntu/gpg
-    # spotify
-    - https://download.spotify.com/debian/pubkey.gpg
 
 - name: Add repositories
   apt_repository: state=present repo={{item}}
@@ -14,8 +12,6 @@
   with_items:
     # docker
     - deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
-    # spotify
-    - deb http://repository.spotify.com stable non-free
 
 - name: Update apt-cache
   apt: update_cache=yes
@@ -28,6 +24,16 @@
     pkg:
       # c++
       - g++
+      - gcc
+      - make
+      - bison
+      - flex
+      - libgmp3-dev
+      - libmpfr-dev
+      - libmpc-dev
+      - texinfo
+      - libisl-dev
+      - cmake
       # docker
       - docker-ce
       # git
@@ -57,23 +63,28 @@
       - libvirt-daemon-system 
       - libvirt-clients 
       - bridge-utils
-      # spotify
-      - spotify-client
       # vim
       - vim
       # zsh
       - zsh
-      # google-chrome
-      - gdebi-core
       # user
       - dconf-editor
+      - fswatch
+      - xclip
 
-- name: Install packages (deb) via apt
+- name: Install packages via snap
   become: true
-  apt: deb={{item}} state=present
+  snap: name={{item.name}} classic={{item.classic | default(omit)}} state=present
   with_items:
-    # google-chrome
-    - https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    # clion
+    - {name: clion, classic: yes}
+    # pycharm
+    - {name: pycharm-professional, classic: yes}
+    # spotify
+    - {name: spotify, classic: yes}
+    # sublime-text
+    - {name: sublime-text, classic: yes}
+
 
 # user
 - name: Create user {{user}}
@@ -100,10 +111,6 @@
     - {path: /opt/nodenv, state: directory, mode: '777'}
     # pyenv
     - {path: /opt/pyenv, state: directory, mode: '777'}
-    # pycharm
-    - {path: /opt/pycharm, state: directory, mode: '777'}
-    # clion
-    - {path: /opt/clion, state: directory, mode: '777'}
     # unity
     - {path: /opt/unity, state: directory, mode: '777'}
     # user
@@ -112,16 +119,6 @@
     - {path: "/home/{{user}}/.zshrc", owner: "{{user}}", state: touch}
     - {path: "/home/{{user}}/.config/plank/dock1/launchers", owner: "{{user}}", state: directory}
     - {path: "/home/{{user}}/.config/tilix/schemes", owner: "{{user}}", state: directory}
-
-- name: Extract archives
-  unarchive: src={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}} creates={{item.creates | default(omit)}} remote_src=yes extra_opts=--strip-components=1
-  become: true
-  become_user: "{{item.owner | default(omit)}}"
-  with_items:
-    # clion
-    - {url: "https://download.jetbrains.com/cpp/CLion-2019.3.2.tar.gz", path: /opt/clion, mode: '755', creates: "/opt/clion/bin/clion.sh"}
-    # pycharm
-    - {url: "https://download.jetbrains.com/python/pycharm-professional-2019.3.1.tar.gz", path: /opt/pycharm, creates: "/opt/pycharm/bin/pycharm.sh", mode: '755'}
 
 - name: Download files
   get_url: url={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}}
@@ -139,13 +136,13 @@
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
-    # nodenv (root first)
+    # nodenv (order matters)
     - {url: "https://github.com/nodenv/nodenv.git", path: /opt/nodenv}
     - {url: "https://github.com/nodenv/node-build.git", path: /opt/nodenv/plugins/node-build}
-    # pyenv (root first)
+    # pyenv (order matters)
     - {url: "https://github.com/pyenv/pyenv.git", path: /opt/pyenv}
     - {url: "https://github.com/pyenv/pyenv-virtualenv", path: /opt/pyenv/plugins/pyenv-virtualenv}
-    # user
+    # user (shell)
     - {url: "https://github.com/ohmyzsh/ohmyzsh.git", path: "/home/{{user}}/.oh-my-zsh", owner: "{{user}}"}
 
 - name: Copy local files
@@ -154,19 +151,28 @@
   become_user: "{{item.owner | default(omit)}}"
   with_items:
     # clion
-    - {src: file.clion.desktop, dest: "/usr/share/applications/clion.desktop"}
-    - {src: file.clion.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/clion.dockitem", owner: '{{user}}'}
+    - {src: file.dockitem.clion, dest: "/home/{{user}}/.config/plank/dock1/launchers/clion.dockitem", owner: '{{user}}'}
     # pycharm
-    - {src: file.pycharm.desktop, dest: "/usr/share/applications/pycharm.desktop"}
-    - {src: file.pycharm.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/pycharm.dockitem", owner: '{{user}}'}
+    - {src: file.dockitem.pycharm, dest: "/home/{{user}}/.config/plank/dock1/launchers/pycharm.dockitem", owner: '{{user}}'}
     # unity
-    - {src: file.unity.png, dest: /opt/unity/unity.png, mode: '644'}
-    - {src: file.unity.desktop, dest: "/usr/share/applications/unity.desktop"}
-    - {src: file.unity.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/unity.dockitem", owner: '{{user}}'}
+    - {src: file.png.icon_unity, dest: /opt/unity/unity.png, mode: '644'}
+    - {src: file.desktop.unity, dest: "/usr/share/applications/unity.desktop"}
+    - {src: file.dockitem.unity, dest: "/home/{{user}}/.config/plank/dock1/launchers/unity.dockitem", owner: '{{user}}'}
+    # firefox
+    - {src: file.dockitem.firefox, dest: "/home/{{user}}/.config/plank/dock1/launchers/firefox.dockitem", owner: '{{user}}'}
+    # sublime-text
+    - {src: file.dockitem.sublime_text, dest: "/home/{{user}}/.config/plank/dock1/launchers/sublime_text.dockitem", owner: '{{user}}'}
+    # spotify
+    - {src: file.dockitem.spotify, dest: "/home/{{user}}/.config/plank/dock1/launchers/spotify.dockitem", owner: '{{user}}'}
+    # user (theme)
+    - {src: file.json.theme_tilix, dest: "/home/{{user}}/.config/tilix/schemes/theme_tilix.json", owner: '{{user}}'}
+    # user (shell)
+    - {src: file.zsh-theme.ben, dest: "/home/{{user}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{user}}'}
+    # user (dock)
+    - {src: file.dockitem.nemo, dest: "/home/{{user}}/.config/plank/dock1/launchers/nemo.dockitem", owner: '{{user}}'}
+    - {src: file.dockitem.tilix, dest: "/home/{{user}}/.config/plank/dock1/launchers/tilix.dockitem", owner: '{{user}}'}
     # user
-    - {src: file.theme_tilix.json, dest: "/home/{{user}}/.config/tilix/schemes/theme_tilix.json", owner: '{{user}}'}
-    - {src: file.ben.zsh-theme, dest: "/home/{{user}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{user}}'}
-    - {src: file.tilix.dockitem, dest: "/home/{{user}}/.config/plank/dock1/launchers/tilix.dockitem", owner: '{{user}}'}
+    - {src: file.conf.lightdm, dest: "/etc/lightdm/lightdm.conf"}
 
 
 - name: Add blocks to existing files
@@ -177,11 +183,11 @@
     block: "{{ lookup('file', '../files/{{item.src}}') }}"
   with_items:
     # pyenv
-    - {src: block.pyenv.zshrc, dest: "/home/{{user}}/.zshrc"}
+    - {src: block.zshrc.pyenv, dest: "/home/{{user}}/.zshrc"}
     # nodenv
-    - {src: block.nodenv.zshrc, dest: "/home/{{user}}/.zshrc"}
-    # user
-    - {src: block.ohmyzsh.zshrc, dest: "/home/{{user}}/.zshrc"}
+    - {src: block.zshrc.nodenv, dest: "/home/{{user}}/.zshrc"}
+    # user (shell)
+    - {src: block.zshrc.ohmyzsh, dest: "/home/{{user}}/.zshrc"}
 
 - name: Run commands
   become: true
@@ -189,9 +195,12 @@
   command:
     cmd: "{{item.cmd}}"
   with_items:
-    # user
+    # user (theme)
     - {cmd: "dbus-launch dconf write /org/gnome/desktop/interface/gtk-theme \"'Pocillo'\"", user: "{{user}}"}
     - {cmd: "dbus-launch dconf write /com/solus-project/budgie-panel/dark-theme true", user: "{{user}}"}
+    # user (dock)
+    - {cmd: "dbus-launch dconf write  /net/launchpad/plank/docks/dock1/dock-items '[\"nemo.dockitem\", \"firefox.dockitem\", \"spotify.dockitem\", \"tilix.dockitem\", \"sublime_text.dockitem\", \"clion.dockitem\", \"pycharm.dockitem\", \"unity.dockitem\"]'", user: "{{user}}"}
+    # user (locale)
     - {cmd: "timedatectl set-timezone America/Los_Angeles"}
     - {cmd: "dbus-launch dconf write /system/locale/region '\"en_US.UTF-8\"'", user: "{{user}}"}
     - {cmd: "update-locale LANG='\"en_US.UTF-8\"'"}
