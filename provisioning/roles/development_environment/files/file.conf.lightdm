@@ -1,4 +1,0 @@
-[Seat:*]
-autologin-guest=false
-autologin-user=vagrant
-autologin-user-timeout=0

@@ -1,16 +1,22 @@
 ---
+- name: Get kernel version
+  command: uname -r
+  register: kernel_version
+
+- name: Get ubuntu release name
+  command: lsb_release -c -s
+  register: ubuntu_release_name
+
 - name: Add GPG keys
   apt_key: url={{item}} state=present
   become: true
   with_items:
-    # docker
     - https://download.docker.com/linux/ubuntu/gpg
 
 - name: Add repositories
   apt_repository: state=present repo={{item}}
   become: true
   with_items:
-    # docker
     - deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
 
 - name: Update apt-cache
@@ -22,6 +28,10 @@
   apt:
     state: present 
     pkg:
+      # vbox-guest-additions
+      - build-essential
+      - dkms
+      - linux-headers-{{kernel_version.stdout}}
       # c++
       - g++
       - gcc
@@ -68,35 +78,26 @@
       # zsh
       - zsh
       # user
-      - dconf-editor
-      - fswatch
       - xclip
 
 - name: Install packages via snap
   become: true
   snap: name={{item.name}} classic={{item.classic | default(omit)}} state=present
   with_items:
-    # clion
     - {name: clion, classic: yes}
-    # pycharm
     - {name: pycharm-professional, classic: yes}
-    # spotify
     - {name: spotify, classic: yes}
-    # sublime-text
     - {name: sublime-text, classic: yes}
 
-
-# user
-- name: Create user {{user}}
-  user: name={{user}} password={{password|password_hash('sha512', 'salt')}} create_home=yes state=present shell=/usr/bin/zsh
+- name: Set user "{{ansible_user_id}}" shell to zsh
+  user: name={{ansible_user_id}} state=present shell=/usr/bin/zsh
   become: true
 
-# user
-- name: Add user "{{user}}" to sudoers
+- name: Add user "{{ansible_user_id}}" to sudoers
   become: true
   lineinfile:
-    path: /etc/sudoers.d/{{user}}
-    line: '{{user}} ALL=(ALL) NOPASSWD: ALL'
+    path: /etc/sudoers.d/{{ansible_user_id}}
+    line: '{{ansible_user_id}} ALL=(ALL) NOPASSWD: ALL'
     state: present
     mode: 0440
     create: yes
@@ -107,27 +108,18 @@
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
-    # nodenv
     - {path: /opt/nodenv, state: directory, mode: '777'}
-    # pyenv
     - {path: /opt/pyenv, state: directory, mode: '777'}
-    # unity
     - {path: /opt/unity, state: directory, mode: '777'}
-    # user
-    - {path: "/usr/share/applications", state: directory}
-    - {path: "/home/{{user}}/.oh-my-zsh", owner: "{{user}}", state: directory}
-    - {path: "/home/{{user}}/.zshrc", owner: "{{user}}", state: touch}
-    - {path: "/home/{{user}}/.config/plank/dock1/launchers", owner: "{{user}}", state: directory}
-    - {path: "/home/{{user}}/.config/tilix/schemes", owner: "{{user}}", state: directory}
+    - {path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}", state: directory}
+    - {path: "/home/{{ansible_user_id}}/.zshrc", owner: "{{ansible_user_id}}", state: touch}
 
 - name: Download files
   get_url: url={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}}
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
-    # unity
     - {url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage", mode: '755', path: /opt/unity/UnityHub.AppImage}
-    # kubernetes
     - {url: "https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl", path: /usr/local/bin/kubectl, mode: '755'}
     - {url: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64", path: /usr/local/bin/minikube, mode: '755'}
   
@@ -136,43 +128,18 @@
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
-    # nodenv (order matters)
     - {url: "https://github.com/nodenv/nodenv.git", path: /opt/nodenv}
     - {url: "https://github.com/nodenv/node-build.git", path: /opt/nodenv/plugins/node-build}
-    # pyenv (order matters)
     - {url: "https://github.com/pyenv/pyenv.git", path: /opt/pyenv}
     - {url: "https://github.com/pyenv/pyenv-virtualenv", path: /opt/pyenv/plugins/pyenv-virtualenv}
-    # user (shell)
-    - {url: "https://github.com/ohmyzsh/ohmyzsh.git", path: "/home/{{user}}/.oh-my-zsh", owner: "{{user}}"}
+    - {url: "https://github.com/ohmyzsh/ohmyzsh.git", path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}"}
 
 - name: Copy local files
   copy: src={{item.src}} dest={{item.dest}} owner={{item.owner | default(omit)}} group={{item.group | default(omit)}} mode={{item.mode | default(omit)}}
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
-    # clion
-    - {src: file.dockitem.clion, dest: "/home/{{user}}/.config/plank/dock1/launchers/clion.dockitem", owner: '{{user}}'}
-    # pycharm
-    - {src: file.dockitem.pycharm, dest: "/home/{{user}}/.config/plank/dock1/launchers/pycharm.dockitem", owner: '{{user}}'}
-    # unity
-    - {src: file.png.icon_unity, dest: /opt/unity/unity.png, mode: '644'}
-    - {src: file.desktop.unity, dest: "/usr/share/applications/unity.desktop"}
-    - {src: file.dockitem.unity, dest: "/home/{{user}}/.config/plank/dock1/launchers/unity.dockitem", owner: '{{user}}'}
-    # firefox
-    - {src: file.dockitem.firefox, dest: "/home/{{user}}/.config/plank/dock1/launchers/firefox.dockitem", owner: '{{user}}'}
-    # sublime-text
-    - {src: file.dockitem.sublime_text, dest: "/home/{{user}}/.config/plank/dock1/launchers/sublime_text.dockitem", owner: '{{user}}'}
-    # spotify
-    - {src: file.dockitem.spotify, dest: "/home/{{user}}/.config/plank/dock1/launchers/spotify.dockitem", owner: '{{user}}'}
-    # user (theme)
-    - {src: file.json.theme_tilix, dest: "/home/{{user}}/.config/tilix/schemes/theme_tilix.json", owner: '{{user}}'}
-    # user (shell)
-    - {src: file.zsh-theme.ben, dest: "/home/{{user}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{user}}'}
-    # user (dock)
-    - {src: file.dockitem.nemo, dest: "/home/{{user}}/.config/plank/dock1/launchers/nemo.dockitem", owner: '{{user}}'}
-    - {src: file.dockitem.tilix, dest: "/home/{{user}}/.config/plank/dock1/launchers/tilix.dockitem", owner: '{{user}}'}
-    # user
-    - {src: file.conf.lightdm, dest: "/etc/lightdm/lightdm.conf"}
+    - {src: file.zsh-theme.ben, dest: "/home/{{ansible_user_id}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{ansible_user_id}}'}
 
 
 - name: Add blocks to existing files
@@ -182,43 +149,15 @@
     marker: "# {mark} {{item.src}}"
     block: "{{ lookup('file', '../files/{{item.src}}') }}"
   with_items:
-    # pyenv
-    - {src: block.zshrc.pyenv, dest: "/home/{{user}}/.zshrc"}
-    # nodenv
-    - {src: block.zshrc.nodenv, dest: "/home/{{user}}/.zshrc"}
-    # user (shell)
-    - {src: block.zshrc.ohmyzsh, dest: "/home/{{user}}/.zshrc"}
+    - {src: block.zshrc.pyenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
+    - {src: block.zshrc.nodenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
+    - {src: block.zshrc.ohmyzsh, dest: "/home/{{ansible_user_id}}/.zshrc"}
+    - {src: block.zshrc.xclip, dest: "/home/{{ansible_user_id}}/.zshrc"}
 
-- name: Run commands
-  become: true
-  become_user: "{{item.user | default(omit)}}"
-  command:
-    cmd: "{{item.cmd}}"
-  with_items:
-    # user (theme)
-    - {cmd: "dbus-launch dconf write /org/gnome/desktop/interface/gtk-theme \"'Pocillo'\"", user: "{{user}}"}
-    - {cmd: "dbus-launch dconf write /com/solus-project/budgie-panel/dark-theme true", user: "{{user}}"}
-    # user (dock)
-    - {cmd: "dbus-launch dconf write  /net/launchpad/plank/docks/dock1/dock-items '[\"nemo.dockitem\", \"firefox.dockitem\", \"spotify.dockitem\", \"tilix.dockitem\", \"sublime_text.dockitem\", \"clion.dockitem\", \"pycharm.dockitem\", \"unity.dockitem\"]'", user: "{{user}}"}
-    # user (locale)
-    - {cmd: "timedatectl set-timezone America/Los_Angeles"}
-    - {cmd: "dbus-launch dconf write /system/locale/region '\"en_US.UTF-8\"'", user: "{{user}}"}
-    - {cmd: "update-locale LANG='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_ADDRESS='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_NUMERIC='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_TIME='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_MONETARY='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_PAPER='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_NAME='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_TELEPHONE='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_MEASUREMENT='\"en_US.UTF-8\"'"}
-    - {cmd: "update-locale LC_IDENTIFICATION='\"en_US.UTF-8\"'"}
 
 - name: Start services
   systemd: name={{item}} state=started enabled=yes
   with_items:
-    # docker
     - docker
-    # mdns
     - avahi-daemon
   
