@@ -113,6 +113,7 @@
     - {path: /opt/unity, state: directory, mode: '777'}
     - {path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}", state: directory}
     - {path: "/home/{{ansible_user_id}}/.zshrc", owner: "{{ansible_user_id}}", state: touch}
+    - {path: "/home/{{ansible_user_id}}/source", owner: "{{ansible_user_id}}", state: directory}
 
 - name: Download files
   get_url: url={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}}
@@ -152,7 +153,7 @@
     - {src: block.zshrc.pyenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
     - {src: block.zshrc.nodenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
     - {src: block.zshrc.ohmyzsh, dest: "/home/{{ansible_user_id}}/.zshrc"}
-    - {src: block.zshrc.xclip, dest: "/home/{{ansible_user_id}}/.zshrc"}
+    - {src: block.zshrc.aliases, dest: "/home/{{ansible_user_id}}/.zshrc"}
 
 
 - name: Start services
