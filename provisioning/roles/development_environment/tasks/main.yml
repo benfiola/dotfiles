@@ -36,13 +36,6 @@
       - g++
       - gcc
       - make
-      - bison
-      - flex
-      - libgmp3-dev
-      - libmpfr-dev
-      - libmpc-dev
-      - texinfo
-      - libisl-dev
       - cmake
       # docker
       - docker-ce
@@ -86,6 +79,7 @@
   with_items:
     - {name: clion, classic: yes}
     - {name: pycharm-professional, classic: yes}
+    - {name: goland, classic: yes}
     - {name: spotify, classic: yes}
     - {name: sublime-text, classic: yes}
 
@@ -110,6 +104,7 @@
   with_items:
     - {path: /opt/nodenv, state: directory, mode: '777'}
     - {path: /opt/pyenv, state: directory, mode: '777'}
+    - {path: /opt/goenv, state: directory, mode: '777'}
     - {path: /opt/unity, state: directory, mode: '777'}
     - {path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}", state: directory}
     - {path: "/home/{{ansible_user_id}}/.zshrc", owner: "{{ansible_user_id}}", state: touch}
@@ -129,6 +124,7 @@
   become: true
   become_user: "{{item.owner | default(omit)}}"
   with_items:
+    - {url: "https://github.com/syndbg/goenv.git", path: /opt/goenv}
     - {url: "https://github.com/nodenv/nodenv.git", path: /opt/nodenv}
     - {url: "https://github.com/nodenv/node-build.git", path: /opt/nodenv/plugins/node-build}
     - {url: "https://github.com/pyenv/pyenv.git", path: /opt/pyenv}
@@ -152,6 +148,7 @@
   with_items:
     - {src: block.zshrc.pyenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
     - {src: block.zshrc.nodenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
+    - {src: block.zshrc.goenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
     - {src: block.zshrc.ohmyzsh, dest: "/home/{{ansible_user_id}}/.zshrc"}
     - {src: block.zshrc.aliases, dest: "/home/{{ansible_user_id}}/.zshrc"}
 
