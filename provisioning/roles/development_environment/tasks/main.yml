@@ -82,6 +82,7 @@
     - {name: goland, classic: yes}
     - {name: spotify, classic: yes}
     - {name: sublime-text, classic: yes}
+    - {name: code, classic: yes}
 
 - name: Set user "{{ansible_user_id}}" shell to zsh
   user: name={{ansible_user_id}} state=present shell=/usr/bin/zsh
@@ -106,6 +107,7 @@
     - {path: /opt/pyenv, state: directory, mode: '777'}
     - {path: /opt/goenv, state: directory, mode: '777'}
     - {path: /opt/unity, state: directory, mode: '777'}
+    - {path: /opt/appimaged, state: directory, mode: '777'}
     - {path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}", state: directory}
     - {path: "/home/{{ansible_user_id}}/.zshrc", owner: "{{ansible_user_id}}", state: touch}
     - {path: "/home/{{ansible_user_id}}/source", owner: "{{ansible_user_id}}", state: directory}
@@ -116,6 +118,7 @@
   become_user: "{{item.owner | default(omit)}}"
   with_items:
     - {url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage", mode: '755', path: /opt/unity/UnityHub.AppImage}
+    - {url: "https://github.com/AppImage/appimaged/releases/download/continuous/appimaged-x86_64.AppImage", path: /opt/appimaged/appimaged.AppImage, mode: '755'}
     - {url: "https://storage.googleapis.com/kubernetes-release/release/v1.18.0/bin/linux/amd64/kubectl", path: /usr/local/bin/kubectl, mode: '755'}
     - {url: "https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64", path: /usr/local/bin/minikube, mode: '755'}
   
@@ -158,4 +161,8 @@
   with_items:
     - docker
     - avahi-daemon
+  
+- name: Install appimaged
+  command: "/opt/appimaged/appimaged.AppImage --install"
+  ignore_errors: true
   
