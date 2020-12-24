@@ -1,0 +1,7 @@
+---
+user: "{{ ansible_user_id }}"
+user_home: "/home/{{ ansible_user_id }}"
+shell: "/usr/bin/zsh"
+shell_profile: "{{ user_home }}/.zshrc"
+
+oh_my_zsh_path: "{{ user_home }}/.oh-my-zsh"

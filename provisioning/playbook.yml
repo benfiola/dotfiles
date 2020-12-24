@@ -1,209 +1,29 @@
 ---
 - hosts: 127.0.0.1
   connection: local
-
   vars:
-    kubectl_version: 1.20.1
-    python_version: 3.9.1
-    node_version: 15.4.0
-    go_version: 1.15.6
-    kind_version: 0.9.0
-
-    pyenv_path: "/home/{{ ansible_user_id }}/.pyenv"
-    nodenv_path: "/home/{{ ansible_user_id }}/.nodenv"
-    goenv_path: "/home/{{ ansible_user_id }}/.goenv"
     unity_path: "/opt/unity"
-  
-  tasks:
-  - name: Get kernel version
-    command: uname -r
-    register: kernel_version
-
-  - name: Add GPG keys
-    apt_key: url={{item}} state=present
-    become: true
-    with_items:
-      - https://download.docker.com/linux/ubuntu/gpg
-
-  - name: Add repositories
-    apt_repository: state=present repo={{item}}
-    become: true
-    with_items:
-      - deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
-
-  - name: Update apt-cache
-    apt: update_cache=yes
-    become: true
-
-  - name: Install packages (pkg) via apt
-    become: true
-    apt:
-      state: present 
-      pkg:
-        # vbox-guest-additions
-        - build-essential
-        - dkms
-        - linux-headers-{{kernel_version.stdout}}
-        
-        # c++
-        - g++
-        - gcc
-        - make
-        - cmake
-
-        # docker
-        - docker-ce
-
-        # git
-        - git
-
-        # mdns
-        - avahi-daemon
-
-        # pyenv
-        - make 
-        - build-essential 
-        - libssl-dev 
-        - zlib1g-dev 
-        - libbz2-dev 
-        - libreadline-dev 
-        - libsqlite3-dev 
-        - wget 
-        - curl 
-        - llvm 
-        - libncurses5-dev 
-        - xz-utils 
-        - tk-dev 
-        - libxml2-dev 
-        - libxmlsec1-dev 
-        - libffi-dev 
-        - liblzma-dev
-
-        # qemu
-        - qemu-kvm 
-        - libvirt-daemon-system 
-        - libvirt-clients 
-        - bridge-utils
-
-        # vim
-        - vim
-
-        # zsh
-        - zsh
-
-        # user
-        - xclip
-
-  - name: Install packages via snap
-    become: true
-    snap: name={{item.name}} classic={{item.classic | default(omit)}} state=present
-    with_items:
-      - {name: clion, classic: yes}
-      - {name: pycharm-professional, classic: yes}
-      - {name: goland, classic: yes}
-      - {name: spotify, classic: yes}
-      - {name: sublime-text, classic: yes}
-      - {name: code, classic: yes}
-
-  - name: Set user "{{ansible_user_id}}" shell to zsh
-    user: name={{ansible_user_id}} state=present shell=/usr/bin/zsh
-    become: true
-
-  - name: Add user "{{ansible_user_id}}" to sudoers
-    become: true
-    lineinfile:
-      path: /etc/sudoers.d/{{ansible_user_id}}
-      line: '{{ansible_user_id}} ALL=(ALL) NOPASSWD: ALL'
-      state: present
-      mode: 0440
-      create: yes
-      validate: 'visudo -cf %s'
-
-  - name: Create folders and files
-    file: path={{item.path}} state={{item.state}} mode={{item.mode | default(omit)}} owner={{item.owner | default(omit)}} group={{item.group | default(omit)}} 
-    become: true
-    become_user: "{{item.owner | default(omit)}}"
-    with_items:
-      - {path: "{{ nodenv_path }}", state: directory, mode: '777'}
-      - {path: "{{ pyenv_path }}", state: directory, mode: '777'}
-      - {path: "{{ goenv_path }}", state: directory, mode: '777'}
-      - {path: "{{ unity_path }}", state: directory, mode: '777'}
-      - {path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}", state: directory}
-      - {path: "/home/{{ansible_user_id}}/.zshrc", owner: "{{ansible_user_id}}", state: touch}
-      - {path: "/home/{{ansible_user_id}}/source", owner: "{{ansible_user_id}}", state: directory}
-
-  - name: Download files
-    get_url: url={{item.url}} dest={{item.path}} mode={{item.mode | default(omit)}}
-    become: true
-    become_user: "{{item.owner | default(omit)}}"
-    with_items:
-      - {url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage", mode: '755', path: "{{ unity_path }}/UnityHub.AppImage"}
-      - {url: "https://github.com/AppImage/appimaged/releases/download/continuous/appimaged-x86_64.AppImage", path: "/tmp/appimaged.AppImage", mode: '755'}
-      - {url: "https://storage.googleapis.com/kubernetes-release/release/v{{ kubectl_version }}/bin/linux/amd64/kubectl", path: /usr/local/bin/kubectl, mode: '755'}
-    
-  - name: Clone repositories
-    git: repo={{item.url}} dest={{item.path}}
-    become: true
-    become_user: "{{item.owner | default(omit)}}"
-    with_items:
-      - {url: "https://github.com/syndbg/goenv.git", path: "{{ goenv_path }}"}
-      - {url: "https://github.com/nodenv/nodenv.git", path: "{{ nodenv_path }}"}
-      - {url: "https://github.com/nodenv/node-build.git", path: "{{ nodenv_path }}/plugins/node-build"}
-      - {url: "https://github.com/pyenv/pyenv.git", path: "{{ pyenv_path }}"}
-      - {url: "https://github.com/pyenv/pyenv-virtualenv", path: "{{ pyenv_path }}/plugins/pyenv-virtualenv"}
-      - {url: "https://github.com/ohmyzsh/ohmyzsh.git", path: "/home/{{ansible_user_id}}/.oh-my-zsh", owner: "{{ansible_user_id}}"}
-
-  - name: Copy local files
-    copy: src={{item.src}} dest={{item.dest}} owner={{item.owner | default(omit)}} group={{item.group | default(omit)}} mode={{item.mode | default(omit)}}
-    become: true
-    become_user: "{{item.owner | default(omit)}}"
-    with_items:
-      - {src: files/file.zsh-theme.ben, dest: "/home/{{ansible_user_id}}/.oh-my-zsh/themes/ben.zsh-theme", owner: '{{ansible_user_id}}'}
-
-
-  - name: Add blocks to existing files
-    become: true
-    blockinfile:
-      path: "{{item.dest}}"
-      marker: "# {mark} {{item.src}}"
-      block: "{{ lookup('file', '../files/{{item.src}}') }}"
-    with_items:
-      - {src: block.zshrc.pyenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
-      - {src: block.zshrc.nodenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
-      - {src: block.zshrc.goenv, dest: "/home/{{ansible_user_id}}/.zshrc"}
-      - {src: block.zshrc.ohmyzsh, dest: "/home/{{ansible_user_id}}/.zshrc"}
-      - {src: block.zshrc.aliases, dest: "/home/{{ansible_user_id}}/.zshrc"}
-
-
-  - name: Start services
-    systemd: name={{item}} state=started enabled=yes
-    with_items:
-      - docker
-      - avahi-daemon
-    
-  - name: Install appimaged
-    command: 
-      cmd: "/tmp/appimaged.AppImage --install"
-      creates: "/home/{{ ansible_user_id }}/.local/bin/appimaged"
-  
-  - name: Install programming languages
-    become_user: "{{ ansible_user_id }}"
-    shell: 
-      cmd: "{{ item.cmd }}"
-      creates: "{{ item.creates | default(omit) }}"
-      executable: "/usr/bin/zsh"
-    args:
-    with_items:
-      - {cmd: "source /home/{{ ansible_user_id }}/.zshrc && pyenv install {{ python_version }}", creates: "{{ pyenv_path }}/versions/{{ python_version }}"}
-      - {cmd: "source /home/{{ ansible_user_id }}/.zshrc &&  pyenv global {{ python_version }}"}
-      - {cmd: "source /home/{{ ansible_user_id }}/.zshrc &&  goenv install {{ go_version }}", creates: "{{ goenv_path }}/versions/{{ go_version }}"}
-      - {cmd: "source /home/{{ ansible_user_id }}/.zshrc &&  goenv global {{ go_version }}"}
-      - {cmd: "source /home/{{ ansible_user_id }}/.zshrc &&  nodenv install {{ node_version }}", creates: "{{ nodenv_path }}/versions/{{ node_version }}"}
-      - {cmd: "source /home/{{ ansible_user_id }}/.zshrc && nodenv global {{ node_version }}"}
-
-  - name: Install kind
-    shell: 
-      cmd: "source /home/{{ ansible_user_id }}/.zshrc &&  env GO111MODULE=on go get sigs.k8s.io/kind@v{{ kind_version }}"
-      creates: "/home/{{ ansible_user_id }}/go/{{ go_version }}/bin/kind"
-      executable: "/usr/bin/zsh"
-
+  roles:
+    - appimaged
+    - c++
+    - clion
+    - docker
+    - git
+    - go
+    - goenv
+    - goland
+    - kind
+    - kubectl
+    - mdns
+    - node
+    - nodenv
+    - pycharm
+    - pyenv
+    - python
+    - qemu
+    - spotify
+    - sublime_text
+    - unity_hub
+    - user
+    - vbox_guest_additions
+    - vs_code

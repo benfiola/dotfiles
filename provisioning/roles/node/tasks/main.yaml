@@ -1,0 +1,26 @@
+---
+- name: Install node-{{ node_version }}
+  become: true
+  become_user: "{{ user }}"
+  shell: 
+    cmd: "{{ shell }} -i -c 'nodenv install {{ node_version }}'"
+    creates: "{{ nodenv_path }}/versions/{{ node_version }}"
+
+
+- name: Set node-{{ node_version }} as system node
+  become: true
+  become_user: "{{ user }}"
+  shell: 
+    cmd: "{{ shell }} -i -c 'nodenv global {{ node_version }}'"
+
+- name: Find node executable
+  become: true
+  become_user: "{{ user }}"
+  shell:
+    cmd: "{{ shell }} -i -c 'nodenv which node'"
+  register: node_executable
+
+- name: Set facts
+  set_fact:
+    node_version: "{{ node_version }}"
+    node_executable: "{{ node_executable.stdout_lines[0] }}"

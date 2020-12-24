@@ -1,0 +1,2 @@
+---
+pyenv_path: "{{ user_home }}/.pyenv"

@@ -1,0 +1,17 @@
+---
+- name: "Update apt-cache"
+  apt: update_cache=yes
+  become: true
+
+- name: "Install apt packages"
+  become: true
+  apt:
+    state: present 
+    pkg:
+      - avahi-daemon
+
+- name: "Start {{ service }}.service"
+  become: true
+  systemd: name={{ service }} state=started enabled=yes
+  vars:
+    service: avahi-daemon

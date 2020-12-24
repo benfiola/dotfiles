@@ -1,0 +1,89 @@
+---
+- name: "Update apt-cache"
+  apt: update_cache=yes
+  become: true
+
+- name: "Install apt packages"
+  become: true
+  apt:
+    state: present 
+    pkg:
+      - vim
+      - zsh
+      - xclip
+
+- name: "Set '{{ user }}' shell to {{ shell }}"
+  user: name={{ user }} state=present shell={{ shell }}
+  become: true
+
+- name: "Create {{ path }} to add {{ user }} to sudoers"
+  become: true
+  lineinfile:
+    path: "{{ path }}"
+    line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+  vars:
+    path: "/etc/sudoers.d/{{ user }}"
+
+- name: "Create {{ path }}"
+  file: path={{ path }} state=directory recurse=true owner={{ user }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    path: "{{ user_home }}/source"
+
+- name: "Create {{ path }}"
+  file: path={{ path }} state=directory recurse=true owner={{ user }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    path: "{{ oh_my_zsh_path }}"
+
+- name: "Clone {{ source }} to {{ destination }}"
+  git: repo={{ source }} dest={{ destination }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    source: https://github.com/ohmyzsh/ohmyzsh.git
+    destination: "{{ oh_my_zsh_path }}"
+
+- name: "Copy {{ source }} to {{ destination }}"
+  copy: src={{ source }} dest={{ destination }} owner={{ user }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    source: "files/ben.zsh-theme"
+    destination: "{{ oh_my_zsh_path }}/themes/ben.zsh-theme"
+
+- name: "Create {{ path }}"
+  file: path={{ path }} state=touch owner={{ user }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    path: "{{ shell_profile }}"
+
+- name: "Add {{ file }} to {{ shell_profile }}"
+  blockinfile:
+    dest: "{{ shell_profile }}"
+    block: "{{ lookup('file', '{{ file }}') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
+  vars:
+    file: files/ohmyzsh.zshrc
+
+- name: "Add {{ file }} to {{ shell_profile }}"
+  blockinfile:
+    dest: "{{ shell_profile }}"
+    block: "{{ lookup('file', '{{ file }}') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
+  vars:
+    file: files/aliases.zshrc
+
+- name: "Set facts"
+  set_fact:
+    user: "{{ user }}"
+    user_home: "{{ user_home }}"
+    shell: "{{ shell }}"
+    shell_profile: "{{ shell_profile }}"
