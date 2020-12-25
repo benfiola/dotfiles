@@ -25,5 +25,5 @@
     - sublime_text
     - unity_hub
     - user
-    - vbox_guest_additions
+    # - vbox_guest_additions
     - vs_code
