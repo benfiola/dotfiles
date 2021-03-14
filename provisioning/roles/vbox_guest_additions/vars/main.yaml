@@ -1,3 +1,0 @@
----
-vbox_guest_additions_device: "/dev/cdrom"
-vbox_guest_additions_mount_point: "/mnt/cdrom"

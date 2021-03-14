@@ -1,19 +1,18 @@
 ---
+- block:
+  - name: "Create {{ unity_hub_editors_path }}"
+    file: path={{ unity_hub_editors_path }} state=directory recurse=true owner={{ user }} mode=777
+    become: true
 
-- name: "Create {{ path }}"
-  file: path={{ path }} state=directory recurse=true owner={{ user }} mode=777
-  become: true
+  - name: Download {{ unity_hub_url }} to {{ unity_hub_path }}
+    get_url: url={{ unity_hub_url }} dest={{ unity_hub_path }} mode=755
+    become: true
+
+  - name: Set facts
+    set_fact:
+      unity_hub_path: "{{ unity_hub_path }}"
+      unity_hub_editors_path: "{{ unity_hub_editors_path }}"
   vars:
-    path: "{{ unity_hub_editors_path }}"
-
-- name: Download {{ source }} to {{ destination }}
-  get_url: url={{ source }} dest={{ destination }} mode=755
-  become: true
-  vars:
-    source: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage"
-    destination: "{{ unity_hub_path }}"
-
-- name: Set facts
-  set_fact:
     unity_hub_path: "{{ unity_hub_path }}"
     unity_hub_editors_path: "{{ unity_hub_editors_path }}"
+    unity_hub_url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage"
