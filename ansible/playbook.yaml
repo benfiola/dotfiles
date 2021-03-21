@@ -1,0 +1,22 @@
+---
+- hosts: local_vm
+  roles:
+    - asdf
+    - asdf-golang
+    - asdf-kind
+    - asdf-kubectl
+    - asdf-nodejs
+    - asdf-python
+    - asdf-sops
+    - asdf-tilt
+    - c++
+    - clion
+    - ctlptl
+    - docker
+    - git
+    - goland
+    - mdns
+    - pycharm
+    - qemu
+    - user
+    - vs_code

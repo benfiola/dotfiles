@@ -1,0 +1,4 @@
+all:
+  hosts:
+    local_vm:
+      ansible_connection: local
