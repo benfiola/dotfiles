@@ -27,6 +27,7 @@
     become: true
     become_user: "{{ user }}"
     blockinfile:
+      creates: true
       dest: "{{ gpg_agent_conf }}"
       block: "{{ lookup('file', '{{ file }}') }}"
       marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
@@ -38,6 +39,7 @@
     become: true
     become_user: "{{ user }}"
     blockinfile:
+      creates: true
       dest: "{{ scdaemon_conf }}"
       block: "{{ lookup('file', '{{ file }}') }}"
       marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
