@@ -1,5 +1,5 @@
 ---
-- hosts: local_vm
+- hosts: all
   roles:
     - asdf
     - asdf-golang
