@@ -1,0 +1,4 @@
+---
+username: "{{ ansible_user_id }}"
+git_config_user_name: "Ben Fiola"
+git_config_user_email: "benfiola@gmail.com"

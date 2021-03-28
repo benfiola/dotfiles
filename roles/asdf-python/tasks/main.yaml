@@ -1,42 +1,37 @@
 ---
-- block:
-  - name: get asdf plugin list
-    become: true
-    become_user: "{{ user }}"
-    command: 
-      cmd: "{{ executable }} plugin list"
-    register: asdf_plugin_list
-    failed_when: asdf_plugin_list.rc != 0 and 'No plugins installed' not in asdf_plugin_list.stderr
+- name: "({{ username }}) Get user information"
+  become: true
+  user:
+    name: "{{ username }}"
+  register: user
 
-  - name: Install asdf-{{ plugin }}
-    become: true
-    become_user: "{{ user }}"
-    command:
-      cmd: "{{ executable }} plugin add {{ plugin }}"
-    when: "plugin not in asdf_plugin_list.stdout"
+- name: "({{ user.name }}) Get asdf executable"
+  set_fact:
+    asdf_executable: "{{ user.home }}/.asdf/bin/asdf"
+
+- name: "({{ user.name }}) Check if asdf executable exists"
+  become: true
+  become_user: "{{ user.name }}"
+  stat:
+    path: "{{ asdf_executable }}"
+  register: asdf_executable_stat
+
+- fail:
+    msg: "asdf executabhle not found"
+  when: 'not asdf_executable_stat.stat.exists'
+
+- name: "({{ user.name }}) Get asdf plugin list"
+  become: true
+  become_user: "{{ user.name }}"
+  command: 
+    cmd: "{{ asdf_executable }} plugin list"
+  register: asdf_plugin_list
+  failed_when: asdf_plugin_list.rc != 0 and 'No plugins installed' not in asdf_plugin_list.stderr
+
+- name: ({{ user.name }}) Install plugin
+  become: true
+  become_user: "{{ user.name }}"
+  command:
+    cmd: "{{ asdf_executable }} plugin add python"
+  when: "'python' not in asdf_plugin_list.stdout"
   
-  - name: Install python build dependencies
-    become: true
-    apt:
-      state: present 
-      pkg:
-      - make
-      - build-essential
-      - libssl-dev 
-      - zlib1g-dev
-      - libbz2-dev
-      - libreadline-dev
-      - libsqlite3-dev
-      - wget
-      - curl
-      - llvm
-      - libncurses5-dev
-      - xz-utils
-      - tk-dev
-      - libxml2-dev
-      - libxmlsec1-dev
-      - libffi-dev
-      - liblzma-dev
-  vars:
-    executable: "{{ asdf_path }}/bin/asdf"
-    plugin: python

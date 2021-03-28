@@ -1,67 +1,67 @@
 ---
-- block:
-  - name: "Update apt-cache"
-    apt: update_cache=yes
-    become: true
+- name: "({{ username }}) Get user"
+  user:
+    name: "{{ username }}"
+  register: user
 
-  - name: "Install apt packages"
-    become: true
-    apt:
-      state: present 
-      pkg:
-        - gpg
-        - scdaemon
-        - pcscd
-    
-  - name: "Add {{ file }} to {{ shell_profile }}"
-    become: true
-    become_user: "{{ user }}"
-    blockinfile:
-      dest: "{{ shell_profile }}"
-      block: "{{ lookup('file', '{{ file }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
-    vars:
-      file: files/gpg.zshrc
-  
-  - name: "Add {{ file }} to {{ gpg_agent_conf }}"
-    become: true
-    become_user: "{{ user }}"
-    blockinfile:
-      create: true
-      dest: "{{ gpg_agent_conf }}"
-      block: "{{ lookup('file', '{{ file }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
-    vars:
-      file: files/gpg-agent.conf
-      gpg_agent_conf: "{{ gpg_home_dir }}/gpg-agent.conf" 
-
-  - name: "Add {{ file }} to {{ scdaemon_conf }}"
-    become: true
-    become_user: "{{ user }}"
-    blockinfile:
-      create: true
-      dest: "{{ scdaemon_conf }}"
-      block: "{{ lookup('file', '{{ file }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
-    vars:
-      file: files/scdaemon.conf
-      scdaemon_conf: "{{ gpg_home_dir }}/scdaemon.conf" 
-  
-  - name: "Restart pcscd.service"
-    become: true
-    service:
-      name: pcscd
-      enabled: true
-      state: restarted
-  
-  - name: "Restart gpg-agent.service"
-    become: true
-    become_user: "{{ user }}"
-    systemd:
-      name: gpg-agent
-      scope: user
-      enabled: true
-      state: restarted
-    when: ansible_user == user
+- name: "({{ user.name }}) Get shell profile"
   vars:
-    gpg_home_dir: "{{ user_home }}/.gnupg"
+    shell: "{{ user.shell | basename }}"
+    shell_map:
+      bash: "{{ user.home }}/.bashrc"
+      zsh: "{{ user.home }}/.zshrc"
+  set_fact:
+    shell_profile: "{{ shell_map[shell] }}"
+
+- name: "Install apt packages"
+  become: true
+  apt:
+    state: present 
+    update_cache: true
+    pkg:
+      - gpg
+      - scdaemon
+      - pcscd
+
+- name: "({{ user.name }}) Update shell profile"
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    dest: "{{ shell_profile }}"
+    block: "{{ lookup('file', 'files/gpg.zshrc') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}"
+  
+- name: "({{ user.name }}) Create gpg-agent.conf"
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    create: true
+    dest: "{{ user.home }}/.gnupg/gpg-agent.conf"
+    block: "{{ lookup('file', 'files/gpg-agent.conf') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}"
+
+- name: "({{ user.name }}) Create scdaemon.conf"
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    create: true
+    dest: "{{ user.home }}/.gnupg/scdaemon.conf"
+    block: "{{ lookup('file', 'files/scdaemon.conf') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}"
+
+- name: "Restart pcscd.service"
+  become: true
+  service:
+    name: pcscd
+    enabled: true
+    state: restarted
+
+- name: "({{ user.name }}) Restart gpg-agent.service"
+  become: true
+  become_user: "{{ user.name }}"
+  systemd:
+    name: gpg-agent
+    scope: user
+    enabled: true
+    state: restarted
+  when: ansible_user_id == user.name

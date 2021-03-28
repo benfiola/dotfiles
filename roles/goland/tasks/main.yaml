@@ -1,5 +1,7 @@
 ---
-- block:
-  - name: "Install snap apps"
-    become: true
-    snap: name=goland classic=yes state=present
+- name: "Install snap app"
+  become: true
+  snap: 
+    name: "goland"
+    classic: yes
+    state: present

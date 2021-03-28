@@ -1,15 +1,11 @@
 ---
-- block:
-  - name: "Update apt-cache"
-    apt: update_cache=yes
-    become: true
-
-  - name: "Install apt packages"
-    become: true
-    apt:
-      state: present 
-      pkg:
-        - qemu-kvm 
-        - libvirt-daemon-system 
-        - libvirt-clients 
-        - bridge-utils
+- name: "Install apt packages"
+  become: true
+  apt:
+    state: present 
+    pkg:      
+      - qemu-kvm 
+      - libvirt-daemon-system 
+      - libvirt-clients 
+      - bridge-utils
+    update_cache: true

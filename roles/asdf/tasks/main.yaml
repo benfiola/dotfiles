@@ -1,45 +1,41 @@
 ---
-- block:
-  - name: Update apt-cache
-    apt: update_cache=yes
-    become: true
+- name: "({{ username }}) Get user information"
+  user:
+    name: "{{ username }}"
+  register: user
 
-  - name: Install apt packages
-    become: true
-    apt:
-      state: present 
-      pkg:
-        - curl
-
-  - name: "Create {{ path }}"
-    file: path={{ path }} state=directory recurse=true owner={{ user }}
-    become: true
-    become_user: "{{ user }}"
-    vars:
-      path: "{{ asdf_path }}"
-
-  - name: "Clone {{ source }} to {{ destination }}"
-    git: repo={{ source }} dest={{ destination }}
-    become: true
-    become_user: "{{ user }}"
-    vars:
-      source: https://github.com/asdf-vm/asdf.git
-      destination: "{{ asdf_path }}"
-
-  - name: "Add {{ template }} to {{ shell_profile }}"
-    become: true
-    become_user: "{{ user }}"
-    blockinfile:
-      dest: "{{ shell_profile }}"
-      block: "{{ lookup('template', '{{ template }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
-    vars:
-      template: templates/asdf.zshrc.j2
-      path: "{{ asdf_path }}"
-
-  - name: Set facts
-    set_fact:
-      asdf_path: "{{ asdf_path }}"
+- name: "({{ user.name }}) Get shell profile path"
   vars:
-    asdf_path: "{{ user_home }}/.asdf"
+    shell: "{{ user.shell | basename }}"
+    shell_map:
+      bash: "{{ user.home }}/.bashrc"
+      zsh: "{{ user.home }}/.zshrc"
+  set_fact:
+    shell_profile: "{{ shell_map[shell] }}"
+
+- name: Install apt packages
+  become: true
+  apt:
+    state: present
+    update_cache: true 
+    pkg:
+      - curl
+      - git
+
+- name: "({{ user.name }}) Clone asdf repositroy"
+  become: true
+  become_user: "{{ user.name }}"
+  git: 
+    repo: "https://github.com/asdf-vm/asdf.git"
+    dest: "{{ user.home }}/.asdf"
+
+- name: "({{ user.name }}) Update shell profile"
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    dest: "{{ shell_profile }}"
+    block: "{{ lookup('template', 'templates/asdf.zshrc.j2') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}"
+  vars:
+    asdf_path: "{{ user.home }}/.asdf"
   

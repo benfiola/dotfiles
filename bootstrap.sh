@@ -7,15 +7,14 @@ sudo -S apt install -y git ansible curl
 
 # run prep playbook
 prep_playbook="https://raw.githubusercontent.com/benfiola/development_environment/master/prep.yaml"
-username="ansible"
 directory="$(mktemp -d)"
+
 # delete $directory - git clone will fail if the directory exists
 rm -rf "$directory"
 echo "running prep playbook"
 echo "playbook: $prep_playbook"
-echo "username: $username"
 echo "directory: $directory"
-curl -sSL "$prep_playbook" | ansible-playbook -i localhost, -c local --extra-vars "username=$username directory=$directory" /dev/stdin
+curl -sSL "$prep_playbook" | ansible-playbook -i localhost, -c local --extra-vars "directory=$directory" /dev/stdin
 
 # run main playbook
 main_playbook="$directory/main.yaml"

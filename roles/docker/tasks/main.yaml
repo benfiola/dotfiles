@@ -1,26 +1,28 @@
 ---
-- block:
-  - name: "Add apt repository GPG keys"
-    apt_key: url=https://download.docker.com/linux/ubuntu/gpg state=present
-    become: true
-    
-  - name: "Add apt repository"
-    apt_repository: state=present repo="deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-    become: true
+- name: "Add apt repository GPG keys"
+  become: true
+  apt_key: 
+    url: https://download.docker.com/linux/ubuntu/gpg 
+    state: present
+  
+- name: "Add apt repository"
+  become: true
+  apt_repository: 
+    state: present
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 
-  - name: "Update apt-cache"
-    apt: update_cache=yes
-    become: true
-
-  - name: "Install apt packages"
-    become: true
-    apt:
-      state: present 
-      pkg:
-        - docker-ce
-    
-  - name: "Start docker.service"
-    become: true
-    systemd: name=docker state=started enabled=yes
-    vars:
-      service: docker
+- name: "Install apt packages"
+  become: true
+  apt:
+    update_cache: true
+    state: present 
+    pkg:
+      - docker-ce
+  
+- name: "Start service"
+  become: true
+  systemd: 
+    name: docker
+    state: started
+    enabled: true
+  
