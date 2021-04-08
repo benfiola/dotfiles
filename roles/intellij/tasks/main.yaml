@@ -1,0 +1,7 @@
+---
+- name: "Install snap app"
+  become: true
+  snap: 
+    name: "intellij-idea-ultimate"
+    classic: yes
+    state: present
