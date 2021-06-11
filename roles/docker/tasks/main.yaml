@@ -18,7 +18,20 @@
     state: present 
     pkg:
       - docker-ce
-  
+
+- name: Add group
+  become: true
+  group:
+    name: docker
+    state: present
+
+- name: Add user to group
+  become: true
+  user:
+    name: "{{ username }}"
+    groups: docker
+    append: true
+
 - name: "Start service"
   become: true
   systemd: 
