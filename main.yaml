@@ -6,11 +6,13 @@
     - asdf-gcloud
     - asdf-golang
     - asdf-java
+    - asdf-jb
     - asdf-kind
     - asdf-kubectl
     - asdf-nodejs
     - asdf-python
     - asdf-sops
+    - asdf-tanka
     - asdf-tilt
     - c++
     - clion
