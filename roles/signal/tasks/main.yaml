@@ -1,0 +1,6 @@
+---
+- name: "Install snap app"
+  become: true
+  snap: 
+    name: signal-desktop
+    state: present
