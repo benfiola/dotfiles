@@ -28,6 +28,12 @@
   register: asdf_plugin_list
   failed_when: asdf_plugin_list.rc != 0 and 'No plugins installed' not in asdf_plugin_list.stderr
 
+- name: Install build dependencies
+  become: true
+  apt:
+    name: "{{ apt_packages }}"
+    state: present
+
 - name: ({{ user.name }}) Install plugin
   become: true
   become_user: "{{ user.name }}"
