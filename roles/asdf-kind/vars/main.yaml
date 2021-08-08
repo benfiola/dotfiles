@@ -1,2 +1,1 @@
----
-username: "{{ ansible_user_id }}"
+asdf_kind_plugin: kind

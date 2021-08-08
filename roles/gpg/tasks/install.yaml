@@ -1,0 +1,55 @@
+---
+- name: install | install apt packages
+  become: true
+  apt:
+    state: present 
+    pkg: "{{gpg_apt_packages}}"
+
+- name: install | update shell profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    dest: "{{user_profile}}"
+    block: "{{lookup('template', 'templates/profile.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+  
+- name: install | create gpg-agent conf
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    create: true
+    dest: "{{user_home}}/.gnupg/gpg-agent.conf"
+    block: "{{lookup('template', 'templates/gpg-agent.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+  notify:
+  - handlers | restart pcscd
+  - handlers | restart gpg agent
+
+- name: install | create scdaemon conf
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    create: true
+    dest: "{{user_home}}/.gnupg/scdaemon.conf"
+    block: "{{lookup('template', 'templates/scdaemon.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+  register: gpg_scdaemon_conf
+  notify:
+  - handlers | restart pcscd service
+  - handlers | restart gpg agent service
+
+- name: install | start pcscd service 
+  become: true
+  service:
+    name: pcscd
+    enabled: true
+    state: started
+
+- name: install | start gpg agent service
+  become: true
+  become_user: "{{user_name}}"
+  systemd:
+    name: gpg-agent
+    scope: user
+    enabled: true
+    state: started

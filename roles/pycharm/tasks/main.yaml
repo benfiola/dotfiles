@@ -1,7 +1,0 @@
----
-- name: "Install snap app"
-  become: true
-  snap: 
-    name: "pycharm-professional"
-    classic: yes
-    state: present

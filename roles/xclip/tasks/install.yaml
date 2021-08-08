@@ -1,0 +1,16 @@
+---
+- name: install | install apt packages
+  become: true
+  apt:
+    pkg: "{{xclip_apt_packages}}"
+    state: present
+
+- name: install | add copy alias to profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    create: true
+    dest: "{{user_profile}}"
+    block: "{{lookup('template', 'templates/alias_copy.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+    owner: "{{user_name}}"

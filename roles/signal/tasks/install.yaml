@@ -1,0 +1,6 @@
+- name: install | install snap app
+  become: true
+  snap: 
+    name: "{{signal_snap_app}}"
+    classic: true
+    state: present

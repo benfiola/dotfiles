@@ -1,2 +1,6 @@
 ---
-username: "{{ ansible_user_id }}"
+docker_apt_keys_url: https://download.docker.com/linux/ubuntu/gpg 
+docker_apt_packages: [docker-ce]
+docker_apt_repository: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+docker_group_name: docker
+docker_service_name: docker

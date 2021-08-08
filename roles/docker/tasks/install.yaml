@@ -1,0 +1,47 @@
+---
+- name: install | add gpg keys
+  become: true
+  apt_key: 
+    url: "{{docker_apt_keys_url}}"
+    state: present
+  register: docker_apt_keys
+  
+- name: install | add apt repository
+  become: true
+  apt_repository: 
+    state: present
+    repo: "{{docker_apt_repository}}"
+  register: docker_apt_repository
+
+- name: install | update apt cache
+  become: true
+  apt:
+    update_cache: true
+  when: docker_apt_keys.changed or docker_apt_repository.changed
+
+- name: install | install apt packages
+  become: true
+  apt:
+    pkg: "{{docker_apt_packages}}"
+    state: present 
+
+- name: install | create system group
+  become: true
+  group:
+    name: "{{docker_group_name}}"
+    state: present
+
+- name: install | add user to system group
+  become: true
+  user:
+    name: "{{user_name}}"
+    groups: "{{docker_group_name}}"
+    append: true
+
+- name: install | start service
+  become: true
+  systemd: 
+    name: "{{docker_service_name}}"
+    state: started
+    enabled: true
+  

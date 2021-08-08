@@ -1,28 +1,36 @@
 #!/bin/bash
 set -e 
 
-# install dependencies
-sudo -S apt update
-sudo -S apt install -y git ansible curl
-
-# run prep playbook
-prep_playbook="https://raw.githubusercontent.com/benfiola/development_environment/master/prep.yaml"
+cwd="$(pwd)"
 directory="$(mktemp -d)"
-
-# delete $directory - git clone will fail if the directory exists
-rm -rf "$directory"
-echo "running prep playbook"
-echo "playbook: $prep_playbook"
-echo "directory: $directory"
-curl -sSL "$prep_playbook" | ansible-playbook -i localhost, -c local --extra-vars "directory=$directory" /dev/stdin
-
-# run main playbook
 main_playbook="$directory/main.yaml"
-inventory="$directory/inventory.yaml"
-echo "running main playbook"
-echo "playbook: $main_playbook"
-echo "inventory: $inventory"
-ansible-playbook -u ansible -i "$inventory" "$main_playbook"
+repo_url="https://github.com/benfiola/development_environment.git"
 
-# clean up if successful
-sudo rm -rf "$directory"
+cleanup() {
+    if [ -d "$directory" ]; then
+        rm -rf "$directory"
+    fi
+    cd "$cwd"
+}
+trap "cleanup" exit;
+
+# install dependencies
+echo "installing dependencies"
+sudo -S apt-get -y update > /dev/null
+sudo -S apt-get -y install git ansible curl > /dev/null
+
+# clone repository
+echo "cloning $repo_url -> $directory"
+rm -rf "$directory"
+git clone -q "$repo_url" "$directory" > /dev/null
+
+# ensure main playbook exists
+if [ ! -f "$main_playbook" ]; then
+    1>&2 echo "error: file not found: $main_playbook"
+    exit 1
+fi
+
+# run playbook
+echo "running playbook: $main_playbook"
+cd "$directory"
+ansible-playbook "$main_playbook"

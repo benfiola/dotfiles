@@ -1,0 +1,29 @@
+- name: install | install apt packages
+  become: true
+  apt:
+    state: present
+    pkg: "{{asdf_apt_packages}}"
+
+- name: install | set asdf_home fact
+  set_fact:
+    asdf_path: "{{user_home}}/.asdf"
+
+- name: install | set asdf_executable fact
+  set_fact:
+    asdf_executable: "{{asdf_path}}/bin/asdf"
+
+- name: install | clone asdf repository
+  become: true
+  become_user: "{{user_name}}"
+  git: 
+    repo: "{{asdf_git_url}}"
+    dest: "{{asdf_path}}"
+
+- name: install | update profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    dest: "{{user_profile}}"
+    block: "{{lookup('template', 'templates/profile.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+  

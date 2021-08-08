@@ -1,0 +1,32 @@
+---
+- name: install | install apt packages
+  become: true
+  apt:
+    state: present 
+    pkg: "{{ohmyzsh_apt_packages}}"
+  
+- name: install | clone repository
+  become: true
+  become_user: "{{user_name}}"
+  git: 
+    repo: "{{ohmyzsh_repo_url}}" 
+    dest: "{{ohmyzsh_path}}"
+
+- name: install | create theme
+  become: true
+  become_user: "{{user_name}}"
+  copy: 
+    content: "{{lookup('template', 'templates/theme.j2')}}"
+    dest: "{{ohmyzsh_path}}/custom/themes/theme.zsh-theme"
+    remote_src: true
+    owner: "{{user_name}}"
+
+- name: install | update profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    create: true
+    owner: "{{user_name}}"
+    dest: "{{user_profile}}"
+    block: "{{lookup('template', 'templates/profile.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
