@@ -71,5 +71,24 @@
     create: true
     dest: "{{user_profile}}"
     block: "{{lookup('template', 'templates/alias_src.j2')}}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}} templates/alias_src.j2"
     owner: "{{user_name}}"
+
+
+- name: create | add python commands to profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    create: true
+    dest: "{{user_profile}}"
+    block: "{{lookup('template', item)}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}} {{item}}"
+    owner: "{{user_name}}"
+  loop:
+  - templates/cmd_mkpy.j2
+  - templates/cmd_mkpyve.j2
+  - templates/cmd_rmpyve.j2
+  - templates/cmd_lspyve.j2
+  - templates/cmd_usepyve.j2
+  vars:
+    venv_home: "{{user_home}}/.virtualenvs"

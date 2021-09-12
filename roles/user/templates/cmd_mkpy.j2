@@ -1,0 +1,31 @@
+mkpy() {    
+    usage() {
+        echo "mkpy <version>";
+    }
+
+    # validate args
+    version="$1"
+    if [ "$version" = "" ]; then
+        1>&2 echo "error: version unset"
+        usage
+        return
+    fi
+
+    # ensure asdf is installed
+    command -v asdf 2>&1 > /dev/null 
+    has_asdf="$?"
+    if [ ! "$has_asdf" = "0" ]; then
+        1>&2 echo "error: command not found: asdf"
+        return
+    fi
+
+    # ensure python plugin installed
+    has_plugin="$(asdf plugin list | grep "^python$")"
+    if [ "$has_plugin" = "" ]; then
+        1>&2 echo "error: asdf plugin not found: python"
+        return
+    fi
+
+    # install python version
+    asdf install python "$version" > /dev/null
+}

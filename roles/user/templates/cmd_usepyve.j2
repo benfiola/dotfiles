@@ -1,0 +1,32 @@
+usepyve() {
+    venv_home="{{venv_home}}"
+
+    usage() {
+        echo "usepyve <name>"
+    }
+    
+    # validate args
+    name="$1"
+    if [ "$name" = "" ]; then
+        1>&2 echo "error: name unset"
+        usage
+        return
+    fi
+
+    # validate venv directory exists
+    venv_dir="$venv_home/$name"
+    if [ ! -d "$venv_dir" ]; then
+        1>&2 echo "error: venv not found: $name"
+        return
+    fi
+
+    # validate activation script exists
+    activate_script="$venv_dir/bin/activate"
+    if [ ! -f "$activate_script" ]; then
+        1>&2 echo "error: activation script not found: $activate_script"
+        return
+    fi
+
+    # activate venv
+    source "$activate_script"
+}

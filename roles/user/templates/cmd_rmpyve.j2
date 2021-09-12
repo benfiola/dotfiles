@@ -1,0 +1,35 @@
+rmpyve() {
+    venv_home="{{venv_home}}"
+
+    usage() {
+        echo "rmpyve <name>"
+    }
+
+    # validate args
+    name="$1"
+    if [ "$name" = "" ]; then
+        1>&2 echo "error: name unset"
+        usage
+        return
+    fi
+
+    # ensure venv exists
+    venv_dir="$venv_home/$name"
+    if [ ! -d "$venv_dir" ]; then
+        1>&2 echo "error: venv not found: $name"
+        return
+    fi
+
+    # delete venv directory
+    rm -r "$venv_dir"
+    success="$?"
+    if [ ! "$success" = "0" ]; then
+        1>&2 echo "error: venv delete failed"
+        return
+    fi
+
+    # deactivate if deleted venv is currently activated
+    if [ "$VIRTUAL_ENV" = "$venv_dir" ]; then
+        deactivate
+    fi
+}
