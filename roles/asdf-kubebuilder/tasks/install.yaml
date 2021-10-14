@@ -1,0 +1,10 @@
+- name: install | install asdf plugin + version
+  become: true
+  become_user: "{{user_name}}"
+  asdf:
+    plugin: "{{asdf_kubebuilder_plugin}}"
+    version: "{{asdf_kubebuilder_version}}"
+    state: present
+    executable: "{{asdf_executable}}"
+    global_: true
+  
