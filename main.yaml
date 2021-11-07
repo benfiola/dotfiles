@@ -36,5 +36,6 @@
   - include_role: {name: variety, tasks_from: install}
   - include_role: {name: vim, tasks_from: install}
   - include_role: {name: vscode, tasks_from: install}
+  - include_role: {name: webstorm, tasks_from: install}
   - include_role: {name: xclip, tasks_from: install}
 
