@@ -1,5 +1,3 @@
 - name: install | install apt packages
   become: true
-  apt:
-    state: present 
-    pkg: "{{cpp_apt_packages}}"
+  apt: pkg=gcc,g++,make,cmake state=present

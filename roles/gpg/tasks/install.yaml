@@ -1,55 +1,46 @@
 ---
 - name: install | install apt packages
   become: true
-  apt:
-    state: present 
-    pkg: "{{gpg_apt_packages}}"
+  apt: pkg=gpg,scdaemon,pcscd state=present
 
 - name: install | update shell profile
   become: true
   become_user: "{{user_name}}"
-  blockinfile:
-    dest: "{{user_profile}}"
+  blockinfile: dest={{user_profile}} block={{block}} marker={{marker}}
+  vars:
     block: "{{lookup('template', 'templates/profile.j2')}}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
   
 - name: install | create gpg-agent conf
   become: true
   become_user: "{{user_name}}"
-  blockinfile:
-    create: true
+  blockinfile: dest={{dest}} block={{block}} marker={{marker}} create=true
+  vars:
     dest: "{{user_home}}/.gnupg/gpg-agent.conf"
     block: "{{lookup('template', 'templates/gpg-agent.j2')}}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
   notify:
   - handlers | restart pcscd
-  - handlers | restart gpg agent
+  - handlers | restart gpg-agent
 
 - name: install | create scdaemon conf
   become: true
   become_user: "{{user_name}}"
-  blockinfile:
-    create: true
+  blockinfile: dest={{dest}} block={{block}} marker={{marker}} create=true
+  vars:
     dest: "{{user_home}}/.gnupg/scdaemon.conf"
     block: "{{lookup('template', 'templates/scdaemon.j2')}}"
     marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
   register: gpg_scdaemon_conf
   notify:
-  - handlers | restart pcscd service
-  - handlers | restart gpg agent service
+  - handlers | restart pcscd
+  - handlers | restart gpg-agent
 
 - name: install | start pcscd service 
   become: true
-  service:
-    name: pcscd
-    enabled: true
-    state: started
+  service: name=pcscd enabled=true state=started
 
 - name: install | start gpg agent service
   become: true
   become_user: "{{user_name}}"
-  systemd:
-    name: gpg-agent
-    scope: user
-    enabled: true
-    state: started
+  systemd: name=gpg-agent scope=user enabled=true state=started

@@ -1,0 +1,13 @@
+- name: install | install asdf plugin + version
+  become: true
+  become_user: "{{user_name}}"
+  asdf: plugin=java version={{java_version}} state=present executable={{asdf_executable}} global_=true
+
+- name: install | update profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile: dest={{user_profile}} block={{block}} marker={{marker}}
+  vars:
+    block: "{{lookup('template', 'templates/profile.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+  

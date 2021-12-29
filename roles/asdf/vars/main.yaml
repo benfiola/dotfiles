@@ -1,3 +1,0 @@
----
-asdf_apt_packages: [curl, git]
-asdf_git_url: https://github.com/asdf-vm/asdf.git

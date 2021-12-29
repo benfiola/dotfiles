@@ -1,3 +1,0 @@
-imwheel_apt_packages: [imwheel]
-imwheel_service_name: imwheel
-imwheel_service_path: "{{user_home}}/.config/systemd/user/{{imwheel_service_name}}.service"

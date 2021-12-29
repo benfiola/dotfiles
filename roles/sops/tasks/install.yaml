@@ -1,0 +1,15 @@
+- name: install | set facts
+  set_fact:
+    sops_platform: "{{ansible_system | lower}}"
+    sops_architecture: "{{ansible_architecture | lower}}"
+
+- name: install | set architecture
+  set_fact: sops_architecture=arm64
+  when: sops_architecture == 'aarch64'
+
+- name: install | download url
+  become: true
+  get_url: url={{url}} dest=/usr/local/bin/sops mode=0755
+  when: sops_architecture != 'arm64'
+  vars:
+    url: https://github.com/mozilla/sops/releases/download/v{{sops_version}}/sops-v{{sops_version}}.{{sops_platform}}

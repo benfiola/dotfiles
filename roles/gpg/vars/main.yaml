@@ -1,1 +1,0 @@
-gpg_apt_packages: [gpg, scdaemon, pcscd]

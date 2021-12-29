@@ -2,40 +2,40 @@
 - hosts: all
   gather_facts: true
   tasks:
-  - include_role: {name: user, tasks_from: create}
+  - include_role: name=user tasks_from=create
 
-  - include_role: {name: asdf, tasks_from: install}
-  - include_role: {name: asdf-ctlptl, tasks_from: install}
-  - include_role: {name: asdf-direnv, tasks_from: install}
-  - include_role: {name: asdf-gcloud, tasks_from: install}
-  - include_role: {name: asdf-golang, tasks_from: install}
-  - include_role: {name: asdf-java, tasks_from: install}
-  - include_role: {name: asdf-jb, tasks_from: install}
-  - include_role: {name: asdf-jsonnet, tasks_from: install}
-  - include_role: {name: asdf-kind, tasks_from: install}
-  - include_role: {name: asdf-kubebuilder, tasks_from: install}
-  - include_role: {name: asdf-kubectl, tasks_from: install}
-  - include_role: {name: asdf-nodejs, tasks_from: install}
-  - include_role: {name: asdf-python, tasks_from: install}
-  - include_role: {name: asdf-sops, tasks_from: install}
-  - include_role: {name: asdf-tanka, tasks_from: install}
-  - include_role: {name: asdf-tilt, tasks_from: install}
-  - include_role: {name: cpp, tasks_from: install}
-  - include_role: {name: chromium, tasks_from: install}
-  - include_role: {name: clion, tasks_from: install}
-  - include_role: {name: docker, tasks_from: install}
-  - include_role: {name: git, tasks_from: install}
-  - include_role: {name: goland, tasks_from: install}
-  - include_role: {name: gpg, tasks_from: install}
-  - include_role: {name: imwheel, tasks_from: install}
-  - include_role: {name: intellij, tasks_from: install}
-  - include_role: {name: ohmyzsh, tasks_from: install}
-  - include_role: {name: pycharm, tasks_from: install}
-  - include_role: {name: qemu, tasks_from: install}
-  - include_role: {name: signal, tasks_from: install}
-  - include_role: {name: variety, tasks_from: install}
-  - include_role: {name: vim, tasks_from: install}
-  - include_role: {name: vscode, tasks_from: install}
-  - include_role: {name: webstorm, tasks_from: install}
-  - include_role: {name: xclip, tasks_from: install}
+  - include_role: name=chromium tasks_from=install
+  - include_role: name=cpp tasks_from=install
+  - include_role: name=ctlptl tasks_from=install
+  - include_role: name=docker tasks_from=install
+  - include_role: name=gcloud tasks_from=install
+  - include_role: name=git tasks_from=install
+  - include_role: name=gpg tasks_from=install
+  - include_role: name=imwheel tasks_from=install
+  - include_role: name=jb tasks_from=install
+  - include_role: name=jsonnet tasks_from=install
+  - include_role: name=kind tasks_from=install
+  - include_role: name=ohmyzsh tasks_from=install
+  - include_role: name=qemu tasks_from=install
+  - include_role: name=signal tasks_from=install
+  - include_role: name=sops tasks_from=install
+  - include_role: name=tanka tasks_from=install
+  - include_role: name=tilt tasks_from=install
+  - include_role: name=variety tasks_from=install
+  - include_role: name=vim tasks_from=install
+  - include_role: name=vscode tasks_from=install
+  - include_role: name=xclip tasks_from=install
 
+  - include_role: name=asdf tasks_from=install
+  - include_role: name=golang tasks_from=install
+  - include_role: name=java tasks_from=install
+  - include_role: name=kubectl tasks_from=install
+  - include_role: name=nodejs tasks_from=install
+  - include_role: name=python tasks_from=install
+
+  - include_role: name=jbr tasks_from=install
+  - include_role: name=clion tasks_from=install
+  - include_role: name=goland tasks_from=install
+  - include_role: name=intellij tasks_from=install
+  - include_role: name=pycharm tasks_from=install
+  - include_role: name=webstorm tasks_from=install

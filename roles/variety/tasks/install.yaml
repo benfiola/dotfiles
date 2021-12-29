@@ -1,6 +1,3 @@
----
 - name: install | install apt packages
   become: true
-  apt:
-    state: present 
-    pkg: "{{variety_apt_packages}}"
+  apt: pkg=variety state=present

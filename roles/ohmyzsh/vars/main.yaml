@@ -1,4 +1,2 @@
 ---
-ohmyzsh_apt_packages: [git]
 ohmyzsh_path: "{{user_home}}/.oh-my-zsh"
-ohmyzsh_repo_url: https://github.com/ohmyzsh/ohmyzsh.git

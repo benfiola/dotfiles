@@ -1,6 +1,3 @@
----
 - name: install | install snap app
   become: true
-  snap: 
-    name: "{{chromium_snap_app}}"
-    state: present
+  snap: name=chromium state=present

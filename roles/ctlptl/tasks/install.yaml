@@ -1,0 +1,18 @@
+- name: install | set facts
+  set_fact:
+    ctlptl_platform: "{{ansible_system | lower}}"
+    ctlptl_architecture: "{{ansible_architecture | lower}}"
+
+- name : install | set platform
+  set_fact: ctlptl_platform=mac
+  when: ctlptl_platform == 'darwin'
+
+- name: install | set architecture
+  set_fact: ctlptl_architecture=arm64
+  when: ctlptl_architecture == 'aarch64'
+
+- name: install | extract url
+  become: true
+  unarchive: src={{url}} dest=/usr/local/bin remote_src=true mode=a+x creates=/usr/local/bin/ctlptl
+  vars:
+    url: https://github.com/tilt-dev/ctlptl/releases/download/v{{ctlptl_version}}/ctlptl.{{ctlptl_version}}.{{ctlptl_platform}}.{{ctlptl_architecture}}.tar.gz
