@@ -1,4 +1,0 @@
-- name: install | install asdf plugin + version
-  become: true
-  become_user: "{{user_name}}"
-  asdf: plugin=golang version={{golang_version}} state=present executable={{asdf_executable}} global_=true

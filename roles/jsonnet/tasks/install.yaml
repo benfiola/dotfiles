@@ -1,3 +1,0 @@
-- name: install | install apt package
-  become: true
-  apt: name=jsonnet state=present

@@ -1,9 +1,25 @@
-# development_environment
+# development-environment
 
-Create a machine with a user capable of elevating privileges.
+Bootstraps a development environment
 
-Run the [bootstrap.sh](./bootstrap.sh) command:
+# Requirements
+
+* `ansible`
+
+# Usage
+
+## Local
 
 ```
-/bin/bash -c "$(curl -fsSL https://raw.github.com/benfiola/development_environment/master/bootstrap.sh)"
+LOCAL=1 ansible-playbook main.yaml
 ```
+
+## Remote
+
+```
+REMOTE=<ip> ansible-playbook main.yaml
+```
+
+# TODO
+
+* 

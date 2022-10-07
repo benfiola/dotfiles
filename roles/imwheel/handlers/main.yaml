@@ -1,4 +1,0 @@
-- name: handlers | restart imwheel service
-  become: true
-  become_user: "{{user_name}}"
-  service: name=imwheel state=restarted scope=user

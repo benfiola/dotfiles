@@ -1,0 +1,13 @@
+- name: restart ulauncher
+  when: debian
+  ansible.builtin.systemd:
+    name: ulauncher
+    state: restarted
+    scope: user
+
+- name: restart variety
+  when: debian
+  ansible.builtin.systemd:
+    name: variety
+    state: restarted
+    scope: user

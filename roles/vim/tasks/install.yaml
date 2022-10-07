@@ -1,4 +1,0 @@
-- name: install | install apt packages
-  become: true
-  apt: pkg=vim state=present
-

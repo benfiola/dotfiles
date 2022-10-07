@@ -1,0 +1,11 @@
+[Unit]
+Description={{description}}
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart={{command}}
+
+[Install]
+WantedBy=graphical-session.target
