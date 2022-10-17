@@ -8,18 +8,13 @@ Bootstraps a development environment
 
 # Usage
 
-## Local
-
+Run the following commi
 ```
-LOCAL=1 ansible-playbook main.yaml
+LOCAL=1 ansible-pull -U https://github.com/benfiola/development-environment.git main.yaml
 ```
 
 ## Remote
 
 ```
-REMOTE=<ip> ansible-playbook main.yaml
+REMOTE=<ip> ansible-pull -U https://github.com/benfiola/development-environment.git main.yaml
 ```
-
-# TODO
-
-* 
