@@ -7,14 +7,19 @@ import os
 import shutil
 import tempfile
 import time
+from urllib.parse import urlparse
     
 
 @contextlib.contextmanager
 def mount_dmg(module, file):
-    with tempfile.TemporaryDirectory() as td:
+    with tempfile.TemporaryDirectory() as td, tempfile.NamedTemporaryFile(suffix=".dmg") as tf:
         try:
-            module.run_command(["hdiutil", "attach", "-mountpoint", td, file], check_rc=True)
-            yield td            
+            if urlparse(file).hostname:
+                module.run_command(["curl", "-L", "-o", tf.name, file])
+                file = tf.name
+
+            module.run_command(["hdiutil", "attach", "-noautoopen", "-mountpoint", td, file], check_rc=True)
+            yield td
         finally:
             time.sleep(1)
             module.run_command(["hdiutil", "detach", td], check_rc=True)
@@ -47,17 +52,7 @@ def run_module():
         dest = module.params["dest"]
 
         with mount_dmg(module, src) as mount_point:
-            for p in os.listdir(mount_point):
-                src_p = os.path.join(mount_point, p)
-                dest_p = os.path.join(dest, p)
-
-                if os.path.islink(src_p):
-                    continue
-                
-                if os.path.isdir(src_p):
-                    shutil.copytree(src_p, dest_p)
-                else:
-                    shutil.copyfile(src_p, dest_p)
+            module.run_command(["cp", "-R", "{0}/".format(mount_point), dest], check_rc=True)
     
     module.exit_json(**result)
 
@@ -68,3 +63,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+ 

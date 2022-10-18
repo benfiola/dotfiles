@@ -3,5 +3,5 @@
 ## Usage
 
 ```
-cat <directory>/settings.gsettings | xargs -l -t gsettings set
+<directory>/gsettings.sh
 ```
