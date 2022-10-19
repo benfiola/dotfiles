@@ -15,8 +15,7 @@ def run_module():
         prefix=dict(type='str', required=False, default=None),
         suffix=dict(type='str', required=False, default=None),
         basedir=dict(type='str', required=False, default=None),
-        directory=dict(type='bool', required=False, default=False),
-        mode=dict(type='str', required=False, default=None)
+        directory=dict(type='bool', required=False, default=False)
     )
     
     result = {
@@ -46,13 +45,13 @@ def run_module():
             dir=basedir
         ).name
     else:
-        mode = module.params['mode']
-        path = tempfile.NamedTemporaryFile(
+        with tempfile.NamedTemporaryFile(
             prefix=prefix,
             suffix=suffix,
             dir=basedir,
-            mode=mode
-        ).name
+            delete=False
+        ) as f:
+            path = f.name
     temp_files.append(path)
     result["path"] = path
     
