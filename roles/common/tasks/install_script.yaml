@@ -6,7 +6,7 @@
   register: binary_exists
 
 - name: install binary
-  when: binary_exists.stat.exists
+  when: not binary_exists.stat.exists
   block:
   - name: create temp file
     temp_file:
