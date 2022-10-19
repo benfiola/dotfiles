@@ -22,7 +22,8 @@ def mount_dmg(module, file):
             yield td
         finally:
             time.sleep(1)
-            module.run_command(["hdiutil", "detach", td], check_rc=True)
+            if os.path.exists(td):
+                module.run_command(["hdiutil", "detach", td], check_rc=True)
 
 
 def run_module():

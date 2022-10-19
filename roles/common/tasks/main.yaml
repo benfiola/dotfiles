@@ -44,11 +44,12 @@
   block:
     - name: set brew path fact
       ansible.builtin.set_fact:
-        brew_path: "{{paths[architecture]}}"
+        brew_path: "{{path}}"
       vars:
         paths:
           x86_64: /usr/local/bin
           arm64: /opt/homebrew/bin
+        path: "{{paths[architecture]}}"
       
     - name: install brew with script
       include_tasks: ./install_script.yaml
@@ -84,8 +85,8 @@
       when: linux
       ansible.builtin.lineinfile:
         dest: /etc/default/locale
-        regexp: "^LANG="
-        line: "LANG=en_US.UTF-8"
+        regexp: ^LANG=
+        line: LANG=en_US.UTF-8
 
 - name: set timezone
   become: true
@@ -192,12 +193,13 @@
       become: true
       ansible.builtin.file:
         src: "{{item}}"
-        dest: "{{paths[system]}}/{{item | basename}}"
+        dest: "{{directory}}/{{item | basename}}"
         state: hard
       vars:
-        paths:
+        directories:
           linux: /usr/local/share/fonts
           darwin: /Library/Fonts
+        directory: "{{directories[system]}}"
       loop: "{{fonts.files | map(attribute='path') }}"
 
 - name: install gnome
@@ -269,6 +271,7 @@
         url: https://raw.githubusercontent.com/starship/starship/v1.10.3/install/install.sh
         binary: /usr/local/bin/starship
         args: --yes
+        become: true
     
     - name: create starship prompt configuration directory
       ansible.builtin.file:
@@ -335,18 +338,20 @@
       become: true
       when: debian
       ansible.builtin.apt:
-        deb: "{{urls[architecture]}}"
+        deb: "{{url}}"
       vars:
         urls:
           x86_64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
           arm64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-arm64
+        url: "{{urls[architecture]}}"
       
-    - name: install vscode with dmg
+    - name: install vscode with zip
       when: darwin
-      include_tasks: ./install_app_dmg.yaml
-      vars:
-        url: https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal
-        app: Visual Studio Code.app
+      ansible.builtin.unarchive:
+        src: https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal
+        remote_src: true
+        dest: /Applications
+        creates: /Applications/Visual Studio Code.app
 
 - name: install google-chrome
   when: darwin
@@ -462,7 +467,7 @@
           become: true
           ansible.builtin.template:
             src: systemd.service.j2
-            dest: "/usr/lib/systemd/user/variety.service"
+            dest: /usr/lib/systemd/user/variety.service
           vars:
             description: variety
             command: /usr/bin/variety --profile %h/.config/variety/
@@ -624,13 +629,14 @@
       become: true
       when: linux
       ansible.builtin.get_url:
-        url: "{{urls[architecture]}}"
+        url: "{{url}}"
         dest: /usr/local/bin/jb
         mode: 0755
       vars:
         urls:
           x86_64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64
           arm64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-arm64
+        url: "{{urls[architecture]}}"
 
     - name: install jsonnet-bundler with brew
       when: darwin
@@ -645,13 +651,14 @@
       become: true
       when: linux
       ansible.builtin.get_url:
-        url: "{{urls[architecture]}}"
+        url: "{{url}}"
         dest: /usr/local/bin/tk
         mode: 0755
       vars:
         urls:
           x86_64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-amd64
           arm64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-arm64
+        url: "{{urls[architecture]}}"
 
     - name: install tanka with brew
       when: darwin
@@ -680,8 +687,8 @@
             state: present
           vars:
             repositories:
-              x86_64: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable"
-              arm64: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable"
+              x86_64: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable
+              arm64: deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable
 
     - name: install docker with apt
       become: true
@@ -698,8 +705,8 @@
       include_tasks: ./install_app_dmg.yaml
       vars:
         urls:
-          x86_64: "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
-          arm64: "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+          x86_64: https://desktop.docker.com/mac/main/amd64/Docker.dmg
+          arm64: https://desktop.docker.com/mac/main/arm64/Docker.dmg
         url: "{{urls[architecture]}}"
         app: Docker.app
 
