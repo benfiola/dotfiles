@@ -1,0 +1,55 @@
+- when: linux
+  block:
+    - name: install jsonnet with tar
+      become: true
+      ansible.builtin.unarchive:
+        src: "{{url}}"
+        remote_src: true
+        dest: /usr/local/bin
+        creates: /usr/local/bin/jsonnet
+        include:
+          - jsonnet
+      vars:
+        urls:
+          arm64: https://github.com/google/go-jsonnet/releases/download/v0.19.1/go-jsonnet_0.19.1_Linux_arm64.tar.gz
+          amd64: https://github.com/google/go-jsonnet/releases/download/v0.19.1/go-jsonnet_0.19.1_Linux_x86_64.tar.gz
+        url: "{{urls[architecture]}}"
+
+    - name: install jsonnet-bundler with url
+      become: true
+      ansible.builtin.get_url:
+        url: "{{url}}"
+        dest: /usr/local/bin/jb
+        mode: 0755
+      vars:
+        urls:
+          amd64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64
+          arm64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-arm64
+        url: "{{urls[architecture]}}"
+
+    - name: install tanka with url
+      become: true
+      ansible.builtin.get_url:
+        url: "{{url}}"
+        dest: /usr/local/bin/tk
+        mode: 0755
+      vars:
+        urls:
+          amd64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-amd64
+          arm64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-arm64
+        url: "{{urls[architecture]}}"
+
+- when: darwin
+  block:
+    - name: install dependencies with brew
+      community.general.homebrew:
+        package:
+          - jsonnet
+          - jsonnet-bundler
+        path: "{{brew_path}}"
+
+    - name: install tanka with brew
+      community.general.homebrew:
+        name:
+          - tanka
+        path: "{{brew_path}}"

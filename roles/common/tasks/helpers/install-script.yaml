@@ -22,6 +22,7 @@
     ansible.builtin.get_url:
       url: "{{url}}"
       dest: "{{temp_path.path}}"
+      force: true
 
   - name: run script
     become: "{{become | default(false)}}"

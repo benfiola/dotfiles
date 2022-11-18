@@ -1,0 +1,50 @@
+- when: linux
+  block:
+    - name: install gnome with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - gdm
+          - gnome-shell
+          - gnome-shell-extensions
+          - gnome-session
+          - gnome-themes-extra
+          - gnome-tweaks
+          - gnome-control-center
+          - nautilus
+          - fonts-cantarell
+          - adwaita-icon-theme-full
+
+    - name: install gnome with pacman
+      become: true
+      when: archlinux
+      community.general.pacman:
+        name:
+          - gdm
+          - gnome-shell
+          - gnome-shell-extensions
+          - gnome-session
+          - gnome-themes-extra
+          - gnome-tweaks
+          - gnome-control-center
+          - nautilus
+          - cantarell-fonts
+          - adwaita-icon-theme
+
+    - name: enable gdm
+      become: true
+      ansible.builtin.systemd:
+        name: gdm
+        enabled: true
+      
+    - name: install gnome theme
+      become: true
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/gnome/theme"
+        dest: /usr/share/themes/theme
+        state: link
+
+    - name: run gnome configuration script
+      ansible.builtin.command:
+        cmd: "{{dotfiles_path}}/gnome/gsettings.sh"

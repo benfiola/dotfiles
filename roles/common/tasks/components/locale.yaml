@@ -1,0 +1,29 @@
+- name: install locale dependencies with apt
+  become: true
+  when: debian
+  ansible.builtin.apt:
+    package:
+      - locales
+
+- when: linux
+  block:
+    - name: generate system locale with localegen
+      become: true
+      community.general.locale_gen:
+        name: en_US.UTF-8
+
+    - name: set system locale
+      become: true
+      ansible.builtin.lineinfile:
+        dest: "{{item}}"
+        regexp: ^LANG=
+        line: LANG=en_US.UTF-8
+        create: true
+      loop:
+        - /etc/default/locale
+        - /etc/locale.conf
+
+- name: set timezone
+  become: true
+  community.general.timezone:
+    name: America/Los_Angeles

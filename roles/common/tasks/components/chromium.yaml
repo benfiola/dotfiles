@@ -1,0 +1,38 @@
+- when: darwin
+  block:
+    - name: install google-chrome with dmg
+      ansible.builtin.include_tasks: ./helpers/install-app-dmg.yaml
+      vars:
+        url: https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg
+        app: Google Chrome.app
+
+    - name: remove existing google-chrome policy
+      become: true
+      failed_when: false
+      ansible.builtin.command:
+        cmd: profiles -R -F {{dotfiles_path}}/chromium/macos.mobileconfig
+
+    - name: install google-chrome policy
+      ansible.builtin.command:
+        cmd: open {{dotfiles_path}}/chromium/macos.mobileconfig
+
+- when: linux
+  block:
+    - name: install chromium with snap
+      become: true
+      community.general.snap:
+        name: chromium
+
+    - name: create chromium policy folder
+      become: true
+      ansible.builtin.file:
+        path: /etc/chromium-browser/policies/managed
+        recurse: true
+        state: directory
+
+    - name: install chromium policy
+      become: true
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/chromium/policy.json"
+        dest: /etc/chromium-browser/policies/managed/policy.json
+        state: hard

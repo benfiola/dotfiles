@@ -1,0 +1,3 @@
+- name: install asdf-nodejs
+  asdf_plugin:
+    name: nodejs

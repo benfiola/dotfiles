@@ -1,0 +1,7 @@
+---
+- ansible.builtin.include_tasks: ./components/facts.yaml
+- ansible.builtin.include_tasks: ./components/passwordless-sudo.yaml
+- ansible.builtin.include_tasks: ./components/package-managers.yaml
+- ansible.builtin.include_tasks: ./components/locale.yaml
+- ansible.builtin.include_tasks: ./components/open-vm-tools.yaml
+- ansible.builtin.include_tasks: ./components/snap.yaml

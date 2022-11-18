@@ -1,0 +1,19 @@
+- name: install vim with apt
+  become: true
+  when: debian
+  ansible.builtin.apt:
+    package:
+      - vim
+
+- name: install vim with pacman
+  become: true
+  when: archlinux
+  community.general.pacman:
+    name:
+      - vim
+
+- name: install vimrc
+  ansible.builtin.file:
+    src: "{{dotfiles_path}}/vim/vimrc"
+    path: "{{user.home}}/.vimrc"
+    state: link

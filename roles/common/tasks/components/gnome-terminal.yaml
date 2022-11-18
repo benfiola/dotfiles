@@ -1,0 +1,19 @@
+- when: linux
+  block:
+    - name: install gnome-terminal with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - gnome-terminal
+      
+    - name: install gnome-terminal with pacman
+      become: true
+      when: archlinux
+      community.general.pacman:
+        name:
+          - gnome-terminal
+
+    - name: run gnome-terminal configuration script
+      ansible.builtin.command:
+        cmd: "{{dotfiles_path}}/gnome-terminal/gsettings.sh"

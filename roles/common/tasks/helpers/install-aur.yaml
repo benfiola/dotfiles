@@ -1,0 +1,32 @@
+# installs a pacman package '{{package}}' via AUR '{{url}}'
+# if '{{package}}' exists, install is skipped
+- name: check if package exists
+  ansible.builtin.command: 
+    cmd: pacman -Qi "{{package}}"
+  failed_when: false
+  register: cmd_package_exists
+
+- name: install package
+  when: cmd_package_exists.rc == 1
+  block:
+    - name: install build dependencies
+      become: true
+      community.general.pacman:
+        name:
+          - git
+          - base-devel
+  
+    - name: create temp directory
+      temp_file:
+        directory: true
+      register: temp_path
+    
+    - name: clone AUR repo
+      ansible.builtin.git:
+        repo: "{{url}}"
+        dest: "{{temp_path.path}}"
+    
+    - name: install package
+      ansible.builtin.command:
+        cmd: makepkg -sri --noconfirm
+        chdir: "{{temp_path.path}}"

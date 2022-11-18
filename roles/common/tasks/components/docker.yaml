@@ -1,0 +1,65 @@
+- when: ubuntu
+  block:
+    - name: add ubuntu docker signing key
+      become: true
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+
+    - name: add ubuntu docker repository
+      become: true
+      ansible.builtin.apt_repository:
+        repo: "{{repositories[architecture]}}"
+      vars:
+        repositories:
+          amd64: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable
+          arm64: deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable
+
+
+- name: install docker with apt
+  become: true
+  when: debian
+  ansible.builtin.apt:
+    package:
+      - containerd.io
+      - docker-ce
+      - docker-ce-cli
+      - docker-compose-plugin
+
+- when: archlinux
+  block:
+    - name: install docker with pacman
+      become: true
+      community.general.pacman:
+        name:
+          - docker
+    
+    - name: enable docker service
+      become: true
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+- name: install docker with dmg
+  when: darwin
+  ansible.builtin.include_tasks: ./helpers/install-app-dmg.yaml
+  vars:
+    urls:
+      amd64: https://desktop.docker.com/mac/main/amd64/Docker.dmg
+      arm64: https://desktop.docker.com/mac/main/arm64/Docker.dmg
+    url: "{{urls[architecture]}}"
+    app: Docker.app
+
+- when: linux
+  block:
+    - name: add docker group
+      become: true
+      ansible.builtin.group:
+        name: docker
+
+    - name: add user to docker group
+      become: true
+      ansible.builtin.user:
+        name: "{{user.name}}"
+        append: true
+        groups: docker

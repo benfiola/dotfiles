@@ -1,0 +1,49 @@
+- name: install dependencies with apt
+  become: true
+  when: debian
+  ansible.builtin.apt:
+    package:
+      - git
+
+- name: install dependencies with pacman
+  become: true
+  when: archlinux
+  community.general.pacman:
+    name:
+      - git
+
+- name: clone development environment repo
+  ansible.builtin.git:
+    repo: https://github.com/benfiola/development-environment.git
+    dest: "{{user.home}}/.development-environment"
+
+- name: set dotfiles fact
+  ansible.builtin.set_fact:
+    dotfiles_path: "{{user.home}}/.development-environment/dotfiles"
+
+- name: install zsh with apt
+  become: true
+  when: debian
+  ansible.builtin.apt:
+    package:
+      - zsh
+  
+- name: install zsh with pacman
+  become: true
+  when: archlinux
+  community.general.pacman:
+    name:
+      - zsh
+
+- name: set user shell
+  become: true
+  ansible.builtin.user:
+    name: "{{user.name}}"
+    shell: /bin/zsh
+  register: user
+
+- name: install user shell profile
+  ansible.builtin.file:
+    src: "{{dotfiles_path}}/zshrc"
+    path: "{{user.home}}/.zshrc"
+    state: link
