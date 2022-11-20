@@ -30,3 +30,7 @@
       ansible.builtin.systemd:
         name: sddm
         enabled: true
+
+    - name: run kde configuration script
+        ansible.builtin.command:
+          cmd: "{{dotfiles_path}}/kde/lookandfeel.sh"
