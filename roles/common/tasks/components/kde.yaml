@@ -30,18 +30,3 @@
       ansible.builtin.systemd:
         name: sddm
         enabled: true
-
-    - name: create sddm conf folder
-      become: true
-      ansible.builtin.file:
-        path: /etc/sddm.conf.d
-        recurse: true
-        state: directory
-    
-    - name: force wayland compositor for sddm
-      become: true
-      ansible.builtin.lineinfile:
-        dest: /etc/sddm.conf.d/01-wayland.conf
-        regexp: ^DisplayServer=
-        line: DisplayServer=wayland
-        create: true
