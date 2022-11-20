@@ -20,6 +20,8 @@
 
 - name: set misc data
   ansible.builtin.set_fact:
+    gnome: "{{desktop_environment == 'gnome'}}"
+    kde: "{{desktop_environment == 'kde'}}"
     linux: "{{system == 'linux'}}"
     darwin: "{{system == 'darwin'}}"
     debian: "{{os_family == 'debian'}}"

@@ -1,0 +1,47 @@
+- when: linux and kde
+  block:
+    - name: install kde with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - sddm
+          - kde-plasma-desktop
+          - plasma-workspace-wayland
+
+    - name: install kde with pacman
+      become: true
+      when: archlinux
+      community.general.pacman:
+        name:
+          - gdm
+          - gnome-shell
+          - gnome-shell-extensions
+          - gnome-session
+          - gnome-themes-extra
+          - gnome-tweaks
+          - gnome-control-center
+          - nautilus
+          - cantarell-fonts
+          - adwaita-icon-theme
+
+    - name: enable sddm
+      become: true
+      ansible.builtin.systemd:
+        name: sddm
+        enabled: true
+
+    - name: create sddm conf folder
+      become: true
+      ansible.builtin.file:
+        path: /etc/sddm.conf.d
+        recurse: true
+        state: directory
+    
+    - name: force wayland compositor for sddm
+      become: true
+      ansible.builtin.lineinfile:
+        dest: /etc/sddm.conf.d/01-wayland.conf
+        regexp: ^DisplayServer=
+        line: DisplayServer=wayland
+        create: true

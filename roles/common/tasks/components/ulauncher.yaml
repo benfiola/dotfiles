@@ -39,6 +39,7 @@
         state: link
 
     - name: install ulauncher keybindings
+      when: gnome
       ansible.builtin.command:
         cmd: "{{dotfiles_path}}/ulauncher/gsettings.sh"
 

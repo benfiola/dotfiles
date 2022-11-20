@@ -1,4 +1,4 @@
-- when: linux
+- when: linux and gnome
   block:
     - name: install gnome-terminal with apt
       become: true
