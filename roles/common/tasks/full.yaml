@@ -32,3 +32,4 @@
 
 - ansible.builtin.include_tasks: ./components/proton.yaml
 - ansible.builtin.include_tasks: ./components/steam.yaml
+- ansible.builtin.include_tasks: ./components/spotify.yaml
