@@ -20,7 +20,6 @@
       loop:
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ audible-bell true
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ background-color '#2E3440'
-        - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ background-transparency-percent 50
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ backspace-binding 'ascii-delete'
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ bold-color '#D8DEE9'
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ bold-color-same-as-fg true
@@ -60,8 +59,6 @@
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ use-custom-command false
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ use-system-font true
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ use-theme-colors false
-        - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ use-theme-transparency false
-        - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ use-transparent-background false
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ visible-name 'Nord'
         - gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:422b29ae-8085-4eb4-9051-e9e81c408fd6/ word-char-exceptions '@ms nothing'
         - gsettings set org.gnome.Terminal.ProfilesList list "['422b29ae-8085-4eb4-9051-e9e81c408fd6']"

@@ -28,7 +28,7 @@
       ansible.builtin.command:
         cmd: "{{item}}"
       loop:
-        - kwriteconfig5 --file {{user.home}}/.config/plasmarc --group Theme --key name breeze-dark
+        - env QT_QPA_PLATFORM=offscreen lookandfeeltool -a org.kde.breezedark.desktop
         - gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
         - gsettings set org.gnome.desktop.interface gtk-theme 'Breeze-Dark'
         - gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'
