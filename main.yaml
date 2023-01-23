@@ -13,6 +13,7 @@
   - include_role: {name: asdf-jb, tasks_from: install}
   - include_role: {name: asdf-jsonnet, tasks_from: install}
   - include_role: {name: asdf-kind, tasks_from: install}
+  - include_role: {name: asdf-kubebuilder, tasks_from: install}
   - include_role: {name: asdf-kubectl, tasks_from: install}
   - include_role: {name: asdf-nodejs, tasks_from: install}
   - include_role: {name: asdf-python, tasks_from: install}
