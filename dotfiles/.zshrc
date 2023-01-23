@@ -1,4 +1,3 @@
-
 debug_msg() {
     if [ "$ZSHRC_DEBUG" = "" ]; then
         return

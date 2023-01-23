@@ -226,6 +226,11 @@
     package: 
       - gnome-terminal
 
+- name: (linux) install terminal configuration
+  when: linux
+  ansible.builtin.shell:
+    cmd: "cat {{dotfiles_path}}/gnome-terminal/settings.gsettings | xargs -l -t gsettings set"
+
 - name: (darwin) install terminal
   become: true
   when: darwin
@@ -235,17 +240,19 @@
     dest: /Applications
     creates: /Applications/iTerm.app
 
-- name: (linux) install terminal configuration
-  when: linux
-  ansible.builtin.shell:
-    cmd: "cat {{dotfiles_path}}/gnome-terminal/settings.gsettings | xargs -l -t gsettings set"
-
-- name: (darwin) install terminal configuration
-  when: darwin
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/iterm/preferences.plist"
-    dest: "{{user.home}}/Library/Preferences/com.googlecode.iterm2.plist"
-    state: hard
+- name: (darwin) set terminal defaults
+  community.general.osx_defaults:
+    domain: com.googlecode.iterm2
+    key: "{{item.key}}"
+    type: "{{item.type}}"
+    value: "{{item.value}}"
+  loop:
+    - key: PrefsCustomFolder
+      type: string
+      value: "{{dotfiles_path}}/iterm"
+    - key: LoadPrefsFromCustomFolder
+      type: bool
+      value: true
   
 - name: download starship prompt install script
   ansible.builtin.get_url:
