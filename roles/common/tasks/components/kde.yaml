@@ -10,7 +10,8 @@
           - plasma-workspace-wayland
           - pulseaudio
           - pavucontrol
-          - kmix
+          - plasma-pa
+          - kscreen
           - fonts-noto-color-emoji
 
     - name: install kde with pacman
@@ -23,7 +24,8 @@
           - plasma-wayland-session
           - pulseaudio
           - pavucontrol
-          - kmix
+          - plasma-pa
+          - kscreen
           - noto-fonts-emoji
 
     - name: enable sddm

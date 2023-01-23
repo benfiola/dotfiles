@@ -25,4 +25,3 @@ ansible-pull -U https://github.com/benfiola/development-environment.git full.yam
 
 # TODO
 * Fix discord screen sharing audio (?)
-* Fix KDE opening windows off-screen
