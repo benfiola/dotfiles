@@ -1,8 +1,8 @@
-- name: install bitwarden with snap
+- name: install bitwarden with flatpak
   become: true
   when: linux and amd64
-  community.general.snap:
-    name: bitwarden
+  community.general.flatpak:
+    name: com.bitwarden.desktop
 
 - name: install bitwarden with dmg
   when: darwin

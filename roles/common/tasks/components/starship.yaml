@@ -6,14 +6,17 @@
     args: --yes
     become: true
 
-- name: create starship prompt configuration directory
-  ansible.builtin.file:
-    path: "{{user.home}}/.config"
-    recurse: true
-    state: directory
+- block:
+  - name: create starship prompt configuration directory
+    ansible.builtin.file:
+      path: "{{file|dirname}}"
+      recurse: true
+      state: directory
 
-- name: install starship prompt configuration
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/starship/starship.toml"
-    dest: "{{user.home}}/.config/starship.toml"
-    state: link
+  - name: install starship prompt configuration
+    ansible.builtin.file:
+      src: "{{dotfiles_path}}/starship/starship.toml"
+      dest: "{{file}}"
+      state: link
+  vars:
+    file: "{{user.home}}/.config/starship.toml"

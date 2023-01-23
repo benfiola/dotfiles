@@ -30,23 +30,26 @@
         command: ulauncher-toggle
         name: ulauncher-toggle
     
-    - name: create ulauncher user theme directory
-      ansible.builtin.file:
-        path: "{{user.home}}/.config/ulauncher/user-themes"
-        state: directory
-        recurse: true
+    - block:
+      - name: create ulauncher user theme directory
+        ansible.builtin.file:
+          path: "{{folder}}/user-themes"
+          state: directory
+          recurse: true
 
-    - name: install ulauncher theme
-      ansible.builtin.file:
-        src: "{{dotfiles_path}}/ulauncher/theme"
-        dest: "{{user.home}}/.config/ulauncher/user-themes/theme"
-        state: link
+      - name: install ulauncher theme
+        ansible.builtin.file:
+          src: "{{dotfiles_path}}/ulauncher/theme"
+          dest: "{{folder}}/user-themes/theme"
+          state: link
 
-    - name: install ulauncher configuration
-      ansible.builtin.file:
-        src: "{{dotfiles_path}}/ulauncher/settings.json"
-        dest: "{{user.home}}/.config/ulauncher/settings.json"
-        state: link
+      - name: install ulauncher configuration
+        ansible.builtin.file:
+          src: "{{dotfiles_path}}/ulauncher/settings.json"
+          dest: "{{folder}}/settings.json"
+          state: link
+      vars:
+        folder: "{{user.home}}/.config/ulauncher"
 
     - name: install ulauncher keybindings
       when: gnome

@@ -5,3 +5,4 @@
 - ansible.builtin.include_tasks: ./components/locale.yaml
 - ansible.builtin.include_tasks: ./components/open-vm-tools.yaml
 - ansible.builtin.include_tasks: ./components/snap.yaml
+- ansible.builtin.include_tasks: ./components/flatpak.yaml

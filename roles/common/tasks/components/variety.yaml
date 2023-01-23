@@ -21,22 +21,25 @@
 
 - when: linux
   block:
-    - name: create variety configuration folder
-      ansible.builtin.file:
-        path: "{{user.home}}/.config/variety"
-        recurse: true
-        state: directory
+    - block:
+      - name: create variety configuration folder
+        ansible.builtin.file:
+          path: "{{folder}}"
+          recurse: true
+          state: directory
 
-    - name: create variety first-run file
-      ansible.builtin.shell:
-        cmd: date > {{user.home}}/.config/variety/.firstrun
-        creates: "{{user.home}}/.config/variety/.firstrun"
+      - name: create variety first-run file
+        ansible.builtin.shell:
+          cmd: date > {{folder}}/.firstrun
+          creates: "{{folder}}/.firstrun"
 
-    - name: install variety configuration
-      ansible.builtin.file:
-        src: "{{dotfiles_path}}/variety/variety.conf"
-        dest: "{{user.home}}/.config/variety/variety.conf"
-        state: link
+      - name: install variety configuration
+        ansible.builtin.file:
+          src: "{{dotfiles_path}}/variety/variety.conf"
+          dest: "{{folder}}/variety.conf"
+          state: link
+      vars:
+        folder: "{{user.home}}/.config/variety"
 
     - when: linux
       block:

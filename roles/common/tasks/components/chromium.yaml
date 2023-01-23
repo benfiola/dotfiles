@@ -18,21 +18,44 @@
 
 - when: linux
   block:
-    - name: install chromium with snap
+    - name: install chromium with flatpak
       become: true
-      community.general.snap:
-        name: chromium
+      community.general.flatpak:
+        name: org.chromium.Chromium
 
-    - name: create chromium policy folder
-      become: true
-      ansible.builtin.file:
-        path: /etc/chromium-browser/policies/managed
-        recurse: true
-        state: directory
+    - block:
+      - name: create chromium policy folder
+        become: true
+        ansible.builtin.file:
+          path: "{{file|dirname}}"
+          recurse: true
+          state: directory
 
-    - name: install chromium policy
-      become: true
-      ansible.builtin.file:
-        src: "{{dotfiles_path}}/chromium/policy.json"
-        dest: /etc/chromium-browser/policies/managed/policy.json
-        state: hard
+      - name: install chromium policy
+        become: true
+        ansible.builtin.file:
+          src: "{{dotfiles_path}}/chromium/policy.json"
+          dest: "{{file}}"
+          state: hard
+      vars:
+        file: /etc/chromium-browser/policies/managed/policy.json
+    
+    - block:
+        - name: create flatpak extension folder
+          become: true
+          ansible.builtin.file:
+            path: "{{folder|dirname}}"
+            recurse: true
+            state: directory
+
+        - name: symlink chromium policies to flatpak extension folder
+          become: true
+          ansible.builtin.file:
+            src: "/etc/chromium-browser"
+            path: "{{folder}}"
+            state: link
+      vars:
+        folders:
+          amd64: /var/lib/flatpak/extension/org.chromium.Chromium.Extension.system-policies/x86_64/1
+          arm64: /var/lib/flatpak/extension/org.chromium.Chromium.Extension.system-policies/aarch64/1
+        folder: "{{folders[architecture]}}"
