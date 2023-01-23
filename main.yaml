@@ -38,6 +38,7 @@
     - sops
     - source
     - spotify
+    - ssh
     - starship
     - steam
     - tanka
@@ -46,6 +47,7 @@
     - vim
     - vscode
     - wine
+    - xbox
     - zsh
 
 - hosts: all

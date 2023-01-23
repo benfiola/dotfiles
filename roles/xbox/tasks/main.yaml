@@ -1,0 +1,18 @@
+---
+- tags: [optional]
+  block:
+    - when: not archlinux
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: archlinux
+      block:
+        - name: pacman aur install xone-dkms
+          ansible.builtin.include_role: 
+            name: utils
+            tasks_from: install-pacman-aur.yaml
+          vars:
+            url: https://aur.archlinux.org/xone-dkms.git
+            package: xone-dkms
+...

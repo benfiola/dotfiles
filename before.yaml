@@ -1,0 +1,8 @@
+---
+- hosts: all
+  connection: local
+  tasks:
+    - name: install ansible-galaxy dependencies
+      command:
+        cmd: ansible-galaxy install -r requirements.yaml
+...

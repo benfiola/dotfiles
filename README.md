@@ -12,7 +12,7 @@ This is my personal dotfiles project and supports macOS, Ubuntu, Archlinux opera
 Running the following command will fully personalize your local machine.  
 
 ```shell
-LOCAL=1 ansible-pull -U https://github.com/benfiola/development-environment.git
+LOCAL=1 ansible-pull -U https://github.com/benfiola/development-environment.git before.yaml main.yaml
 ```
 
 # Ansible?
@@ -54,6 +54,8 @@ Configuration is defined in the environment, and consumed via [dynamic inventory
 | _SYMLINK_PLAYBOOK_ | When set to a truthy value, will symlink the current playbook directory to the dotfiles path (for local development). |
 
 # Playbook
+
+The [before playbook](./before.yaml) must be run before the main playbook - it installs necessary ansible-galaxy collection dependencies.
 
 The [main playbook](./main.yaml) lists all available roles alphabetically to ensure that no roles are accidentally ignored.
 
