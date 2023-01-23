@@ -7,6 +7,7 @@
     - asdf-golang
     - asdf-java
     - asdf-jb
+    - asdf-jsonnet
     - asdf-kind
     - asdf-kubectl
     - asdf-nodejs
