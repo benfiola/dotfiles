@@ -16,7 +16,8 @@
           - fonts-noto-color-emoji
           - fonts-noto-cjk
           - kwin-bismuth
-
+          - kwallet-pam
+    
     - when: archlinux
       block:
       - name: install kde with pacman
@@ -35,6 +36,7 @@
             - dolphin
             - noto-fonts-emoji
             - noto-fonts-cjk
+            - kwallet-pam
       
       - name: install bismuth with AUR
         ansible.builtin.include_tasks: ./helpers/install-aur.yaml
