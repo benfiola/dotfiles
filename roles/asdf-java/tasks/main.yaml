@@ -35,3 +35,13 @@
     cmd: "{{ asdf_executable }} plugin add java"
   when: "'java' not in asdf_plugin_list.stdout"
   
+- name: "({{ user.name }}) Update shell profile"
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    dest: "{{ shell_profile }}"
+    block: "{{ lookup('template', 'templates/asdf-java.zshrc.j2') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}"
+  vars:
+    asdf_path: "{{ user.home }}/.asdf"
+  
