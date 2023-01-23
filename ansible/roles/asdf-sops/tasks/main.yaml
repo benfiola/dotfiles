@@ -1,0 +1,19 @@
+---
+- block:
+  - name: get asdf plugin list
+    become: true
+    become_user: "{{ user }}"
+    command: 
+      cmd: "{{ executable }} plugin list"
+    register: asdf_plugin_list
+    failed_when: asdf_plugin_list.rc != 0 and 'No plugins installed' not in asdf_plugin_list.stderr
+
+  - name: Install asdf-{{ plugin }}
+    become: true
+    become_user: "{{ user }}"
+    command:
+      cmd: "{{ executable }} plugin add {{ plugin }}"
+    when: "plugin not in asdf_plugin_list.stdout"
+  vars:
+    executable: "{{ asdf_path }}/bin/asdf"
+    plugin: sops
