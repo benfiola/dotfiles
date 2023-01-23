@@ -15,6 +15,11 @@
       when: architecture == 'aarch64'
       ansible.builtin.set_fact:
         architecture: arm64
+    
+    - name: set system facts - coerce x86_64 to amd64
+      when: architecture == 'x86_64'
+      ansible.builtin.set_fact:
+        architecture: amd64
 
     - name: set system facts - convenience
       ansible.builtin.set_fact:
@@ -22,7 +27,7 @@
         darwin: "{{system == 'darwin'}}"
         debian: "{{os_family == 'debian'}}"
         ubuntu: "{{distribution == 'ubuntu'}}"
-        x86_64: "{{architecture == 'x86_64'}}"
+        amd64: "{{architecture == 'amd64'}}"
         arm64: "{{architecture == 'arm64'}}"
 
 - name: get user data
@@ -47,7 +52,7 @@
         brew_path: "{{path}}"
       vars:
         paths:
-          x86_64: /usr/local/bin
+          amd64: /usr/local/bin
           arm64: /opt/homebrew/bin
         path: "{{paths[architecture]}}"
       
@@ -341,7 +346,7 @@
         deb: "{{url}}"
       vars:
         urls:
-          x86_64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+          amd64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
           arm64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-arm64
         url: "{{urls[architecture]}}"
       
@@ -399,7 +404,7 @@
   block:
     - name: install bitwarden with snap
       become: true
-      when: linux and x86_64
+      when: linux and amd64
       community.general.snap:
         name: bitwarden
 
@@ -414,7 +419,7 @@
   block:
     - name: install authy with snap
       become: true
-      when: linux and x86_64
+      when: linux and amd64
       community.general.snap:
         name: authy
     
@@ -607,6 +612,41 @@
           - cmake
         path: "{{brew_path}}"
 
+- name: install gnupg
+  block:
+    - name: install gnupg with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - gnupg2
+    
+    - name: install gnupg with brew
+      when: darwin
+      community.general.homebrew:
+        package:
+          - gnupg2
+        path: "{{brew_path}}"
+
+- name: install sops
+  block:
+    - name: install sops with url
+      become: true
+      when: debian
+      ansible.builtin.get_url:
+        url: "{{url}}"
+        dest: /usr/local/bin/sops
+        mode: 0755
+      vars:
+        urls:
+          linux:
+            arm64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux.arm64
+            amd64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux.amd64
+          darwin:
+            arm64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.arm64
+            amd64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.amd64
+        url: "{{urls[system][architecture]}}"
+
 - name: install jsonnet
   block:
     - name: install jsonnet with apt
@@ -634,7 +674,7 @@
         mode: 0755
       vars:
         urls:
-          x86_64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64
+          amd64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64
           arm64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-arm64
         url: "{{urls[architecture]}}"
 
@@ -656,7 +696,7 @@
         mode: 0755
       vars:
         urls:
-          x86_64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-amd64
+          amd64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-amd64
           arm64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-arm64
         url: "{{urls[architecture]}}"
 
@@ -687,7 +727,7 @@
             state: present
           vars:
             repositories:
-              x86_64: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable
+              amd64: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable
               arm64: deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable
 
     - name: install docker with apt
@@ -705,7 +745,7 @@
       include_tasks: ./install_app_dmg.yaml
       vars:
         urls:
-          x86_64: https://desktop.docker.com/mac/main/amd64/Docker.dmg
+          amd64: https://desktop.docker.com/mac/main/amd64/Docker.dmg
           arm64: https://desktop.docker.com/mac/main/arm64/Docker.dmg
         url: "{{urls[architecture]}}"
         app: Docker.app
