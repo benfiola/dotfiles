@@ -164,6 +164,11 @@
     shell: /bin/zsh
   register: user
 
+- name: create user source directory
+  ansible.builtin.file:
+    path: "{{user.home}}/source"
+    state: directory
+
 - name: install user shell profile
   ansible.builtin.file:
     src: "{{dotfiles_path}}/.zshrc"
