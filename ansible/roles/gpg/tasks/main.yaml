@@ -19,7 +19,7 @@
     blockinfile:
       dest: "{{ shell_profile }}"
       block: "{{ lookup('file', '{{ file }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
     vars:
       file: files/gpg.zshrc
   
@@ -29,7 +29,7 @@
     blockinfile:
       dest: "{{ gpg_agent_conf }}"
       block: "{{ lookup('file', '{{ file }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
     vars:
       file: files/gpg-agent.conf
       gpg_agent_conf: "{{ gpg_home_dir }}/gpg-agent.conf" 
@@ -40,7 +40,7 @@
     blockinfile:
       dest: "{{ scdaemon_conf }}"
       block: "{{ lookup('file', '{{ file }}') }}"
-      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
     vars:
       file: files/scdaemon.conf
       scdaemon_conf: "{{ gpg_home_dir }}/scdaemon.conf" 
