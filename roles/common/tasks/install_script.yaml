@@ -1,5 +1,6 @@
 # installs a '{{binary}}' via a script provided at '{{url}}', supplying '{{args}}' if specified
 # if '{{binary}}' exists, install is skipped
+# if '{{become}}' exists, script is elevated to '{{become}}' prior to execution
 - name: check binary exists
   ansible.builtin.stat:
     path: "{{binary}}"
@@ -23,6 +24,7 @@
       dest: "{{temp_path.path}}"
 
   - name: run script
+    become: "{{become | default(false)}}"
     ansible.builtin.command:
       cmd: "{{temp_path.path}} {{args | default('')}}"
       creates: "{{binary}}"
