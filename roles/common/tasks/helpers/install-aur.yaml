@@ -4,6 +4,7 @@
   ansible.builtin.command: 
     cmd: pacman -Qi "{{package}}"
   failed_when: false
+  changed_when: false
   register: cmd_package_exists
 
 - name: install package

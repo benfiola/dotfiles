@@ -1,3 +1,13 @@
+- name: install discord debian
+  when: debian
+  fail:
+    msg: unimplemented
+
+- name: install discord darwin
+  when: darwin
+  fail:
+    msg: unimplemented
+
 - name: install discord via pacman
   become: true
   when: archlinux

@@ -1,3 +1,13 @@
+- name: install gimp debian
+  when: debian
+  fail:
+    msg: unimplemented
+
+- name: install gimp darwin
+  when: darwin
+  fail:
+    msg: unimplemented
+
 - name: install gimp with pacman
   when: archlinux
   become: true

@@ -4,3 +4,4 @@ if ! command -v vim > /dev/null 2>&1; then
 fi
 
 alias vi="vim"
+export EDITOR=vim
