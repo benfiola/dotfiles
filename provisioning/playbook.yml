@@ -1,33 +1,22 @@
 ---
 - hosts: 127.0.0.1
   connection: local
-  vars:
-    unity_path: "/opt/unity"
   roles:
-    # - appimaged
+    - appimaged
     - asdf
     - asdf-golang
+    - asdf-kind
     - asdf-kubectl
     - asdf-nodejs
     - asdf-python
-    # - c++
-    # - clion
-    # - docker
-    # - git
-    # - go
-    # - goenv
-    # - goland
-    # - kind
-    # - kubectl
-    # - mdns
-    # - node
-    # - nodenv
-    # - pycharm
-    # - pyenv
-    # - python
-    # - qemu
-    # - spotify
-    # - sublime_text
-    # - unity_hub
-    # - user
-    # - vs_code
+    - c++
+    - clion
+    - docker
+    - git
+    - goland
+    - mdns
+    - pycharm
+    - qemu
+    - unity_hub
+    - user
+    - vs_code

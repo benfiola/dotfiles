@@ -1,3 +1,0 @@
----
-appimaged_directory: "/opt/appimaged"
-appimaged_path: "{{ appimaged_directory }}/appimaged.AppImage"

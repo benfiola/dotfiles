@@ -1,40 +1,43 @@
 ---
-- name: Update apt-cache
-  apt: update_cache=yes
-  become: true
+- block:
+  - name: Update apt-cache
+    apt: update_cache=yes
+    become: true
 
-- name: Install apt packages
-  become: true
-  apt:
-    state: present 
-    pkg:
-      - curl
+  - name: Install apt packages
+    become: true
+    apt:
+      state: present 
+      pkg:
+        - curl
 
-- name: "Create {{ path }}"
-  file: path={{ path }} state=directory recurse=true owner={{ user }}
-  become: true
-  become_user: "{{ user }}"
+  - name: "Create {{ path }}"
+    file: path={{ path }} state=directory recurse=true owner={{ user }}
+    become: true
+    become_user: "{{ user }}"
+    vars:
+      path: "{{ asdf_path }}"
+
+  - name: "Clone {{ source }} to {{ destination }}"
+    git: repo={{ source }} dest={{ destination }}
+    become: true
+    become_user: "{{ user }}"
+    vars:
+      source: https://github.com/asdf-vm/asdf.git
+      destination: "{{ asdf_path }}"
+
+  - name: "Add {{ template }} to {{ shell_profile }}"
+    blockinfile:
+      dest: "{{ shell_profile }}"
+      block: "{{ lookup('template', '{{ template }}') }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+    vars:
+      template: templates/asdf.zshrc.j2
+      path: "{{ asdf_path }}"
+
+  - name: Set facts
+    set_fact:
+      asdf_path: "{{ asdf_path }}"
   vars:
-    path: "{{ asdf_path }}"
-
-- name: "Clone {{ source }} to {{ destination }}"
-  git: repo={{ source }} dest={{ destination }}
-  become: true
-  become_user: "{{ user }}"
-  vars:
-    source: https://github.com/asdf-vm/asdf.git
-    destination: "{{ asdf_path }}"
-
-- name: "Add {{ template }} to {{ shell_profile }}"
-  blockinfile:
-    dest: "{{ shell_profile }}"
-    block: "{{ lookup('template', '{{ template }}') }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
-  vars:
-    template: templates/asdf.zshrc.j2
-    path: "{{ asdf_path }}"
-
-- name: Set facts
-  set_fact:
-    asdf_path: "{{ asdf_path }}"
+    asdf_path: "{{ user_home }}/.asdf"
   

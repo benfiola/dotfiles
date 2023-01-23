@@ -1,4 +1,5 @@
 ---
-- name: "Install snap apps"
-  become: true
-  snap: name=pycharm-professional classic=yes state=present
+- block:
+  - name: "Install snap apps"
+    become: true
+    snap: name=pycharm-professional classic=yes state=present

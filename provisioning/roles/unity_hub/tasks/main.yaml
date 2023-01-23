@@ -13,6 +13,6 @@
       unity_hub_path: "{{ unity_hub_path }}"
       unity_hub_editors_path: "{{ unity_hub_editors_path }}"
   vars:
-    unity_hub_path: "{{ unity_hub_path }}"
-    unity_hub_editors_path: "{{ unity_hub_editors_path }}"
+    unity_hub_editors_path: "/opt/unity_hub/editors"
+    unity_hub_path: "/opt/Unity Hub.AppImage"
     unity_hub_url: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage"
