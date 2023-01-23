@@ -1,0 +1,21 @@
+---
+- tags: [graphical, amethyst]
+  block:
+    - when: not darwin
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew cask install amethyst
+          community.general.homebrew_cask:
+            name: amethyst
+            path: "{{brew_path}}"
+
+        - name: symlink amethyst configuration
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/amethyst/files/amethyst.yml"
+            path: "{{user.home}}/.amethyst.yml"
+            state: link
+...

@@ -1,0 +1,22 @@
+---
+- tags: [optional, spotify]
+  block:
+    - when: not (linux or darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: linux
+      block:
+        - name: flatpak install spotify
+          become: true
+          community.general.flatpak:
+            name: com.spotify.Client
+    
+    - when: darwin
+      block:
+        - name: brew cask install spotify
+          community.general.homebrew_cask:
+            name: spotify
+            path: "{{brew_path}}"
+...

@@ -1,0 +1,22 @@
+---
+- tags: [minimal, apt]
+  block:
+    - when: not debian
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: debian
+      block:
+        - name: apt update cache
+          become: true
+          ansible.builtin.apt:
+            update_cache: true
+      
+        - name: apt remove unattended upgrades
+          become: true
+          ansible.builtin.apt:
+            package:
+              - unattended-upgrades
+            state: absent
+...

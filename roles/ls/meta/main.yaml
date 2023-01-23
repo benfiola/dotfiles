@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: benfiola.dotfiles.facts
+  - role: benfiola.dotfiles.brew
+  - role: benfiola.dotfiles.user
+...

@@ -1,0 +1,41 @@
+---
+- tags: [minimal, c]
+  block:
+    - when: not (debian or archlinux or darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install c dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - cmake
+              - libc-dev
+              - libc++-dev
+              - gcc
+              - g++
+              - make
+
+    - when: archlinux
+      block:
+        - name: pacman install c dependencies
+          become: true
+          community.general.pacman:
+            name:
+              - cmake
+              - gcc
+              - glibc
+              - libc++
+              - make
+    
+    - when: darwin
+      block:
+        - name: brew install c dependencies
+          community.general.homebrew:
+            name:
+              - cmake
+            path: "{{brew_path}}"
+...

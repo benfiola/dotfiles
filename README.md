@@ -12,34 +12,29 @@ This is my personal dotfiles project and supports macOS, Ubuntu, Archlinux opera
 Running the following command will fully personalize your local machine.  
 
 ```shell
-LOCAL=1 ansible-pull -C main -U https://github.com/benfiola/development-environment.git before.yaml main.yaml
+mkdir -p ~/.ansible/collections/benfiola
+
+git clone git@github.com:benfiola/dotfiles.git ~/.dotfiles
+ansible-galaxy install -r ~/.dotfiles/requirements.yaml
+ln -s "~/.dotfiles" ~/.ansible/collections/benfiola/dotfiles
+
+cd "~/.dotfiles"
+LOCAL=1 ansible-playbook benfiola.dotfiles.main
 ```
 
 # Ansible?
 
-Generally, dotfiles projects provide a mix of static configuration and bootstrapping scripts to provision a local computing environment.  
-
-However, I wanted to achieve the following:
-
-* Provision a development environment from a clean, minimal, server OS image
-* Support different operating systems (e.g., macOS, Ubuntu, Archlinux)
-* Support different architectures (e.g., arm64, amd64)
-* Support runtime configuration (e.g., install kde _or_ install gnome)
-* Support various 'flavors' of personalization (e.g., only CLI tools _or_ a full-desktop environment)
-* Avoid redundant work (e.g., only install VSCode if not installed _or_ generate an SSH key only if one hasn't been made)
-
-While all of the above is scriptable, it also comes for free with [ansible](https://docs.ansible.com/ansible).  Thus, _ansible_ seemed like the right tool for the job.
+Generally, dotfiles projects provide a mix of static configuration and bootstrapping scripts to provision a local computing environment.  However, the effort to provide bootstrapping scripts that comprehensively provision an arbirary machine (architecture, os, package manager)  eventually becomes significant - ansible is more capable of accomplishing this goal.
 
 # Expected outcome and conventions
 
 When this ansible playbook is run, the following outcomes are expected:
 
-* This git repository is copied (or symlinked) to _$HOME/.dotfiles_
 * Files at _$HOME/.profile.d_ are sourced when terminal sessions are created
 * Helper shell scripts are implemented as functions/aliases provided via sourced files in _$HOME/.profile.d_
 * Helper scripts that exist beyond the terminal session are installed to _/usr/local/bin_
-* File-based configuration is symlinked/hardlinked from _$HOME/.dotfiles_ to their expected location (such that local configuration change leaves the repo at _$HOME/.dotfiles_ in a dirty state)
-* Script-based configuration is applied on every playbook execution (e.g., _gsettings_)
+* File-based configuration is symlinked/hardlinked from the project's clone path to their expected location (such that local configuration change leaves the cloned repo in a dirty state)
+* Script-based configuration is applied on every playbook execution (e.g., _gsettings_ settings)
 * All necessary, supported applications are installed
 * OS, desktop environments, and applications are all configured and themed appropriately
 
@@ -52,13 +47,10 @@ Configuration is defined in the environment, and consumed via [dynamic inventory
 | - | - |
 | _LOCAL_ | When set to a truthy value, playbook will be applied to the local machine.  One of _LOCAL_ or _REMOTE_IP_ must be provided. |
 | _REMOTE_IP_ | When set to a truthy value, playbook will be applied to the provided IP address. One of _LOCAL_ or _REMOTE_IP_ must be provided. |
-| _SYMLINK_PLAYBOOK_ | When set to a truthy value, will symlink the current playbook directory to the dotfiles path (for local development). |
 
 # Playbook
 
-The [before playbook](./before.yaml) must be run before the main playbook - it installs necessary ansible-galaxy collection dependencies.
-
-The [main playbook](./main.yaml) lists all available roles alphabetically to ensure that no roles are accidentally ignored.
+The [main playbook](./playbooks/main.yaml) lists all available roles alphabetically to ensure that no roles are accidentally ignored.
 
 [Tags](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html) ultimately filter down the roles that are executed, and [role dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies) ensure that roles are executed in a topologically sorted order.
 
@@ -94,6 +86,8 @@ Tags need to be composed - personalizing a machine with a graphical environment 
 
 By default, all tags (`minimal,graphical,optional`) are applied.
 
+Additionally, each role is tagged with its name - allowing you to target specific roles by name.
+
 # Task lists
 
 Role task lists are structured to:
@@ -107,7 +101,7 @@ As a result, role task lists often look like the following:
 ```yaml
 ---
 # apply common tags
-- tags: [<tag>, , "{{role_name}}"]
+- tags: [<tag>, , role_name]
   block:
     # this block only gets executed in the fall-through case
     - when: not (darwin or (linux and amd64))

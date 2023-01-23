@@ -1,0 +1,22 @@
+---
+- tags: [optional, bitwarden]
+  block:
+    - when: not (linux or darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: linux
+      block:
+        - name: flatpak install bitwarden
+          become: true
+          community.general.flatpak:
+            name: com.bitwarden.desktop
+
+    - when: darwin
+      block:
+        - name: brew cask install bitwarden
+          community.general.homebrew_cask:
+            name: bitwarden
+            path: "{{brew_path}}"
+...

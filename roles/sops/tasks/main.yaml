@@ -1,0 +1,23 @@
+---
+- tags: [minimal, sops]
+  block:
+    - when: not (darwin or archlinux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew install gnupg
+          community.general.homebrew:
+            name: sops
+            path: "{{brew_path}}"
+    
+    - when: archlinux
+      block:
+        - name: pacman install sops
+          become: true
+          community.general.pacman:
+            name:
+              - sops
+...

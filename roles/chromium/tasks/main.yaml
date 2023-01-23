@@ -1,0 +1,67 @@
+---
+- tags: [graphical, chromium]
+  block:
+    - when: not (darwin or linux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew cask install google-chrome
+          community.general.homebrew_cask:
+            name: google-chrome
+            path: "{{brew_path}}"
+
+        - name: remove existing google-chrome policy
+          become: true
+          failed_when: false
+          ansible.builtin.command:
+            cmd: profiles -R -F {{dotfiles_path}}/roles/chromium/files/macos.mobileconfig
+
+        - name: install google-chrome policy
+          ansible.builtin.command:
+            cmd: open {{dotfiles_path}}/roles/chromium/files/macos.mobileconfig
+
+    - when: linux
+      block:
+        - name: flatpak install chromium
+          become: true
+          community.general.flatpak:
+            name: org.chromium.Chromium
+
+        - name: create chromium policy folder
+          become: true
+          ansible.builtin.file:
+            path: "{{policy_file|dirname}}"
+            recurse: true
+            state: directory
+
+        - name: install chromium policy
+          become: true
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/chromium/files/policy.json"
+            dest: "{{policy_file}}"
+            state: hard
+            force: true
+        
+        - name: create flatpak extension folder
+          become: true
+          ansible.builtin.file:
+            path: "{{flatpak_policy_folder|dirname}}"
+            recurse: true
+            state: directory
+
+        - name: symlink chromium policies to flatpak extension folder
+          become: true
+          ansible.builtin.file:
+            src: "/etc/chromium-browser"
+            path: "{{flatpak_policy_folder}}"
+            state: link
+      vars:
+        flatpak_policy_folders:
+          amd64: /var/lib/flatpak/extension/org.chromium.Chromium.Extension.system-policies/x86_64/1
+          arm64: /var/lib/flatpak/extension/org.chromium.Chromium.Extension.system-policies/aarch64/1
+        flatpak_policy_folder: "{{flatpak_policy_folders[architecture]}}"
+        policy_file: /etc/chromium-browser/policies/managed/policy.json
+...

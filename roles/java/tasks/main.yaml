@@ -1,0 +1,51 @@
+---
+- tags: [minimal, java]
+  block:
+    - when: not (darwin or debian or archlinux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew install java build dependencies
+          community.general.homebrew:
+            name: jq
+            path: "{{brew_path}}"
+    
+    - when: debian
+      block:
+        - name: apt install java build dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - bash
+              - curl
+              - coreutils
+              - unzip
+              - jq
+  
+    - when: archlinux
+      block:
+        - name: pacman install java build dependencies
+          become: true
+          community.general.pacman:
+            name:
+              - bash
+              - curl
+              - coreutils
+              - unzip
+              - jq
+    
+    - when: archlinux or debian or darwin
+      block:
+        - name: asdf plugin add java
+          benfiola.dotfiles.asdf_plugin:
+            name: java
+        
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/java/files/profile.sh"
+            path: "{{user_profiled_path}}/01-java.sh"
+            state: link
+...

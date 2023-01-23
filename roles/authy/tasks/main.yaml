@@ -1,0 +1,22 @@
+---
+- tags: [optional, authy]
+  block:
+    - when: not (darwin or linux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: linux
+      block:
+        - name: snap install authy
+          become: true
+          community.general.snap:
+            name: authy
+
+    - when: darwin
+      block:
+        - name: brew cask install authy
+          community.general.homebrew_cask:
+            name: authy
+            path: "{{brew_path}}"
+...

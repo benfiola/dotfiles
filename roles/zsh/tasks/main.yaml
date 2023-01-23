@@ -1,0 +1,39 @@
+---
+- tags: [minimal, zsh]
+  block:
+    - when: not (debian or archlinux or darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install zsh
+          become: true
+          ansible.builtin.apt:
+            package:
+              - zsh
+    
+    - when: archlinux
+      block:
+        - name: pacman install zsh
+          become: true
+          community.general.pacman:
+            name:
+              - zsh
+
+    - when: archlinux or debian or darwin
+      block:
+        - name: set user shell
+          become: true
+          ansible.builtin.user:
+            name: "{{user.name}}"
+            shell: /bin/zsh
+          register: user
+
+        - name: install user shell profile
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/zsh/files/profile.sh"
+            path: "{{user.home}}/.zshrc"
+            state: link
+...

@@ -1,0 +1,48 @@
+---
+- tags: [graphical, vscode]
+  block:
+    - when: not (archlinux or debian or darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+  
+    - when: archlinux
+      block:
+        - name: pacman aur install visual-studio-code-bin
+          ansible.builtin.include_role:
+            name: benfiola.dotfiles.utils
+            tasks_from: install-pacman-aur.yaml
+          vars:
+            url: https://aur.archlinux.org/visual-studio-code-bin.git
+            package: visual-studio-code-bin
+      
+    - when: debian
+      block:
+        - name: apt add microsoft signing key
+          become: true
+          ansible.builtin.apt_key:
+            url: https://packages.microsoft.com/keys/microsoft.asc
+
+        - name: apt add vscode repository
+          become: true
+          ansible.builtin.apt_repository:
+            repo: "{{repositories[architecture]}}"
+          vars:
+            repositories:
+              amd64: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+              arm64: deb [arch=arm64] https://packages.microsoft.com/repos/vscode stable main
+
+        - name: apt install code
+          become: true
+          ansible.builtin.apt:
+            update_cache: true
+            package:
+              - code
+
+    - when: darwin
+      block:
+        - name: brew cask install visual-studio-code
+          community.general.homebrew_cask:
+            name: visual-studio-code
+            path: "{{brew_path}}"
+...

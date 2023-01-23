@@ -1,0 +1,24 @@
+---
+- tags: [graphical, ls]
+  block:
+    - when: not (linux or debian)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+
+    - when: darwin
+      block:
+        - name: brew install coreutils
+          community.general.homebrew:
+            name:
+              - coreutils
+            path: "{{brew_path}}"
+    
+    - when: linux or darwin
+      block:
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/ls/files/profile.sh"
+            path: "{{user_profiled_path}}/00-ls.sh"
+            state: link
+...

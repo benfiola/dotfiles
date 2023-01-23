@@ -1,0 +1,23 @@
+---
+- tags: [minimal, ssh]
+  block:
+    - when: not true
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: true
+      block:          
+        - name: create ssh keys
+          vars: 
+            ssh_user: "{{ssh_item.ssh_user}}"
+            ssh_host: "{{ssh_item.ssh_host}}"
+          ansible.builtin.include_role: 
+            role: benfiola.dotfiles.utils
+            tasks_from: create-ssh-key.yaml
+          loop:
+            - {ssh_user: benfiola, ssh_host: github.com}
+          loop_control:
+            label: "{{ssh_item.ssh_user}}@{ssh_item.ssh_host}}"
+            loop_var: ssh_item
+...

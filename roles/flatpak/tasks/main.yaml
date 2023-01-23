@@ -1,0 +1,31 @@
+---
+- tags: [minimal, flatpak]
+  block:
+    - when: not (debian or archlinux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install flatpak
+          become: true
+          ansible.builtin.apt:
+            package:
+              - flatpak
+      
+    - when: archlinux
+      block:
+        - name: pacman install flatpak
+          become: true
+          community.general.pacman:
+            name:
+              - flatpak
+
+        - name: add flathub repo
+          become: true
+          community.general.flatpak_remote:
+            name: flathub
+            state: present
+            flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+...

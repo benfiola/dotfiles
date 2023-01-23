@@ -1,0 +1,41 @@
+---
+- tags: [minimal, locale]
+  block:
+    - when: not (archlinux or debian)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - locales
+    
+    - when: archlinux or debian
+      block:
+        - name: generate system locale with localegen
+          become: true
+          community.general.locale_gen:
+            name: en_US.UTF-8
+
+        - name: set system locale
+          become: true
+          ansible.builtin.lineinfile:
+            dest: "{{item}}"
+            regexp: ^LANG=
+            line: LANG=en_US.UTF-8
+            create: true
+          loop:
+            - /etc/default/locale
+            - /etc/locale.conf
+
+    - when: debian or archlinux
+      block:
+        - name: set timezone
+          become: true
+          community.general.timezone:
+            name: America/Los_Angeles
+...
