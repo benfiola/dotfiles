@@ -41,13 +41,13 @@
         - name: copy playbook to dotfiles directory
           when: not symlink_playbook
           ansible.builtin.synchronize:
-            src: "{{playbook_dir | dirname}}/"
+            src: "{{role_path | dirname | dirname}}/"
             dest: "{{user.home}}/.dotfiles"
 
         - name: symlink playbook to dotfiles directory
           when: symlink_playbook
           ansible.builtin.file:
-            src: "{{playbook_dir | dirname}}"
+            src: "{{role_path | dirname | dirname}}"
             dest: "{{user.home}}/.dotfiles"
             state: link
         
