@@ -1,0 +1,36 @@
+- when: linux and kde
+  block:
+    - name: install kde with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - sddm
+          - kde-plasma-desktop
+          - plasma-workspace-wayland
+
+    - name: install kde with pacman
+      become: true
+      when: archlinux
+      community.general.pacman:
+        name:
+          - sddm
+          - plasma-desktop
+          - plasma-wayland-session
+
+    - name: enable sddm
+      become: true
+      ansible.builtin.systemd:
+        name: sddm
+        enabled: true
+
+    - name: run configuration commands
+      ansible.builtin.command:
+        cmd: "{{item}}"
+      loop:
+        - kwriteconfig5 --file {{user.home}}/.config/plasmarc --group Theme --key name breeze-dark
+        - gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        - gsettings set org.gnome.desktop.interface gtk-theme 'Breeze-Dark'
+        - gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'
+        - gsettings set org.gnome.desktop.interface cursor-theme 'breeze_cursors'
+        - gsettings set org.gnome.desktop.interface monospace-font-name 'FiraCode Nerd Font Mono 12'

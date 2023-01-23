@@ -17,6 +17,8 @@
 - ansible.builtin.include_tasks: ./components/docker.yaml
 
 - ansible.builtin.include_tasks: ./components/lscolors.yaml
+- ansible.builtin.include_tasks: ./components/kde.yaml
+- ansible.builtin.include_tasks: ./components/konsole.yaml
 - ansible.builtin.include_tasks: ./components/gnome.yaml
 - ansible.builtin.include_tasks: ./components/gnome-terminal.yaml
 - ansible.builtin.include_tasks: ./components/macos.yaml

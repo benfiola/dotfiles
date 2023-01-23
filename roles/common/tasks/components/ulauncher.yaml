@@ -19,7 +19,17 @@
       vars:
         url: https://aur.archlinux.org/ulauncher.git
         package: ulauncher
-      
+    
+    - name: create ulauncher-toggle.desktop
+      become: true
+      ansible.builtin.template:
+        src: desktop.j2
+        dest: /usr/share/applications/{{name}}.desktop
+        mode: '0644'
+      vars:
+        command: ulauncher-toggle
+        name: ulauncher-toggle
+    
     - name: create ulauncher user theme directory
       ansible.builtin.file:
         path: "{{user.home}}/.config/ulauncher/user-themes"
@@ -39,9 +49,22 @@
         state: link
 
     - name: install ulauncher keybindings
+      when: gnome
       ansible.builtin.command:
-        cmd: "{{dotfiles_path}}/ulauncher/gsettings.sh"
+        cmd: "{{item}}"
+      loop:
+        - gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/ulauncher-toggle/ binding '<Primary>space'
+        - gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/ulauncher-toggle/ command 'ulauncher-toggle'
+        - gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/ulauncher-toggle/ name 'ulauncher-toggle'
 
+    - name: install ulauncher keybindings
+      when: kde
+      ansible.builtin.command:
+        cmd: "{{item}}"
+      loop:
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group ulauncher-toggle.desktop --key _launch "Ctrl+Space,none,ulauncher-toggle"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group ulauncher-toggle.desktop --key _k_friendly_name "ulauncher-toggle"
+    
     - name: start ulauncher systemd service
       ansible.builtin.systemd:
         name: ulauncher

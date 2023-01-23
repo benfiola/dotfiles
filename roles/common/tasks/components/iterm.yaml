@@ -8,6 +8,9 @@
         dest: /Applications
         creates: /Applications/iTerm.app
 
-    - name: install terminal configuration
+    - name: run configuration commands
       ansible.builtin.command:
-        cmd: "{{dotfiles_path}}/iterm/defaults.sh"
+        cmd: "{{item}}"
+      loop:
+        - defaults write com.googlecode.iterm2 PrefsCustomFolder -string "{{dotfiles_path}}/iterm/com.googlecode.iterm2.plist"
+        - defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true

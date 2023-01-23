@@ -1,3 +1,4 @@
+#!/usr/bin/env -S zsh
 directory="$(dirname "${(%):-%x}")"
 
 ls_bin="ls"

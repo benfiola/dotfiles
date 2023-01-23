@@ -1,11 +1,11 @@
-- when: linux
+- when: linux and gnome
   block:
     - name: install gnome with apt
       become: true
       when: debian
       ansible.builtin.apt:
         package:
-          - gdm
+          - gdm3
           - gnome-shell
           - gnome-shell-extensions
           - gnome-session
@@ -37,14 +37,15 @@
       ansible.builtin.systemd:
         name: gdm
         enabled: true
-      
-    - name: install gnome theme
-      become: true
-      ansible.builtin.file:
-        src: "{{dotfiles_path}}/gnome/theme"
-        dest: /usr/share/themes/theme
-        state: link
 
-    - name: run gnome configuration script
+    - name: run configuration commands
       ansible.builtin.command:
-        cmd: "{{dotfiles_path}}/gnome/gsettings.sh"
+        cmd: "{{item}}"
+      loop:
+        - gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+        - gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+        - gsettings set org.gnome.desktop.interface icon-theme 'Adwaita'
+        - gsettings set org.gnome.desktop.interface cursor-theme 'Adwaita'
+        - gsettings set org.gnome.desktop.interface monospace-font-name 'FiraCode Nerd Font Mono 12'
+        - gsettings set org.gnome.desktop.wm.preferences theme 'Adwaita-dark'
+        - gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/ulauncher-toggle/']"

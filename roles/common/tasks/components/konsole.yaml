@@ -1,0 +1,39 @@
+- when: linux and kde
+  block:
+    - name: install konsole with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - konsole
+      
+    - name: install konsole with pacman
+      become: true
+      when: archlinux
+      community.general.pacman:
+        name:
+          - konsole
+
+    - name: create konsole profile directory
+      ansible.builtin.file:
+        path: "{{user.home}}/.local/share/konsole"
+        recurse: true
+        state: directory
+    
+    - name: link konsole colorscheme file
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/konsole/theme.colorscheme"
+        path: "{{user.home}}/.local/share/konsole/theme.colorscheme"
+        state: link
+
+    - name: link konsole profile file
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/konsole/theme.profile"
+        path: "{{user.home}}/.local/share/konsole/theme.profile"
+        state: link
+    
+    - name: set konsole default profile
+      ansible.builtin.command:
+        cmd: "{{item}}"
+      loop:
+        - kwriteconfig5 --file "{{user.home}}/.config/konsolerc" --group "Desktop Entry" --key "DefaultProfile" "theme.profile"

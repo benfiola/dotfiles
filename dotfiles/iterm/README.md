@@ -3,5 +3,5 @@
 ## Usage
 
 ```
-<directory>/defaults.sh
+<directory>/configure.sh
 ```
