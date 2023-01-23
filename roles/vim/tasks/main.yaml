@@ -1,0 +1,38 @@
+---
+- tags: [minimal]
+  block:
+    - when: not (debian or darwin or archlinux)
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install vim
+          become: true
+          ansible.builtin.apt:
+            package:
+              - vim
+
+    - when: archlinux
+      block:
+        - name: pacman install vim
+          become: true
+          community.general.pacman:
+            name:
+              - vim
+
+    - when: debian or archlinux or darwin
+      block:
+        - name: install vimrc
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/vim/files/vimrc"
+            path: "{{user.home}}/.vimrc"
+            state: link
+      
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/vim/files/zshrc.sh"
+            path: "{{user_profiled_path}}/00-vim.sh"
+            state: link
+...

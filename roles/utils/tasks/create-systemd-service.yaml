@@ -1,0 +1,6 @@
+- name: create {{scope}} systemd service {{name}}
+  become: true
+  ansible.builtin.template:
+    src: systemd.service.j2
+    dest: /usr/lib/systemd/{{scope}}/{{name}}.service
+    mode: '0644'

@@ -1,0 +1,7 @@
+---
+dependencies:
+  - role: facts
+  - role: flatpak
+  - role: brew
+  - role: dotfiles
+...

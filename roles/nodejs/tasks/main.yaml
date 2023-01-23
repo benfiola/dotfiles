@@ -1,0 +1,36 @@
+---
+- tags: [minimal]
+  block:
+    - when: not (debian or archlinux or darwin)
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: debian
+      block:
+        - name: apt install nodejs build dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - python3
+              - g++
+              - make
+              - python-pip
+
+    - when: archlinux
+      block:
+        - name: pacman install nodejs build dependencies
+          become: true
+          community.general.pacman:
+            name:
+              - python
+              - gcc
+              - make
+              - python-pip
+
+    - when: debian or archlinux or darwin
+      block:
+        - name: asdf plugin add nodejs
+          asdf_plugin:
+            name: nodejs
+...

@@ -1,0 +1,46 @@
+---
+- tags: [minimal]
+  block:
+    - when: not (debian or archlinux or darwin)
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: debian
+      block:
+        - name: apt install asdf dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - curl
+              - git
+
+    - when: archlinux
+      block:
+        - name: pacman install asdf dependencies
+          become: true
+          community.general.pacman:
+            name:
+              - curl
+              - git
+
+    - when: debian or archlinux or darwin
+      block:
+        - name: clone asdf repo
+          ansible.builtin.git:
+            repo: https://github.com/asdf-vm/asdf.git
+            dest: "{{user.home}}/.asdf"
+
+        - name: create asdf .tool-versions file
+          ansible.builtin.file:
+            path: "{{user.home}}/.tool-versions"
+            state: touch
+            modification_time: preserve
+            access_time: preserve
+        
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/asdf/files/zshrc.sh"
+            path: "{{user_profiled_path}}/00-asdf.sh"
+            state: link
+...

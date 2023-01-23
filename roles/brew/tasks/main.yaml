@@ -1,0 +1,33 @@
+---
+- tags: [minimal]
+  block:
+    - when: not darwin
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: darwin
+      block:
+        - name: set brew path fact
+          ansible.builtin.set_fact:
+            brew_path: "{{path}}"
+          vars:
+            paths:
+              amd64: /usr/local/bin
+              arm64: /opt/homebrew/bin
+            path: "{{paths[architecture]}}"
+          
+        - name: install brew from url
+          ansible.builtin.include_role: 
+            role: utils
+            tasks_from: execute-url-script.yaml
+          vars:        
+            url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+            binary: "{{brew_path}}"
+        
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/brew/files/zshrc.sh"
+            path: "{{user_profiled_path}}/00-brew.sh"
+            state: link
+...

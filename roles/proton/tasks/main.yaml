@@ -1,0 +1,15 @@
+---
+- tags: [optional]
+  block:
+    - when: not linux
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: linux
+      block:
+        - name: flatpak install protonqt-up
+          become: true
+          community.general.flatpak:
+            name: net.davidotek.pupgui2
+...

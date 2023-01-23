@@ -1,0 +1,23 @@
+---
+- tags: [optional]
+  block:
+    - when: not (darwin or archlinux)
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew cask install discord
+          community.general.homebrew_cask:
+            name: discord
+            path: "{{brew_path}}"
+    
+    - when: archlinux
+      block:
+        - name: pacman install discord
+          become: true
+          community.general.pacman:
+            name:
+              - discord
+...

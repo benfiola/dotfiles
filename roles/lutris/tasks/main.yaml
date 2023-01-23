@@ -1,0 +1,16 @@
+---
+- tags: [optional]
+  block:
+    - when: not archlinux
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: archlinux
+      block:
+      - name: pacman install lutris
+        become: true
+        community.general.pacman:
+          name:
+            - lutris
+...

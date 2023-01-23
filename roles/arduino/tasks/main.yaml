@@ -1,0 +1,32 @@
+---
+- tags: [minimal]
+  block:
+    - when: not (archlinux or darwin)
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: darwin
+      block:
+        - name: brew install arduino-cli
+          community.general.homebrew:
+            name:
+              - arduino-cli
+            path: "{{brew_path}}"
+    
+    - when: archlinux
+      block:
+        - name: pacman install arduino-cli
+          become: true
+          community.general.pacman:
+            name:
+              - arduino-cli
+    
+        - name: add user to uucp group
+          become: true
+          ansible.builtin.user:
+            append: true
+            user: "{{user.name}}"
+            groups:
+              - uucp
+...

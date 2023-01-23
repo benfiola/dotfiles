@@ -1,0 +1,6 @@
+- name: create {{name}}.desktop
+  become: true
+  ansible.builtin.template:
+    src: desktop.j2
+    dest: /usr/share/applications/{{name}}.desktop
+    mode: '0644'

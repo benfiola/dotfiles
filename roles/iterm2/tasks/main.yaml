@@ -1,0 +1,19 @@
+---
+- tags: [graphical]
+  block:
+    - when: not darwin
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew cask install iterm2
+          community.general.homebrew_cask:
+            name: iterm2
+            path: "{{brew_path}}"
+          
+        - name: run configuration commands
+          ansible.builtin.command:
+            cmd: "{{dotfiles_path}}/roles/iterm2/files/config.sh"
+...

@@ -1,0 +1,35 @@
+---
+- tags: [minimal]
+  block:
+    - when: not ((vm and debian) or (vm and archlinux))
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: vm and debian
+      block:
+        - name: apt install open-vm-tools
+          become: true
+          ansible.builtin.apt:
+            package:
+              - open-vm-tools
+              - open-vm-tools-desktop
+    
+    - when: vm and archlinux
+      block:
+        - name: pacman install open-vm-tools
+          become: true
+          community.general.pacman:
+            name:
+              - open-vm-tools
+    
+        - name: start and enable open-vm-tools services
+          become: true
+          ansible.builtin.systemd:
+            name: "{{item}}"
+            state: started
+            enabled: true
+          loop:
+            - vmtoolsd 
+            - vmware-vmblock-fuse
+...

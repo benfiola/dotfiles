@@ -1,0 +1,55 @@
+---
+- tags: [minimal]
+  block:
+    - name: set configuration facts
+      ansible.builtin.set_fact:
+        desktop_environment: "{{desktop_environment | default('kde')}}"
+        symlink_playbook: "{{symlink_playbook | default(False)}}"
+
+    - name: set system facts
+      ansible.builtin.set_fact:
+        os_family: "{{ansible_facts['os_family'] | lower}}"
+        system: "{{ansible_system | lower}}"
+        architecture: "{{ansible_architecture | lower}}"
+        distribution: "{{ansible_distribution | lower}}"
+        release: "{{ansible_distribution_release | lower}}"
+        username: "{{ansible_user_id}}"
+        vm: false
+
+    - name: coerce aarch64 to arm64
+      when: architecture == 'aarch64'
+      ansible.builtin.set_fact:
+        architecture: arm64
+
+    - name: coerce x86_64 to amd64
+      when: architecture == 'x86_64'
+      ansible.builtin.set_fact:
+        architecture: amd64
+
+    - name: set system facts
+      ansible.builtin.set_fact:
+        linux: "{{system == 'linux'}}"
+        darwin: "{{system == 'darwin'}}"
+        debian: "{{os_family == 'debian'}}"
+        archlinux: "{{os_family == 'archlinux'}}"
+        kde: "{{desktop_environment == 'kde'}}"
+        amd64: "{{architecture == 'amd64'}}"
+        arm64: "{{architecture == 'arm64'}}"
+
+    - name: set user
+      ansible.builtin.user:
+        name: "{{username}}"
+      register: user
+
+    - when: linux
+      block:
+        - name: read system product name
+          ansible.builtin.slurp:
+            src: /sys/devices/virtual/dmi/id/product_name
+          register: product_name
+
+        - name: set vm flag
+          when: "'vmware' in (product_name['content'] | b64decode | lower)"
+          ansible.builtin.set_fact:
+            vm: true
+...

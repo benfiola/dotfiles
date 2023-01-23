@@ -1,0 +1,47 @@
+---
+- tags: [graphical]
+  block:
+    - when: not ((kde and debian) or (kde and archlinux))
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: kde and debian
+      block:
+        - name: apt install konsole
+          become: true
+          ansible.builtin.apt:
+            package:
+              - konsole
+
+    - when: kde and archlinux
+      block:
+        - name: pacman install konsole
+          become: true
+          community.general.pacman:
+            name:
+              - konsole
+
+    - when: (kde and archlinux) or (kde and debian)
+      block:
+        - name: create konsole profile directory
+          ansible.builtin.file:
+            path: "{{user.home}}/.local/share/konsole"
+            recurse: true
+            state: directory
+          
+        - name: link konsole colorscheme file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/konsole/files/theme.colorscheme"
+            path: "{{user.home}}/.local/share/konsole/theme.colorscheme"
+            state: link
+
+        - name: link konsole profile file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/konsole/files/theme.profile"
+            path: "{{user.home}}/.local/share/konsole/theme.profile"
+            state: link
+          
+        - name: run configuration script
+          ansible.builtin.command:
+            cmd: "{{dotfiles_path}}/roles/konsole/files/config.sh"

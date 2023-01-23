@@ -1,5 +1,0 @@
-- name: install spotify with flatpak
-  when: linux
-  become: true
-  community.general.flatpak:
-    name: com.spotify.Client

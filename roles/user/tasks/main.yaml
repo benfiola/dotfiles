@@ -1,0 +1,27 @@
+---
+- tags: [minimal]
+  block:
+    - name: enable passwordless sudo
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/99-{{user.name}}
+        create: true
+        line: "{{user.name}} ALL=(ALL) NOPASSWD: ALL"
+        validate: visudo -cf %s
+    
+    - name: create .profile.d directory
+      ansible.builtin.file:
+        path: "{{user.home}}/.profile.d"
+        state: directory
+    
+    - name: create .bin directory
+      ansible.builtin.file:
+        path: "{{user.home}}/.bin"
+        state: directory
+    
+    - name: set path facts
+      ansible.builtin.set_fact:
+        user_profiled_path: "{{user.home}}/.profile.d"
+        user_bin_path: "{{user.home}}/.bin"
+
+...

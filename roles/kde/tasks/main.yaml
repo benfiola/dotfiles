@@ -1,0 +1,66 @@
+---
+- tags: [graphical]
+  block:
+    - when: not ((kde and debian) or (kde and archlinux))
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: kde and debian
+      block:
+        - name: apt install kde + dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - sddm
+              - kde-plasma-desktop
+              - plasma-workspace-wayland
+              - pulseaudio
+              - pavucontrol
+              - plasma-pa
+              - kscreen
+              - dolphin
+              - fonts-noto-color-emoji
+              - fonts-noto-cjk
+              - kwallet-pam
+              - kde-spectacle
+              - powerdevil
+        
+    - when: kde and archlinux
+      block:
+      - name: pacman install kde + dependencies
+        become: true
+        community.general.pacman:
+          name:
+            - sddm
+            - sddm-kcm
+            - plasma-desktop
+            - plasma-wayland-session
+            - pulseaudio
+            - pavucontrol
+            - plasma-pa
+            - kscreen
+            - dolphin
+            - noto-fonts-emoji
+            - noto-fonts-cjk
+            - kwallet-pam
+            - spectacle
+            - powerdevil
+
+    - when: archlinux or debian
+      block:
+        - name: enable sddm
+          become: true
+          ansible.builtin.systemd:
+            name: sddm
+            enabled: true
+
+        - name: run system configuration commands
+          become: true
+          ansible.builtin.command:
+            cmd: "{{dotfiles_path}}/roles/kde/files/config.sh"
+
+        - name: run configuration commands
+          ansible.builtin.command:
+            cmd: "{{dotfiles_path}}/roles/kde/files/config.sh"
+...

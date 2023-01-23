@@ -1,0 +1,31 @@
+---
+- tags: [optional]
+  block:
+    - when: not (darwin or archlinux or debian)
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install gimp
+          become: true
+          ansible.builtin.apt:
+            package:
+              - gimp
+
+    - when: darwin
+      block:
+        - name: brew cask install gimp
+          community.general.homebrew_cask:
+            name: gimp
+            path: "{{brew_path}}"
+    
+    - when: archlinux
+      block:
+        - name: pacman install gimp
+          become: true
+          community.general.pacman:
+            name:
+              - gimp
+...

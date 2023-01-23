@@ -1,0 +1,8 @@
+---
+dependencies:
+  - role: facts
+  - role: dotfiles
+  - role: pacman
+  - role: apt
+  - role: user
+...

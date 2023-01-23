@@ -1,0 +1,43 @@
+---
+- tags: [graphical]
+  block:
+    - when: not (debian or archlinux)
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: debian
+      block:
+        - name: apt install bismuth
+          become: true
+          ansible.builtin.apt:
+            package:
+              - kwin-bismuth
+        
+    - when: archlinux
+      block:
+        - name: pacman aur install bismuth
+          ansible.builtin.include_role: 
+            name: utils
+            tasks_from: install-pacman-aur.yaml
+          vars:
+            url: https://aur.archlinux.org/kwin-bismuth-bin.git
+            package: kwin-bismuth
+    
+    - when: debian or archlinux
+      block:
+        - name: install bismuth-toggle
+          become: true
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/bismuth/files/bismuth-toggle.sh"
+            path: /usr/local/bin/bismuth-toggle
+            state: link
+
+        - name: create bismuth-toggle.desktop
+          ansible.builtin.include_role:
+            name: utils
+            tasks_from: create-desktop.yaml
+          vars:
+            command: /usr/local/bin/bismuth-toggle
+            name: bismuth-toggle
+...

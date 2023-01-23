@@ -1,0 +1,56 @@
+---
+- hosts: all
+  roles:
+    - amethyst
+    - apt
+    - arduino
+    - asdf
+    - authy
+    - bismuth
+    - bitwarden
+    - brew
+    - c
+    - chromium
+    - discord
+    - docker
+    - dotfiles
+    - facts
+    - flatpak
+    - fonts
+    - gimp
+    - golang
+    - gpg
+    - iterm2
+    - java
+    - kde
+    - konsole
+    - kubectl
+    - locale
+    - lscolors
+    - lutris
+    - macos
+    - nodejs
+    - open-vm-tools
+    - pacman
+    - proton
+    - python
+    - snap
+    - sops
+    - source
+    - spotify
+    - starship
+    - steam
+    - tanka
+    - user
+    - variety
+    - vim
+    - vscode
+    - wine
+    - zsh
+
+- hosts: all
+  tasks:
+    - block:
+        - empty: {}
+      always:
+        - temp_file_cleanup: {}

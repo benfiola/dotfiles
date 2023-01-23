@@ -1,0 +1,23 @@
+---
+- tags: [minimal]
+  block:
+    - when: not (darwin or archlinux)
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew install tanka
+          community.general.homebrew:
+            name: tanka
+            path: "{{brew_path}}"
+    
+    - when: archlinux
+      block:
+        - name: pacman install tanka
+          become: true
+          community.general.pacman:
+            name:
+              - tanka
+...

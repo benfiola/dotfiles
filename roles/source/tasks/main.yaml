@@ -1,0 +1,22 @@
+---
+- tags: [minimal]
+  block:
+    - when: not true
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: true
+      block:
+        - name: create source folder
+          ansible.builtin.file:
+            path: "{{user.home}}/source"
+            recurse: true
+            state: directory
+  
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/source/files/zshrc.sh"
+            path: "{{user_profiled_path}}/00-source.sh"
+            state: link
+...

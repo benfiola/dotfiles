@@ -1,6 +1,0 @@
-- name: install coreutils with brew
-  when: darwin
-  community.general.homebrew:
-    name:
-      - coreutils
-    path: "{{brew_path}}"

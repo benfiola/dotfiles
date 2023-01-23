@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: facts
+  - role: brew
+  - role: pacman
+...

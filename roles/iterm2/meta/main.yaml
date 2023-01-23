@@ -1,0 +1,7 @@
+---
+dependencies:
+  - role: facts
+  - role: brew
+  - role: fonts
+  - role: dotfiles
+...

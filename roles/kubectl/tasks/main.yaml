@@ -1,0 +1,14 @@
+---
+- tags: [minimal]
+  block:
+    - when: not true
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: true
+      block:
+        - name: install asdf-kubectl
+          asdf_plugin:
+            name: kubectl
+...

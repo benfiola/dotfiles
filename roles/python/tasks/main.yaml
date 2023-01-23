@@ -1,0 +1,69 @@
+---
+- tags: [minimal]
+  block:
+    - when: not (debian or archlinux or darwin) 
+      block:
+        - name: unimplemented
+          empty: {}
+
+    - when: debian
+      block:
+        - name: apt install python build dependencies
+          become: true
+          ansible.builtin.apt:
+            package:
+              - make
+              - build-essential
+              - libssl-dev
+              - zlib1g-dev
+              - libbz2-dev
+              - libreadline-dev
+              - libsqlite3-dev
+              - wget
+              - curl
+              - llvm
+              - libncursesw5-dev
+              - xz-utils
+              - tk-dev
+              - libxml2-dev
+              - libxmlsec1-dev
+              - libffi-dev
+              - liblzma-dev
+
+    - when: archlinux
+      block:
+        - name: pacman install python build dependencies
+          become: true
+          community.general.pacman:
+            name:
+              - base-devel
+              - openssl
+              - zlib
+              - xz
+              - tk
+    
+    - when: darwin
+      block:
+        - name: brew install python build dependencies
+          community.general.homebrew:
+            name:
+              - openssl
+              - readline
+              - sqlite3
+              - xz
+              - zlib
+              - tcl-tk
+            path: "{{brew_path}}"
+
+    - when: darwin or archlinux or debian
+      block:
+        - name: asdf plugin add python
+          asdf_plugin:
+            name: python
+        
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/python/files/zshrc.sh"
+            path: "{{user_profiled_path}}/01-python.sh"
+            state: link
+...

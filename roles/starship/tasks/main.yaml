@@ -1,0 +1,38 @@
+---
+- tags: [graphical]
+  block:
+    - when: not (darwin or debian or archlinux)
+      block:
+        - name: unimplemented
+          empty: {}
+    
+    - when: darwin or debian or archlinux
+      block:
+        - name: install starship from url
+          ansible.builtin.include_role: 
+            name: utils
+            tasks_from: execute-url-as-script.yaml
+          vars:
+            url: https://raw.githubusercontent.com/starship/starship/v1.10.3/install/install.sh
+            binary: /usr/local/bin/starship
+            args: --yes
+            become: true
+
+        - name: create starship prompt configuration directory
+          ansible.builtin.file:
+            path: "{{user.home}}/.config"
+            recurse: true
+            state: directory
+
+        - name: install starship prompt configuration
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/starship/files/starship.toml"
+            dest: "{{user.home}}/.config/starship.toml"
+            state: link
+
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/starship/files/zshrc.sh"
+            path: "{{user_profiled_path}}/00-starship.sh"
+            state: link
+...

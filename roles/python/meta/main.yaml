@@ -1,0 +1,10 @@
+---
+dependencies:
+  - role: facts
+  - role: asdf
+  - role: brew
+  - role: apt
+  - role: pacman
+  - role: dotfiles
+  - role: user
+...
