@@ -5,16 +5,20 @@ Bootstraps a development environment
 # Requirements
 
 * `ansible`
+* `git`
+
+# Configuration
+
+Configuration is made via environment variables:
+
+* `LOCAL=1` instructs ansible to bootstrap the local machine
+* `REMOTE=<ip-address>` instructs ansible to bootstrap the machine at _<ip-address>_
+* `DESKTOP_ENVIRONMENT=gnome` instructs ansible to bootstrap the machine with the _GNOME_ desktop environment (default: _kde_)
 
 # Usage
 
-Run the following commi
-```
-LOCAL=1 ansible-pull -U https://github.com/benfiola/development-environment.git full.yaml
-```
+Run the following command:
 
-## Remote
-
-```
-REMOTE=<ip> ansible-pull -U https://github.com/benfiola/development-environment.git full.yaml
+```shell
+ansible-pull -U https://github.com/benfiola/development-environment.git full.yaml
 ```
