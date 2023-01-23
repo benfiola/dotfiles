@@ -3,4 +3,5 @@ dependencies:
   - role: facts
   - role: dotfiles
   - role: kde
+  - role: user
 ...

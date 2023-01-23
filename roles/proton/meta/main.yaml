@@ -2,4 +2,5 @@
 dependencies:
   - role: facts
   - role: flatpak
+  - role: user
 ...
