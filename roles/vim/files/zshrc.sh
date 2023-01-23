@@ -4,5 +4,4 @@ if ! command -v vim > /dev/null 2>&1; then
     return
 fi
 
-alias vi="vim"
 export EDITOR=vim

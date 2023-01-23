@@ -21,4 +21,10 @@
             src: "{{dotfiles_path}}/roles/lscolors/files/zshrc.sh"
             path: "{{user_profiled_path}}/00-lscolors.sh"
             state: link
+        
+        - name: link ls bin file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/lscolors/files/ls.sh"
+            path: "{{user_bin_path}}/ls"
+            state: link
 ...

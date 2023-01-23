@@ -11,26 +11,26 @@ debug_msg() {
 debug_msg "start: .zshrc"
 
 if [ "$ZSHRC_PATH" = "" ]; then
-    export ZSHRC_PATH="$PATH"
+    export ZSHRC_ORIGINAL_PATH="$PATH"
 fi
-export PATH="$ZSHRC_PATH"
+export PATH="$ZSHRC_ORIGINAL_PATH"
 
-profiled_dir="$HOME/.profile.d"
-if [ -d "$profiled_dir" ]; then
-    for file in "$profiled_dir"/*.sh; do
+export ZSHRC_PROFILED_PATH="$HOME/.profile.d"
+export ZSHRC_BIN_PATH="$HOME/.bin"
+
+if [ -d "$ZSHRC_PROFILED_PATH" ]; then
+    for file in "$ZSHRC_PROFILED_PATH"/*.sh; do
         debug_msg "source: $file"
         . "$file"
     done
 else
-    debug_msg "$profiled_dir not found"
+    debug_msg "$ZSHRC_PROFILED_PATH not found"
 fi
 
-bin_dir="$HOME/.bin"
-if [ ! -d "$bin_dir" ]; then
-    debug_msg "$bin_dir not found" 
+if [ ! -d "$ZSHRC_BIN_PATH" ]; then
+    debug_msg "$ZSHRC_BIN_PATH not found" 
 fi
-export ZSHRC_BIN_DIR="$bin_dir"
-export PATH="$bin_dir:$PATH"
+export PATH="$ZSHRC_BIN_PATH:$PATH"
 
 debug_msg "end: .zshrc"
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
-directory="$HOME/source"
+SOURCE_DIRECTORY="$HOME/source"
 
-if [ ! -d "$directory" ]; then
-    mkdir -p "$directory"
-fi
-
-alias src="cd ~/source"
+src() {
+    script="$ZSHRC_BIN_PATH/src"
+    source "$script" "$@"
+}

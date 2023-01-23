@@ -35,4 +35,10 @@
             src: "{{dotfiles_path}}/roles/vim/files/zshrc.sh"
             path: "{{user_profiled_path}}/00-vim.sh"
             state: link
+        
+        - name: link vi bin file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/vim/files/vi.sh"
+            path: "{{user_bin_path}}/vi"
+            state: link
 ...

@@ -66,4 +66,28 @@
             src: "{{dotfiles_path}}/roles/python/files/zshrc.sh"
             path: "{{user_profiled_path}}/01-python.sh"
             state: link
+      
+        - name: link mkve bin file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/python/files/mkve.sh"
+            path: "{{user_bin_path}}/python-mkve"
+            state: link
+        
+        - name: link lsve bin file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/python/files/lsve.sh"
+            path: "{{user_bin_path}}/python-lsve"
+            state: link
+        
+        - name: link rmve bin file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/python/files/rmve.sh"
+            path: "{{user_bin_path}}/python-rmve"
+            state: link
+        
+        - name: link useve bin file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/python/files/useve.sh"
+            path: "{{user_bin_path}}/python-useve"
+            state: link
 ...
