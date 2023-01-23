@@ -1,4 +1,0 @@
----
-  - name: "Install snap apps"
-    become: true
-    snap: name=sublime-text classic=yes state=present

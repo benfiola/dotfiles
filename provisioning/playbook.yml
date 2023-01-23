@@ -4,26 +4,30 @@
   vars:
     unity_path: "/opt/unity"
   roles:
-    - appimaged
-    - c++
-    - clion
-    - docker
-    - git
-    - go
-    - goenv
-    - goland
-    - kind
-    - kubectl
-    - mdns
-    - node
-    - nodenv
-    - pycharm
-    - pyenv
-    - python
-    - qemu
-    - spotify
-    - sublime_text
-    - unity_hub
-    - user
-    # - vbox_guest_additions
-    - vs_code
+    # - appimaged
+    - asdf
+    - asdf-golang
+    - asdf-kubectl
+    - asdf-nodejs
+    - asdf-python
+    # - c++
+    # - clion
+    # - docker
+    # - git
+    # - go
+    # - goenv
+    # - goland
+    # - kind
+    # - kubectl
+    # - mdns
+    # - node
+    # - nodenv
+    # - pycharm
+    # - pyenv
+    # - python
+    # - qemu
+    # - spotify
+    # - sublime_text
+    # - unity_hub
+    # - user
+    # - vs_code
