@@ -51,5 +51,7 @@ Vagrant.configure("2") do |config|
                 vb.customize ["modifyvm", :id, "--nested-hw-virt", "on"]
             end
         end
+    else
+        puts "Running from outside of `vagrant devenv` - returning empty VM definition"
     end
 end
