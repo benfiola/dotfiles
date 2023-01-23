@@ -3,6 +3,7 @@
   roles:
     - asdf
     - asdf-ctlptl
+    - asdf-direnv
     - asdf-gcloud
     - asdf-golang
     - asdf-java
