@@ -1,0 +1,19 @@
+---
+
+- name: "Create {{ path }}"
+  file: path={{ path }} state=directory recurse=true owner={{ user }} mode=777
+  become: true
+  vars:
+    path: "{{ unity_hub_editors_path }}"
+
+- name: Download {{ source }} to {{ destination }}
+  get_url: url={{ source }} dest={{ destination }} mode=755
+  become: true
+  vars:
+    source: "https://public-cdn.cloud.unity3d.com/hub/prod/UnityHub.AppImage"
+    destination: "{{ unity_hub_path }}"
+
+- name: Set facts
+  set_fact:
+    unity_hub_path: "{{ unity_hub_path }}"
+    unity_hub_editors_path: "{{ unity_hub_editors_path }}"

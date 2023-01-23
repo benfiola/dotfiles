@@ -1,0 +1,41 @@
+---
+- name: Install go-{{ go_version }}
+  become: true
+  become_user: "{{ user }}"
+  shell: 
+    cmd: "{{ shell }} -i -c 'goenv install {{ go_version }}'"
+    creates: "{{ goenv_path }}/versions/{{ go_version }}"
+
+- name: Set go-{{ go_version }} as system go
+  become: true
+  become_user: "{{ user }}"
+  shell: 
+    cmd: "{{ shell }} -i -c 'goenv global {{ go_version }}'"
+
+- name: Find go root
+  become: true
+  become_user: "{{ user }}"
+  shell:
+    cmd: "{{ shell }} -i -c 'go env GOROOT'"
+  register: go_root
+
+- name: Find go path
+  become: true
+  become_user: "{{ user }}"
+  shell:
+    cmd: "{{ shell }} -i -c 'go env GOPATH'"
+  register: go_path
+
+- name: Find go executable
+  become: true
+  become_user: "{{ user }}"
+  shell:
+    cmd: "{{ shell }} -i -c 'goenv which go'"
+  register: go_executable
+
+- name: Set facts
+  set_fact:
+    go_version: "{{ go_version }}"
+    go_root: "{{ go_root.stdout_lines[0] }}"
+    go_path: "{{ go_path.stdout_lines[0] }}"
+    go_executable: "{{ go_executable.stdout_lines[0] }}"

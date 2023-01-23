@@ -1,0 +1,11 @@
+---
+- name: Download {{ source }} to {{ destination }}
+  get_url: url={{ source }} dest={{ destination }} mode=755
+  become: true
+  vars:
+    source: "https://storage.googleapis.com/kubernetes-release/release/v{{ kubectl_version }}/bin/linux/amd64/kubectl"
+    destination: "/usr/local/bin/kubectl"
+
+- name: Set facts
+  set_fact:
+    kubectl_version: "{{ kubectl_version }}"

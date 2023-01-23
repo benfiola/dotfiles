@@ -1,0 +1,11 @@
+---
+- name: Install kind-{{ kind_version }}
+  become: true
+  become_user: "{{ user }}"
+  shell: 
+    cmd: "{{ shell }} -i -c 'env GO111MODULE=on go get sigs.k8s.io/kind@v{{ kind_version }}'"
+    creates: "{{ go_path }}/bin/kind"
+
+- name: Set facts
+  set_fact:
+    kind_version: "{{ kind_version }}"

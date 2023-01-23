@@ -1,0 +1,36 @@
+---
+- name: "Create {{ path }}"
+  file: path={{ path }} state=directory recurse=true owner={{ user }} mode=777
+  become: true
+  vars:
+    path: "{{ appimaged_directory }}"
+
+- name: Obtain appimaged URL path
+  shell:
+    cmd: curl -s -L https://github.com/probonopd/go-appimage/releases | grep "appimaged-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2
+  register: appimaged_url_path
+
+- name: Download {{ source }} to {{ destination }}
+  get_url: url={{ source }} dest={{ destination }} mode=755
+  become: true
+  become_user: "{{ user }}"  
+  vars:
+    source: "https://github.com{{ appimaged_url_path.stdout_lines[0] }}"
+    destination: "{{ appimaged_path }}"
+
+- name: Install {{ path }}
+  command: 
+    cmd: "{{ path }}"
+  vars:
+    path: "{{ appimaged_path }}"
+
+- name: Register uid of {{ user }}
+  command: id -u {{ user }}
+  register: uid
+
+- name: "Start {{ service }}.service"
+  systemd: name={{ service }} state=started enabled=yes scope=user
+  vars:
+    service: appimaged
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{uid.stdout}}

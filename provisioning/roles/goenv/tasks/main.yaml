@@ -1,0 +1,27 @@
+---
+- name: "Create {{ path }}"
+  file: path={{ path }} state=directory owner={{ user }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    path: "{{ goenv_path }}"
+
+- name: "Clone {{ source }} to {{ destination }}"
+  git: repo={{ source }} dest={{ destination }}
+  become: true
+  become_user: "{{ user }}"
+  vars:
+    source: https://github.com/syndbg/goenv.git
+    destination: "{{ goenv_path }}"
+
+- name: "Add {{ file }} to {{ shell_profile }}"
+  blockinfile:
+    dest: "{{ shell_profile }}"
+    block: "{{ lookup('file', '{{ file }}') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ file }}"
+  vars:
+    file: files/goenv.zshrc
+
+- name: "Set facts"
+  set_fact:
+    goenv_path: "{{ goenv_path }}"

@@ -1,0 +1,4 @@
+---
+- name: "Install snap apps"
+  become: true
+  snap: name=spotify classic=yes state=present

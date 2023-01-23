@@ -1,0 +1,20 @@
+---
+- name: Install python {{ python_version }}
+  become: true
+  become_user: "{{ user }}"
+  shell: 
+    cmd: "{{ shell }} -i -c 'pyenv install {{ python_version }}'"
+    creates: "{{ pyenv_path }}/versions/{{ python_version }}"
+
+- name: Find python executable
+  become: true
+  become_user: "{{ user }}"
+  shell:
+    cmd: "{{ shell }} -i -c 'pyenv shell {{ python_version }} && pyenv which python'"
+  register: python_executable
+
+- name: Set facts
+  set_fact:
+    python_version: "{{ python_version }}"
+    python_executable: "{{ python_executable.stdout_lines[0] }}"
+  
