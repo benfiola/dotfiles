@@ -8,7 +8,7 @@
       system: /usr/share/applications
     folder: "{{folders[scope]}}"
   block:
-    - name: create {{folder}}
+    - name: create {{scope}} applications folder
       become: "{{become}}"
       ansible.builtin.file:
         recurse: true
