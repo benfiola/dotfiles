@@ -17,5 +17,5 @@
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/proton/files/symlink-user-settings.py"
             dest: "{{user_bin_path}}/proton-symlink-user-settings"
-
+            state: link
 ...

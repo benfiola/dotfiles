@@ -77,13 +77,6 @@ def symlink_user_settings(proton_folder: Path):
     proton_user_settings_file = proton_folder.joinpath("user_settings.py")
 
     if proton_user_settings_file.exists():
-        if not proton_user_settings_file.is_symlink():
-            raise FileExistsError(proton_user_settings_file)
-
-        target = proton_user_settings_file.readlink()
-        if target != user_settings_file:
-            raise FileExistsError(proton_user_settings_file)
-
         proton_user_settings_file.unlink()
 
     logger.debug(f"symlink: {proton_user_settings_file} -> {user_settings_file}")
