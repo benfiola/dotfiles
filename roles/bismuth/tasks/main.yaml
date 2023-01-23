@@ -41,4 +41,8 @@
             command: "/usr/local/bin/bismuth-toggle"
             name: bismuth-toggle
             scope: user
+
+        - name: run configuration commands
+          ansible.builtin.command:
+            cmd: "{{dotfiles_path}}/roles/bismuth/files/config.sh"
 ...
