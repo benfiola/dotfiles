@@ -35,12 +35,14 @@
     name: "{{username}}"
   register: user
 
-- name: read system product name
-  ansible.builtin.slurp:
-    src: /sys/devices/virtual/dmi/id/product_name
-  register: product_name
+- when: linux
+  block:
+    - name: read system product name
+      ansible.builtin.slurp:
+        src: /sys/devices/virtual/dmi/id/product_name
+      register: product_name
 
-- name: set vm flag
-  when: "'vmware' in (product_name['content'] | b64decode | lower)"
-  ansible.builtin.set_fact:
-    vm: true
+    - name: set vm flag
+      when: "'vmware' in (product_name['content'] | b64decode | lower)"
+      ansible.builtin.set_fact:
+        vm: true
