@@ -1,0 +1,29 @@
+- name: "({{ username }}) Get user info"
+  become: true
+  user:
+    name: "{{ username }}"
+  register: user
+
+- name: "Install apt packages"
+  become: true
+  apt:
+    pkg: imwheel
+    state: present
+
+- name: "({{ user.name }}) Create user systemd folder"
+  file:
+    path: "{{ user.home }}/.config/systemd/user"
+    state: directory
+    recurse: true
+  
+- name: "({{ user.name }}) Install service"
+  copy:
+    dest: "{{ user.home }}/.config/systemd/user/imwheel.service"
+    content: "{{ lookup('file', 'files/imwheel.service') }}"
+
+- name: "({{ user.name }}) Start service"
+  systemd: 
+    name: imwheel
+    state: started
+    enabled: true
+    scope: user
