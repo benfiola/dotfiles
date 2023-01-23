@@ -27,7 +27,7 @@
         
         - name: link zshrc file
           ansible.builtin.file:
-            src: "{{dotfiles_path}}/roles/brew/files/zshrc.sh"
+            src: "{{dotfiles_path}}/roles/brew/files/profile.sh"
             path: "{{user_profiled_path}}/00-brew.sh"
             state: link
 ...

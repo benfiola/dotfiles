@@ -74,7 +74,7 @@ The decision to create a role (versus adding to an existing role's task list) is
 Dependencies on other roles are explicitly defined via [role dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies).  A role might depend on another role if:
 
 * The role depends on another role's installed binary in order to install itself (e.g., [python](./roles/python/tasks/main.yaml) indirectly depends on the [asdf](./roles/asdf/tasks/main.yaml) role's binary)
-* The role depends on a fact exposed by installing another role (e.g., [lscolors](./roles/lscolors/tasks/main.yaml) depends on the [user](./roles/user/tasks/main.yaml)'s fact _user_profiled_path_).  All roles depend on the [facts](./roles/facts/tasks/main.yaml) role.
+* The role depends on a fact exposed by installing another role (e.g., [ls](./roles/ls/tasks/main.yaml) depends on the [user](./roles/user/tasks/main.yaml)'s fact _user_profiled_path_).  All roles depend on the [facts](./roles/facts/tasks/main.yaml) role.
 
 
 # Tags

@@ -33,7 +33,7 @@
 
         - name: install user shell profile
           ansible.builtin.file:
-            src: "{{dotfiles_path}}/roles/zsh/files/zshrc.sh"
+            src: "{{dotfiles_path}}/roles/zsh/files/profile.sh"
             path: "{{user.home}}/.zshrc"
             state: link
 ...

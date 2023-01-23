@@ -40,7 +40,7 @@
         
         - name: link zshrc file
           ansible.builtin.file:
-            src: "{{dotfiles_path}}/roles/asdf/files/zshrc.sh"
+            src: "{{dotfiles_path}}/roles/asdf/files/profile.sh"
             path: "{{user_profiled_path}}/00-asdf.sh"
             state: link
 ...
