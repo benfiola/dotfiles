@@ -619,15 +619,15 @@
 
 
 - name: (ubuntu) add docker signing key
-  when: ubuntu
   become: true
+  when: ubuntu
   ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
 
 - name: (ubuntu) add docker repository
-  when: ubuntu
   become: true
+  when: ubuntu
   ansible.builtin.apt_repository:
     repo: "{{repositories[architecture]}}"
     state: present
@@ -638,6 +638,7 @@
 
 - name: (debian) install docker
   become: true
+  when: debian
   ansible.builtin.apt:
     package:
       - docker-ce 
@@ -647,6 +648,7 @@
 
 - name: (darwin) install docker
   become: true
+  when: darwin
   dmg_unarchive:
     src: "{{urls[architecture]}}"
     dest: /Applications
@@ -655,3 +657,18 @@
     urls:
       x86_64: "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
       arm64: "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+
+- name: (linux) add docker group
+  become: true
+  when: linux
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: (linux) add user to docker group
+  become: true
+  when: linux
+  ansible.builtin.user:
+    name: "{{user.name}}"
+    append: true
+    groups: docker
