@@ -63,7 +63,7 @@ vim /etc/mkinitcpio.conf
 mkinitcpio -P
 
 # NOTE: nvidia GPU, add pacman hook
-mkdir -p /etc/pacman.d/hook
+mkdir -p /etc/pacman.d/hooks
 vim /etc/pacman.d/hooks/nvidia.hook
 # find hook here: https://wiki.archlinux.org/title/NVIDIA
 
