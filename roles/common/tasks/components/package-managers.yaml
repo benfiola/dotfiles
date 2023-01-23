@@ -31,8 +31,18 @@
           - unattended-upgrades
         state: absent
         
-- name: update pacman cache
-  when: archlinux
-  become: true
-  community.general.pacman:
-    update_cache: true
+- when: archlinux
+  block:
+    - name: enable multilib repo
+      become: true
+      ansible.builtin.blockinfile:
+        path: /etc/pacman.conf
+        marker: "# {mark} enable multilib repo (ansible managed)"
+        block: |
+          [multilib]
+          Include = /etc/pacman.d/mirrorlist
+          
+    - name: update pacman cache
+      become: true
+      community.general.pacman:
+        update_cache: true

@@ -29,3 +29,6 @@
 - ansible.builtin.include_tasks: ./components/bitwarden.yaml
 - ansible.builtin.include_tasks: ./components/authy.yaml
 - ansible.builtin.include_tasks: ./components/variety.yaml
+
+- ansible.builtin.include_tasks: ./components/proton.yaml
+- ansible.builtin.include_tasks: ./components/steam.yaml

@@ -1,0 +1,5 @@
+- name: install protonqt-up with flatpak
+  when: linux
+  become: true
+  community.general.flatpak:
+    name: net.davidotek.pupgui2

@@ -1,0 +1,6 @@
+- name: install steam with pacman
+  become: true
+  when: archlinux
+  community.general.pacman:
+    name:
+      - steam
