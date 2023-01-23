@@ -23,6 +23,7 @@
     - git
     - goland
     - gpg
+    - graphviz
     - imwheel
     - intellij
     - oh-my-zsh

@@ -1,0 +1,5 @@
+- name: "Install apt packages"
+  become: true
+  apt:
+    pkg: graphviz
+    state: present
