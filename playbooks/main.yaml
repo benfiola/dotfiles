@@ -30,7 +30,7 @@
     - benfiola.dotfiles.lutris
     - benfiola.dotfiles.macos
     - benfiola.dotfiles.nodejs
-    - benfiola.dotfiles.open-vm-tools
+    - benfiola.dotfiles.open_vm_tools
     - benfiola.dotfiles.pacman
     - benfiola.dotfiles.proton
     - benfiola.dotfiles.python
