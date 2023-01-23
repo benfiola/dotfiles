@@ -17,6 +17,7 @@
           - fonts-noto-cjk
           - kwin-bismuth
           - kwallet-pam
+          - kde-spectacle
     
     - when: archlinux
       block:
@@ -37,6 +38,7 @@
             - noto-fonts-emoji
             - noto-fonts-cjk
             - kwallet-pam
+            - spectacle
       
       - name: install bismuth with AUR
         ansible.builtin.include_tasks: ./helpers/install-aur.yaml
