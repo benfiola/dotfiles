@@ -17,7 +17,7 @@ mkpyve() {
     fi
     
     # ensure asdf exists
-    if command -v asdf > /dev/null 2>&1; then
+    if ! command -v asdf > /dev/null 2>&1; then
         1>&2 echo "error: asdf not found"
         return 1
     fi
