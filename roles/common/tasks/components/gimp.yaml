@@ -1,0 +1,6 @@
+- name: install gimp with pacman
+  when: archlinux
+  become: true
+  community.general.pacman:
+    name:
+      - gimp

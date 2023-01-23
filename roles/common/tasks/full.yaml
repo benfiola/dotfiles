@@ -35,3 +35,4 @@
 - ansible.builtin.include_tasks: ./components/steam.yaml
 - ansible.builtin.include_tasks: ./components/spotify.yaml
 - ansible.builtin.include_tasks: ./components/discord.yaml
+- ansible.builtin.include_tasks: ./components/gimp.yaml
