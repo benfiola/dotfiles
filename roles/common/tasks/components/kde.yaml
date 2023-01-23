@@ -70,6 +70,10 @@
         - gsettings set org.gnome.desktop.interface cursor-theme 'breeze_cursors'
         - gsettings set org.gnome.desktop.interface monospace-font-name 'FiraCode Nerd Font Mono 12'
         - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Plugins --key bismuthEnabled --type bool true
+        - kwriteconfig5 --file "{{user.home}}/.config/kdeglobals" --group KDE --key SingleClick -type bool false
+        - kwriteconfig5 --file "{{user.home}}/.config/kdeglobals" --group KDE --key ScrollbarLeftClickNavigatesByPage -type bool false
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Windows --key ElectricBorderMaximize -type bool false
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Windows --key ElectricBorderTiling --type bool false
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key decrease_window_width "Meta+Ctrl+H,Meta+Ctrl+H,Increase Window Width"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key increase_window_height "Meta+Ctrl+J,Meta+Ctrl+J,Increase Window Height"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key decrease_window_height "Meta+Ctrl+K,Meta+Ctrl+K,Decrease Window Height"
@@ -82,4 +86,3 @@
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key next_layout "Meta+\\\\,Meta+\\\\,Switch to the Next Layout"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key prev_layout "Meta+|,Meta+|,Switch to the Previous Layout"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key toggle_window_floating "Meta+F,Meta+F,Toggle Active Window Floating"
-
