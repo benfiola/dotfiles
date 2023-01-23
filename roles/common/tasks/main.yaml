@@ -4,6 +4,8 @@
     os_family: "{{ansible_facts['os_family'] | lower}}"
     system: "{{ansible_system | lower}}"
     architecture: "{{ansible_architecture | lower}}"
+    distribution: "{{ansible_distribution | lower}}"
+    release: "{{ansible_distribution_release | lower}}"
     username: "{{ansible_user_id}}"
     vm: true
   
@@ -17,6 +19,7 @@
     linux: "{{system == 'linux'}}"
     darwin: "{{system == 'darwin'}}"
     debian: "{{os_family == 'debian'}}"
+    ubuntu: "{{distribution == 'ubuntu'}}"
     x86_64: "{{architecture == 'x86_64'}}"
     arm64: "{{architecture == 'arm64'}}"
 
@@ -613,3 +616,42 @@
     name:
       - tanka
     path: "{{brew_path}}"
+
+
+- name: (ubuntu) add docker signing key
+  when: ubuntu
+  become: true
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: (ubuntu) add docker repository
+  when: ubuntu
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "{{repositories[architecture]}}"
+    state: present
+  vars:
+    repositories:
+      x86_64: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable"
+      arm64: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable"
+
+- name: (debian) install docker
+  become: true
+  ansible.builtin.apt:
+    package:
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io 
+      - docker-compose-plugin
+
+- name: (darwin) install docker
+  become: true
+  dmg_unarchive:
+    src: "{{urls[architecture]}}"
+    dest: /Applications
+    creates: /Applications/Docker.app
+  vars:
+    urls:
+      x86_64: "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
+      arm64: "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
