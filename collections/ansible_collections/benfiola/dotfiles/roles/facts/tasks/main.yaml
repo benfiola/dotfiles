@@ -1,10 +1,10 @@
 ---
-- tags: [minimal]
+- tags: [minimal, "{{role_name}}"]
   block:
     - name: set configuration facts
       ansible.builtin.set_fact:
         desktop_environment: "{{desktop_environment | default('kde')}}"
-        symlink_playbook: "{{symlink_playbook | default(False)}}"
+        dotfiles_path: "{{role_path | dirname | dirname}}"
 
     - name: set system facts
       ansible.builtin.set_fact:

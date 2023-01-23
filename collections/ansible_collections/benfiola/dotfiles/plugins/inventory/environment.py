@@ -19,20 +19,6 @@ class InventoryModule(BaseInventoryPlugin):
 
     def parse_from_environment(self):
         host_vars = {}
-
-        symlink_playbook = os.environ.get("SYMLINK_PLAYBOOK")
-        if symlink_playbook:
-            host_vars["symlink_playbook"] = True
-        
-        roles_str = os.environ.get("ROLES")
-        if roles_str:
-            roles = []
-            for role in roles_str.split(","):
-                role = role.strip()
-                if not role:
-                    continue
-                roles.append(role)
-            host_vars["roles"] = roles
         
         is_local = os.environ.get("LOCAL")
         remote_ip = os.environ.get("REMOTE_IP")

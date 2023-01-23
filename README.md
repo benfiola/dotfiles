@@ -107,7 +107,7 @@ As a result, role task lists often look like the following:
 ```yaml
 ---
 # apply common tags
-- tags: [<tag>]
+- tags: [<tag>, , "{{role_name}}"]
   block:
     # this block only gets executed in the fall-through case
     - when: not (darwin or (linux and amd64))
