@@ -1,0 +1,64 @@
+---
+- block:
+  - name: "Update apt-cache"
+    apt: update_cache=yes
+    become: true
+
+  - name: "Install apt packages"
+    become: true
+    apt:
+      state: present 
+      pkg:
+        - gpg
+        - scdaemon
+        - pcscd
+    
+  - name: "Add {{ file }} to {{ shell_profile }}"
+    become: true
+    become_user: "{{ user }}"
+    blockinfile:
+      dest: "{{ shell_profile }}"
+      block: "{{ lookup('files', '{{ file }}') }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+    vars:
+      file: files/gpg.zshrc
+  
+  - name: "Add {{ file }} to {{ gpg_agent_conf }}"
+    become: true
+    become_user: "{{ user }}"
+    blockinfile:
+      dest: "{{ gpg_agent_conf }}"
+      block: "{{ lookup('files', '{{ file }}') }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+    vars:
+      file: files/gpg-agent.conf
+      gpg_agent_conf: "{{ gpg_home_dir }}/gpg-agent.conf" 
+
+  - name: "Add {{ file }} to {{ scdaemon_conf }}"
+    become: true
+    become_user: "{{ user }}"
+    blockinfile:
+      dest: "{{ scdaemon_conf }}"
+      block: "{{ lookup('files', '{{ file }}') }}"
+      marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}:{{ template }}"
+    vars:
+      file: files/scdaemon.conf
+      scdaemon_conf: "{{ gpg_home_dir }}/scdaemon.conf" 
+  
+  - name: "Restart pcscd.service"
+    become: true
+    service:
+      name: pcscd
+      enabled: true
+      state: restarted
+  
+  - name: "Restart gpg-agent.service"
+    become: true
+    become_user: "{{ user }}"
+    systemd:
+      name: gpg-agent
+      scope: user
+      enabled: true
+      state: restarted
+  vars:
+    gpg_home_dir: "{{ user_home }}/.gnupg"
