@@ -3,8 +3,9 @@ layouts:
   - wide
   - fullscreen
   - column
+  - floating
 
-focus-follows-mouse: true
+focus-follows-mouse: false
 
 window-margins: true
 window-margin-size: 20
