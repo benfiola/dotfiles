@@ -59,6 +59,7 @@ echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/01-enable-wheel-sudo
 # recreate initramfs
 vim /etc/mkinitcpio.conf
 # add lvm2 (before filesystems) to HOOKS
+# add resume (after lvm2) to HOOKS
 # NOTE: nvidia GPU, add nvidia nvidia_modeset nvidia_uvm nvidia_drm to MODULES
 mkinitcpio -P
 
@@ -67,8 +68,10 @@ mkdir -p /etc/pacman.d/hooks
 vim /etc/pacman.d/hooks/nvidia.hook
 # find hook here: https://wiki.archlinux.org/title/NVIDIA
 
-# NOTE: arm64, ensure grub can find initramfs
-echo "GRUB_EARLY_INITRD_LINUX_CUSTOM=initramfs-linux.img" >> /etc/default/grub
+# set grub defaults (/etc/default/grub)
+# NOTE: arm64, ensure grub can find initramfs GRUB_EARLY_INITRD_LINUX_CUSTOM=initramfs-linux.img
+# add GRUB_CMDLINE_LINUX=... resume=<swap partition>
+# NOTE: 4k, cap grub gfx mode to 1920x1080 - GRUB_GFX_MODE=1920x1080
 
 # install bootloader
 # NOTE: x86_64, use x86_64-efi target
