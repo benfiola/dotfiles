@@ -41,7 +41,7 @@
       - name: install bismuth with AUR
         ansible.builtin.include_tasks: ./helpers/install-aur.yaml
         vars:
-          url: https://aur.archlinux.org/kwin-bismuth.git
+          url: https://aur.archlinux.org/kwin-bismuth-bin.git
           package: kwin-bismuth
         
     - name: enable sddm
