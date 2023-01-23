@@ -34,11 +34,11 @@ While all of the above is scriptable, it also comes for free with [ansible](http
 
 When this ansible playbook is run, the following outcomes are expected:
 
-* This git repository is copied (or symlinked) to _$HOME_/.dotfiles
-* Files at _$HOME_/.profile.d are sourced when terminal sessions are created
-* Helper shell scripts are implemented as functions/aliases provided via sourced files in _$HOME_/.profile.d
+* This git repository is copied (or symlinked) to _$HOME/.dotfiles_
+* Files at _$HOME/.profile.d_ are sourced when terminal sessions are created
+* Helper shell scripts are implemented as functions/aliases provided via sourced files in _$HOME/.profile.d_
 * Helper scripts that exist beyond the terminal session are installed to _/usr/local/bin_
-* File-based configuration is symlinked/hardlinked _from_ _$HOME_/.dotfiles _to_ their expected location (such that local configuration change leaves the repo at _$HOME_/.dotfiles in a dirty state)
+* File-based configuration is symlinked/hardlinked from _$HOME/.dotfiles_ to their expected location (such that local configuration change leaves the repo at _$HOME/.dotfiles_ in a dirty state)
 * Script-based configuration is applied on every playbook execution (e.g., _gsettings_)
 * All necessary, supported applications are installed
 * OS, desktop environments, and applications are all configured and themed appropriately

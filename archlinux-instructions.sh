@@ -26,7 +26,7 @@ mount /dev/vg-os/os /mnt
 mount --mkdir /dev/sda1 /mnt/boot
 
 # install packages
-pacstrap -K /mnt base linux linux-headers linux-firmware vim lvm2 grub-bios efibootmgr sudo networkmanager
+pacstrap -K /mnt base linux linux-headers linux-firmware vim man-db man-pages lvm2 grub-bios efibootmgr sudo networkmanager
 # NOTE: amd CPU, install deps
 pacstrap /mnt amd-ucode
 # NOTE: nvidia GPU, install deps
