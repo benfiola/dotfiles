@@ -51,6 +51,7 @@ echo "arch" > /etc/hostname
 useradd --create-home bfiola
 usermod -aG wheel bfiola
 passwd bfiola
+chfn -f "Ben Fiola" bfiola
 
 # enable sudoers via wheel group
 echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/01-enable-wheel-sudo
