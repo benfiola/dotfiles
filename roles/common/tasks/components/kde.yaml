@@ -12,6 +12,7 @@
           - pavucontrol
           - plasma-pa
           - kscreen
+          - dolphin
           - fonts-noto-color-emoji
 
     - name: install kde with pacman
@@ -26,6 +27,7 @@
           - pavucontrol
           - plasma-pa
           - kscreen
+          - dolphin
           - noto-fonts-emoji
 
     - name: enable sddm
