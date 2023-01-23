@@ -1,0 +1,12 @@
+---
+- block:
+  - name: Download {{ ctlptl_url }} to {{ dest }}
+    become: true
+    unarchive:
+      src: "{{ ctlptl_url }}"
+      dest: "{{ dest }}"
+      remote_src: yes
+    vars:
+      dest: /usr/local/bin
+  vars:
+    ctlptl_url: https://github.com/tilt-dev/ctlptl/releases/download/v0.4.2/ctlptl.0.4.2.mac.x86_64.tar.gz

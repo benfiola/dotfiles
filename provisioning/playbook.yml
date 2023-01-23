@@ -9,8 +9,11 @@
     - asdf-kubectl
     - asdf-nodejs
     - asdf-python
+    - asdf-sops
+    - asdf-tilt
     - c++
     - clion
+    - ctlptl
     - docker
     - git
     - goland
