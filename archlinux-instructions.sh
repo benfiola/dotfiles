@@ -27,8 +27,6 @@ mount --mkdir /dev/sda1 /mnt/boot
 
 # install packages
 pacstrap -K /mnt base linux linux-firmware vim lvm2 grub-bios efibootmgr sudo networkmanager
-# NOTE: vm, install vm deps
-pacstrap /mnt open-vm-tools 
 # NOTE: arm, install arm64 deps
 pacstrap /mnt archlinuxarm-keyring
 
@@ -41,14 +39,6 @@ arch-chroot /mnt
 # NOTE: arm, set arch linux arm repo key as trusted
 pacman-key --init 
 pacman-key --populate archlinuxarm
-
-# set locale
-ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
-hwclock --systohc
-vim /etc/locale.gen 
-# uncomment en_US.UTF-8 UTF-8
-locale-gen
-echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 # set hostname
 echo "arch" > /etc/hostname
@@ -64,7 +54,6 @@ echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/01-enable-wheel-sudo
 # recreate initramfs
 vim /etc/mkinitcpio.conf
 # add lvm2 (before filesystems) to HOOKS
-# NOTE: vm, vmw_balloon vmw_pvscsi vmw_vmci vmwgfx vmxnet3 to MODULES
 mkinitcpio -P
 
 # NOTE: arm64, ensure grub can find initramfs
@@ -78,11 +67,5 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # enable services
 systemctl enable NetworkManager
-# NOTE: vm
-systemctl enable vmtoolsd vmware-vmblock-fuse
 
-reboot
-
-# install KDE
-pacman -S plasma-meta && systemctl enable sddm
-reboot
+# reboot

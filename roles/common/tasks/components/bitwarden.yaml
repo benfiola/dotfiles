@@ -1,0 +1,12 @@
+- name: install bitwarden with snap
+  become: true
+  when: linux and amd64
+  community.general.snap:
+    name: bitwarden
+
+- name: install bitwarden with dmg
+  when: darwin
+  ansible.builtin.include_tasks: ./helpers/install-app-dmg.yaml
+  vars:
+    url: https://vault.bitwarden.com/download/?app=desktop&platform=macos&variant=dmg
+    app: Bitwarden.app

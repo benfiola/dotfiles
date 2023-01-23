@@ -1,0 +1,37 @@
+
+- name: install dependencies with apt
+  become: true
+  when: debian
+  ansible.builtin.apt:
+    package:
+      - gnupg2
+    
+- name: install dependencies with pacman
+  become: true
+  when: archlinux
+  community.general.pacman:
+    name:
+      - gnupg
+    
+- name: install dependencies with brew
+  when: darwin
+  community.general.homebrew:
+    package:
+      - gnupg2
+    path: "{{brew_path}}"
+
+- name: install sops with url
+  become: true
+  ansible.builtin.get_url:
+    url: "{{url}}"
+    dest: /usr/local/bin/sops
+    mode: 0755
+  vars:
+    urls:
+      linux:
+        arm64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux.arm64
+        amd64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux.amd64
+      darwin:
+        arm64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.arm64
+        amd64: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.darwin.amd64
+    url: "{{urls[system][architecture]}}"

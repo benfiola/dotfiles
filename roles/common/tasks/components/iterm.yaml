@@ -1,0 +1,13 @@
+- when: darwin
+  block:
+    - name: install iTerm2.app
+      become: true
+      ansible.builtin.unarchive:
+        src: https://iterm2.com/downloads/stable/iTerm2-3_4_16.zip
+        remote_src: true
+        dest: /Applications
+        creates: /Applications/iTerm.app
+
+    - name: install terminal configuration
+      ansible.builtin.command:
+        cmd: "{{dotfiles_path}}/iterm/defaults.sh"

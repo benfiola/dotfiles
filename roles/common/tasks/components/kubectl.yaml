@@ -1,0 +1,3 @@
+- name: install asdf-kubectl
+  asdf_plugin:
+    name: kubectl

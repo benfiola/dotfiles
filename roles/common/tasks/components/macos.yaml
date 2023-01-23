@@ -1,0 +1,4 @@
+- name: configure macos 
+  when: darwin
+  ansible.builtin.command:
+    cmd: "{{dotfiles_path}}/macos/defaults.sh"

@@ -1,0 +1,50 @@
+- when: linux
+  block:
+    - when: debian
+      block:
+        - name: install ulauncher dependencies with apt
+          become: true
+          ansible.builtin.apt:
+            package:
+              - wmctrl
+
+        - name: install ulauncher with apt
+          become: true
+          ansible.builtin.apt:
+            deb: https://github.com/Ulauncher/Ulauncher/releases/download/5.15.0/ulauncher_5.15.0_all.deb
+
+    - name: install ulauncher with AUR
+      when: archlinux
+      ansible.builtin.include_tasks: ./helpers/install-aur.yaml
+      vars:
+        url: https://aur.archlinux.org/ulauncher.git
+        package: ulauncher
+      
+    - name: create ulauncher user theme directory
+      ansible.builtin.file:
+        path: "{{user.home}}/.config/ulauncher/user-themes"
+        state: directory
+        recurse: true
+
+    - name: install ulauncher theme
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/ulauncher/theme"
+        dest: "{{user.home}}/.config/ulauncher/user-themes/theme"
+        state: link
+
+    - name: install ulauncher configuration
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/ulauncher/settings.json"
+        dest: "{{user.home}}/.config/ulauncher/settings.json"
+        state: link
+
+    - name: install ulauncher keybindings
+      ansible.builtin.command:
+        cmd: "{{dotfiles_path}}/ulauncher/gsettings.sh"
+
+    - name: start ulauncher systemd service
+      ansible.builtin.systemd:
+        name: ulauncher
+        scope: user
+        state: started
+        enabled: true

@@ -2,7 +2,7 @@
 # if '/Applications/{{app}}' exists, install is skipped
 ---
 - name: check app exists
-  stat:
+  ansible.builtin.stat:
     path: /Applications/{{app}}
   register: app_exists
 
