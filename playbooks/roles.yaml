@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+    - include_role:
+        role: "{{item}}"
+      with_items: "{{roles}}"
+
+- ansible.builtin.import_playbook: benfiola.dotfiles.after

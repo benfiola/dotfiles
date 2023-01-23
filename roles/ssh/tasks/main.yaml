@@ -8,30 +8,13 @@
     
     - when: true
       block:
-        - name: install stormssh python dependency
-          pip:
-            name: stormssh
-        
-        - name: ensure .ssh folder exists
-          ansible.builtin.file:
-            path: "{{user.home}}/.ssh"
-            state: directory
-        
-        - name: generate benfiola.github.com keypair
-          community.crypto.openssh_keypair:
-            path: "{{user.home}}/.ssh/benfiola.github.com"
-            size: 2048
-        
-        - name: add benfiola.github.com ssh config
+        - name: create {{ssh_user}}@{{ssh_host}} key
           vars:
-            groups:
-              darwin: "staff"
-            group: "{{groups.get(os_family, omit)}}"
-          community.general.ssh_config:
-            host: "benfiola.github.com"
-            hostname: "github.com"
-            identity_file: "{{user.home}}/.ssh/benfiola.github.com"
-            state: present
-            user: "{{user.name}}"
-            group: "{{group}}"
+            ssh_user: benfiola
+            ssh_host: github.com
+          ansible.builtin.include_role: 
+            role: ssh
+            tasks_from: create-ssh-key.yaml
+          with_items:
+            - {ssh_user: benfiola, ssh_host: github.com}
 ...

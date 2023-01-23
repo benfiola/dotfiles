@@ -1,0 +1,8 @@
+---
+- hosts: all
+  tasks:
+    - block:
+        - benfiola.dotfiles.empty: {}
+      always:
+        - benfiola.dotfiles.temp_file_cleanup: {}
+...
