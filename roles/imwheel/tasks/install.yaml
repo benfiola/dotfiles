@@ -1,0 +1,31 @@
+- name: install | install apt packages
+  become: true
+  apt:
+    pkg: "{{imwheel_apt_packages}}"
+    state: present
+
+- name: install | create user systemd folder
+  become: true
+  become_user: "{{user_name}}"
+  file:
+    path: "{{imwheel_service_path | dirname}}"
+    state: directory
+    recurse: true
+    owner: "{{user_name}}"
+  
+- name: install | create service
+  copy:
+    dest: "{{imwheel_service_path}}"
+    content: "{{ lookup('template', 'templates/service.j2') }}"
+  notify:
+  - handlers | restart imwheel service
+
+- name: install | start service
+  become: true
+  become_user: "{{user_name}}"
+  systemd: 
+    name: "{{imwheel_service_name}}"
+    state: started
+    enabled: true
+    scope: user
+  

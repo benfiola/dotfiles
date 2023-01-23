@@ -1,2 +1,1 @@
----
-username: "{{ ansible_user_id }}"
+gpg_apt_packages: [gpg, scdaemon, pcscd]

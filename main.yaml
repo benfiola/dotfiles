@@ -1,36 +1,39 @@
 ---
 - hosts: all
-  roles:
-    - asdf
-    - asdf-ctlptl
-    - asdf-direnv
-    - asdf-gcloud
-    - asdf-golang
-    - asdf-java
-    - asdf-jb
-    - asdf-jsonnet
-    - asdf-kind
-    - asdf-kubectl
-    - asdf-nodejs
-    - asdf-python
-    - asdf-sops
-    - asdf-tanka
-    - asdf-tilt
-    - c++
-    - clion
-    - chromium
-    - ctlptl
-    - docker
-    - git
-    - goland
-    - gpg
-    - graphviz
-    - imwheel
-    - intellij
-    - oh-my-zsh
-    - pycharm
-    - qemu
-    - signal
-    - variety
-    - vs_code
-    - user
+  gather_facts: true
+  tasks:
+  - include_role: {name: user, tasks_from: create}
+
+  - include_role: {name: asdf, tasks_from: install}
+  - include_role: {name: asdf-ctlptl, tasks_from: install}
+  - include_role: {name: asdf-direnv, tasks_from: install}
+  - include_role: {name: asdf-gcloud, tasks_from: install}
+  - include_role: {name: asdf-golang, tasks_from: install}
+  - include_role: {name: asdf-java, tasks_from: install}
+  - include_role: {name: asdf-jb, tasks_from: install}
+  - include_role: {name: asdf-jsonnet, tasks_from: install}
+  - include_role: {name: asdf-kind, tasks_from: install}
+  - include_role: {name: asdf-kubectl, tasks_from: install}
+  - include_role: {name: asdf-nodejs, tasks_from: install}
+  - include_role: {name: asdf-python, tasks_from: install}
+  - include_role: {name: asdf-sops, tasks_from: install}
+  - include_role: {name: asdf-tanka, tasks_from: install}
+  - include_role: {name: asdf-tilt, tasks_from: install}
+  - include_role: {name: cpp, tasks_from: install}
+  - include_role: {name: chromium, tasks_from: install}
+  - include_role: {name: clion, tasks_from: install}
+  - include_role: {name: docker, tasks_from: install}
+  - include_role: {name: git, tasks_from: install}
+  - include_role: {name: goland, tasks_from: install}
+  - include_role: {name: gpg, tasks_from: install}
+  - include_role: {name: imwheel, tasks_from: install}
+  - include_role: {name: intellij, tasks_from: install}
+  - include_role: {name: ohmyzsh, tasks_from: install}
+  - include_role: {name: pycharm, tasks_from: install}
+  - include_role: {name: qemu, tasks_from: install}
+  - include_role: {name: signal, tasks_from: install}
+  - include_role: {name: variety, tasks_from: install}
+  - include_role: {name: vim, tasks_from: install}
+  - include_role: {name: vscode, tasks_from: install}
+  - include_role: {name: xclip, tasks_from: install}
+

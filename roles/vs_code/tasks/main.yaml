@@ -1,7 +1,0 @@
----
-- name: "Install snap app"
-  become: true
-  snap: 
-    name: "code"
-    classic: yes
-    state: present

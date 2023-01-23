@@ -1,0 +1,16 @@
+- name: install | install apt packages
+  become: true
+  apt:
+    pkg: "{{asdf_gcloud_apt_packages}}"
+    state: present
+
+- name: install | install asdf plugin + version
+  become: true
+  become_user: "{{user_name}}"
+  asdf:
+    plugin: "{{asdf_gcloud_plugin}}"
+    version: "{{asdf_gcloud_version}}"
+    state: present
+    executable: "{{asdf_executable}}"
+    global_: true
+  

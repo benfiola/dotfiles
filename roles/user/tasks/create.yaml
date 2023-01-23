@@ -1,0 +1,75 @@
+---
+- name: create | fail if user_name not defined
+  fail:
+    msg: user_name is undefined
+  when: user_name is not defined
+
+- name: create | fail if user_shell not defined
+  fail:
+    msg: user_shell is undefined
+  when: user_shell is not defined
+
+- name: create | install shell
+  become: true
+  apt:
+    pkg: "{{user_shell}}"
+    state: present
+
+- name: create | find shell path
+  command:
+    cmd: which {{user_shell}}
+  register: shell_path_cmd
+  changed_when: false
+
+- name: create | set user_shell_path fact
+  set_fact:
+    user_shell_path: "{{shell_path_cmd.stdout}}"
+
+- name: create | configure user
+  become: true
+  user:
+    name: "{{user_name}}"
+    state: present
+    shell: "{{user_shell_path}}"
+  register: user_data
+
+- name: create | set user_home fact
+  set_fact:
+    user_home: "{{user_data.home}}"
+
+- name: create | set user_profile fact
+  vars:
+    shell_map:
+      bash: "{{user_home}}/.bashrc"
+      zsh: "{{user_home}}/.zshrc"
+  set_fact:
+    user_profile: "{{shell_map[user_shell]}}"
+  
+- name: create | enable passwordless sudo
+  become: true
+  lineinfile:
+    path: /etc/sudoers.d/{{user_name}}
+    line: '{{user_name}} ALL=(ALL) NOPASSWD: ALL'
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+
+- name: create | create source directory
+  become: true
+  become_user: "{{user_name}}"
+  file: 
+    path: "{{user_home}}/source"
+    state: directory
+    recurse: true
+    owner: "{{user_name}}"
+
+- name: create | add src alias to profile
+  become: true
+  become_user: "{{user_name}}"
+  blockinfile:
+    create: true
+    dest: "{{user_profile}}"
+    block: "{{lookup('template', 'templates/alias_src.j2')}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{role_name}}"
+    owner: "{{user_name}}"

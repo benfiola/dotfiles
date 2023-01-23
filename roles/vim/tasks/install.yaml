@@ -1,0 +1,6 @@
+---
+- name: install | install apt packages
+  become: true
+  apt:
+    pkg: "{{vim_apt_packages}}"
+    state: present
