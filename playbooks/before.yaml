@@ -1,8 +1,0 @@
----
-- hosts: all
-  connection: local
-  tasks:    
-    - name: install ansible-galaxy dependencies
-      command:
-        cmd: ansible-galaxy collection install --force {{playbook_dir | dirname}}
-...
