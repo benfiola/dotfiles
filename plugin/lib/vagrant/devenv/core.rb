@@ -42,11 +42,11 @@ module Vagrant
 
                 if self.store_has_environment? @env.cwd, name
                     unless provision
-                        raise Error "Development environment '#{name}' exists - force previsioning with --prevision"
+                        raise Error.new "Development environment '#{name}' exists - force previsioning with --prevision"
                     end
                 end
 
-                # self.vagrant_up(name, provision: provision)
+                self.vagrant_up(name, provision: provision)
                 self.store_add_environment(@env.cwd, name)
             end
 
@@ -63,8 +63,11 @@ module Vagrant
             end
 
             def list
-                self.store_environments.values.each do |value|
-                    @env.ui.info("#{value[:name]} (#{value[:version]})")
+                store_environments = self.store_environments
+                store_environments.values.each do |environments|
+                    environments.values.each do |environment|
+                        @env.ui.info("#{environment[:directory]}:#{environment[:name]} (#{environment[:version]})")
+                    end
                 end
             end
 
@@ -163,7 +166,7 @@ module Vagrant
             def vagrant_up(name, provision: false)
                 command = [name]
                 if provision
-                    command.push "--force"
+                    command.push "--provision"
                 end
                 VagrantPlugins::CommandUp::Command.new(command, self.command_env).execute
             end

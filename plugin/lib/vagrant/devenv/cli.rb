@@ -3,7 +3,6 @@ require 'thor'
 require_relative './core.rb'
 
 
-
 module Vagrant
     module Devenv
         module CLI

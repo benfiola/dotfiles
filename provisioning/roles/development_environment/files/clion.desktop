@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CLion
+Icon=/opt/clion/bin/clion.png
+Exec="/opt/clion/bin/clion.sh" %f
+Comment=
+Categories=
+Terminal=false
+StartupWMClass=clion
