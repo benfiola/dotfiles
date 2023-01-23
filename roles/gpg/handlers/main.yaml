@@ -1,13 +1,8 @@
-- name: handlers | restart pcscd service
+- name: handlers | restart pcscd
   become: true
-  service:
-    name: pcscd
-    state: restarted
+  service: name=pcscd state=restarted
 
-- name: handlers | restart gpg agent service
+- name: handlers | restart gpg-agent
   become: true
   become_user: "{{user_name}}"
-  systemd:
-    name: gpg-agent
-    scope: user
-    state: restarted
+  systemd: name=gpg-agent scope=user state=restarted

@@ -13,6 +13,7 @@ RETURN = r'''
 
 from ansible.module_utils.basic import AnsibleModule
 import os
+import pathlib
 
 
 class ModuleFailure(Exception):
@@ -25,19 +26,19 @@ def ensure_valid_asdf_executable(module, executable):
         executable, "version"
     ])
     if rc != 0:
-        raise ModuleFailure("invalid asdf executable: {executable}".format(
-            executable=executable
-        ))
+        raise ModuleFailure(f"invalid asdf executable: {executable}")
 
 
 def get_plugins(module, executable):
     rc, out, err = module.run_command([
         executable, "plugin", "list"
     ])
+
+    # NOTE: 'no plugins installed' throws a non-zero exit code
+    if "no plugins installed" in err.lower():
+        return []
     if rc != 0:
-        raise ModuleFailure(f"failed to get plugin list: {err}".format(
-            err=err
-        ))
+        raise ModuleFailure(f"failed to get plugin list: {err}")
     return out.strip().splitlines()
 
 
@@ -46,10 +47,7 @@ def install_plugin(module, executable, name):
         executable, "plugin", "add", name
     ])
     if rc != 0:
-        raise ModuleFailure(f"failed to install plugin {name}: {err}".format(
-            name=name, 
-            err=err
-        ))
+        raise ModuleFailure(f"failed to install plugin {name}: {err}")
 
 
 def uninstall_plugin(module, executable, name):
@@ -57,10 +55,7 @@ def uninstall_plugin(module, executable, name):
         executable, "plugin", "remove", name
     ])
     if rc != 0:
-        raise ModuleFailure(f"failed to uninstall plugin {name}: {err}".format(
-            name=name, 
-            err=err
-        ))
+        raise ModuleFailure(f"failed to uninstall plugin {name}: {err}")
 
 
 def get_plugin_versions(module, executable, name):    
@@ -68,23 +63,17 @@ def get_plugin_versions(module, executable, name):
         executable, "list", name
     ])
     if rc != 0:
-        raise ModuleFailure(f"failed to get version list for plugin {name}: {err}".format(
-            name=name, 
-            err=err
-        ))
+        raise ModuleFailure(f"failed to get version list for plugin {name}: {err}")
     return [v.strip() for v in out.splitlines()]
 
 
 def install_plugin_version(module, executable, name, version):
+    asdf_source_script = pathlib.Path(executable).parent.parent.joinpath("asdf.sh")
     rc, out, err = module.run_command([
-        executable, "install", name, version
+        "/bin/bash", "-c", f"source {asdf_source_script} && {executable} install {name} {version}"
     ])
     if rc != 0:
-        raise ModuleFailure(f"failed to install version {version} for plugin {name}: {err}".format(
-            name=name, 
-            version=version,
-            err=err
-        ))
+        raise ModuleFailure(f"failed to install version {version} for plugin {name}: {err}")
 
 
 def uninstall_plugin_version(module, executable, name, version):
@@ -110,11 +99,7 @@ def set_global_tool_version(module, executable, name, version):
         executable, "global", name, version
     ])
     if rc != 0:
-        raise ModuleFailure(f"failed to set global version {version} for plugin {name}: {err}".format(
-            name=name, 
-            version=version,
-            err=err
-        ))
+        raise ModuleFailure(f"failed to set global version {version} for plugin {name}: {err}")
 
 
 def run_module():
@@ -192,7 +177,7 @@ def run_module():
         
         module.exit_json(**result)
     except ModuleFailure as e:
-        module.fail_json(msg=e.msg)
+        module.fail_json(msg=str(e))
 
 
 def main():

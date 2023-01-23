@@ -1,9 +1,0 @@
-- name: install | install asdf plugin + version
-  become: true
-  become_user: "{{user_name}}"
-  asdf:
-    plugin: "{{asdf_sops_plugin}}"
-    version: "{{asdf_sops_version}}"
-    state: present
-    executable: "{{asdf_executable}}"
-    global_: true

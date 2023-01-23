@@ -1,0 +1,14 @@
+- name: install | set facts
+  set_fact:
+    tanka_platform: "{{ansible_system | lower}}"
+    tanka_architecture: "{{ansible_architecture | lower}}"
+
+- name: install | set architecture
+  set_fact: tanka_architecture=arm64
+  when: tanka_architecture == 'aarch64'
+
+- name: install | download url
+  become: true
+  get_url: url={{url}} dest=/usr/local/bin/tk mode=0755
+  vars:
+    url: https://github.com/grafana/tanka/releases/download/v{{tanka_version}}/tk-{{tanka_platform}}-{{tanka_architecture}}
