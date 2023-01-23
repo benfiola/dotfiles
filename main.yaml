@@ -3,6 +3,7 @@
   roles:
     - asdf
     - asdf-golang
+    - asdf-java
     - asdf-kind
     - asdf-kubectl
     - asdf-nodejs
