@@ -14,27 +14,46 @@
           - kscreen
           - dolphin
           - fonts-noto-color-emoji
+          - fonts-noto-cjk
+          - kwin-bismuth
 
-    - name: install kde with pacman
-      become: true
-      when: archlinux
-      community.general.pacman:
-        name:
-          - sddm
-          - plasma-desktop
-          - plasma-wayland-session
-          - pulseaudio
-          - pavucontrol
-          - plasma-pa
-          - kscreen
-          - dolphin
-          - noto-fonts-emoji
-
+    - when: archlinux
+      block:
+      - name: install kde with pacman
+        become: true
+        when: archlinux
+        community.general.pacman:
+          name:
+            - sddm
+            - sddm-kcm
+            - plasma-desktop
+            - plasma-wayland-session
+            - pulseaudio
+            - pavucontrol
+            - plasma-pa
+            - kscreen
+            - dolphin
+            - noto-fonts-emoji
+            - noto-fonts-cjk
+      
+      - name: install bismuth with AUR
+        ansible.builtin.include_tasks: ./helpers/install-aur.yaml
+        vars:
+          url: https://aur.archlinux.org/kwin-bismuth.git
+          package: kwin-bismuth
+        
     - name: enable sddm
       become: true
       ansible.builtin.systemd:
         name: sddm
         enabled: true
+    
+    - name: run system configuration commands
+      become: true
+      ansible.builtin.command:
+        cmd: "{{item}}"
+      loop:
+        - kwriteconfig5 --file /etc/sddm.conf.d/kde_settings.conf --group Theme --key Current "breeze"
 
     - name: run configuration commands
       ansible.builtin.command:
@@ -46,3 +65,17 @@
         - gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'
         - gsettings set org.gnome.desktop.interface cursor-theme 'breeze_cursors'
         - gsettings set org.gnome.desktop.interface monospace-font-name 'FiraCode Nerd Font Mono 12'
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Plugins --key bismuthEnabled --type bool true
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key decrease_window_width "Meta+Ctrl+H,Meta+Ctrl+H,Increase Window Width"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key increase_window_height "Meta+Ctrl+J,Meta+Ctrl+J,Increase Window Height"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key decrease_window_height "Meta+Ctrl+K,Meta+Ctrl+K,Decrease Window Height"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key increase_window_width "Meta+Ctrl+L,Meta+Ctrl+L,Increase Window Width"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key move_window_to_left_pos "Meta+Shift+H,Meta+Shift+H,Move Window Left"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key move_window_to_bottom_pos "Meta+Shift+J,Meta+Shift+J,Move Window Down"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key move_window_to_upper_pos "Meta+Shift+K,Meta+Shift+K,Move Window Up"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key move_window_to_right_pos "Meta+Shift+L,Meta+Shift+L,Move Window Right"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key rotate "Meta+R,Meta+R,Rotate"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key next_layout "Meta+\\\\,Meta+\\\\,Switch to the Next Layout"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key prev_layout "Meta+|,Meta+|,Switch to the Previous Layout"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key toggle_window_floating "Meta+F,Meta+F,Toggle Active Window Floating"
+
