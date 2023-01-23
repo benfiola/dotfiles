@@ -45,7 +45,24 @@
         vars:
           url: https://aur.archlinux.org/kwin-bismuth-bin.git
           package: kwin-bismuth
-        
+
+    - name: install bismuth-toggle
+      become: true
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/kde/bismuth-toggle.sh"
+        path: /usr/local/bin/bismuth-toggle
+        state: link
+
+    - name: create bismuth-toggle.desktop
+      become: true
+      ansible.builtin.template:
+        src: desktop.j2
+        dest: /usr/share/applications/{{name}}.desktop
+        mode: '0644'
+      vars:
+        command: /usr/local/bin/bismuth-toggle
+        name: bismuth-toggle
+
     - name: enable sddm
       become: true
       ansible.builtin.systemd:
@@ -102,3 +119,5 @@
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key next_layout "Meta+\\\\,Meta+\\\\,Switch to the Next Layout"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key prev_layout "Meta+|,Meta+|,Switch to the Previous Layout"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key toggle_window_floating "Meta+F,Meta+F,Toggle Active Window Floating"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth-toggle.desktop --key _launch "Ctrl+Meta+|,none,bismuth-toggle"
+        - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth-toggle.desktop --key _k_friendly_name "bismuth-toggle"
