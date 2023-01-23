@@ -4,7 +4,7 @@
     - when: not ((vm and debian) or (vm and archlinux))
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
 
     - when: vm and debian
       block:

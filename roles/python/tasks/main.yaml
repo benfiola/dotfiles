@@ -4,7 +4,7 @@
     - when: not (debian or archlinux or darwin) 
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
 
     - when: debian
       block:
@@ -58,7 +58,7 @@
     - when: darwin or archlinux or debian
       block:
         - name: asdf plugin add python
-          asdf_plugin:
+          benfiola.dotfiles.asdf_plugin:
             name: python
         
         - name: link zshrc file

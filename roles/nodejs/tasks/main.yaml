@@ -4,7 +4,7 @@
     - when: not (debian or archlinux or darwin)
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
 
     - when: debian
       block:
@@ -31,6 +31,6 @@
     - when: debian or archlinux or darwin
       block:
         - name: asdf plugin add nodejs
-          asdf_plugin:
+          benfiola.dotfiles.asdf_plugin:
             name: nodejs
 ...

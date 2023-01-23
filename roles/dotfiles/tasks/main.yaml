@@ -3,7 +3,7 @@
     - when: not (debian or archlinux or darwin)
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
   
     - when: debian
       block:
@@ -29,26 +29,25 @@
           ansible.builtin.stat:
             path: "{{user.home}}/.dotfiles"
           register: dotfiles_stat
-        
+
         - name: remove existing dotfiles path
           when: exists and ((symlink_playbook and not is_symlink) or (not symlink_playbook and is_symlink))
           vars:
             exists: "{{dotfiles_stat.stat.exists}}"
-            is_symlink: "{{dotfiles_stat.stat.islnk}}"
+            is_symlink: "{{dotfiles_stat.stat.islnk is defined and dotfiles_stat.stat.islnk}}"
           ansible.builtin.file:
             path: "{{user.home}}/.dotfiles"
-            state: absent
         
         - name: copy playbook to dotfiles directory
           when: not symlink_playbook
           ansible.builtin.synchronize:
-            src: "{{playbook_dir}}/"
+            src: "{{playbook_dir | dirname}}/"
             dest: "{{user.home}}/.dotfiles"
 
         - name: symlink playbook to dotfiles directory
           when: symlink_playbook
           ansible.builtin.file:
-            src: "{{playbook_dir}}"
+            src: "{{playbook_dir | dirname}}"
             dest: "{{user.home}}/.dotfiles"
             state: link
         

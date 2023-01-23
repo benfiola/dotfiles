@@ -13,7 +13,7 @@
           Defaults:{{user.name}} env_keep -= "PATH"
           Defaults:{{user.name}} env_delete += "PATH"
         validate: visudo -cf %s
-    
+
     - name: create .profile.d directory
       ansible.builtin.file:
         path: "{{user.home}}/.profile.d"

@@ -12,7 +12,7 @@ This is my personal dotfiles project and supports macOS, Ubuntu, Archlinux opera
 Running the following command will fully personalize your local machine.  
 
 ```shell
-LOCAL=1 ansible-pull -U https://github.com/benfiola/development-environment.git before.yaml main.yaml
+LOCAL=1 ansible-pull -C main -U https://github.com/benfiola/development-environment.git before.yaml main.yaml
 ```
 
 # Ansible?

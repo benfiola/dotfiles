@@ -4,7 +4,7 @@
     - when: not ((kde and debian) or (kde and archlinux))
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
 
     - when: kde and debian
       block:

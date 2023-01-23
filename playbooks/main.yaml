@@ -1,0 +1,58 @@
+---
+- hosts: all
+  roles:
+    - amethyst
+    - apt
+    - arduino
+    - asdf
+    - authy
+    - bismuth
+    - bitwarden
+    - brew
+    - c
+    - chromium
+    - discord
+    - docker
+    - dotfiles
+    - facts
+    - flatpak
+    - fonts
+    - gimp
+    - golang
+    - gpg
+    - iterm2
+    - java
+    - kde
+    - konsole
+    - kubectl
+    - locale
+    - ls
+    - lutris
+    - macos
+    - nodejs
+    - open-vm-tools
+    - pacman
+    - proton
+    - python
+    - snap
+    - sops
+    - source
+    - spotify
+    - ssh
+    - starship
+    - steam
+    - tanka
+    - user
+    - variety
+    - vim
+    - vscode
+    - wine
+    - xbox
+    - zsh
+
+- hosts: all
+  tasks:
+    - block:
+        - benfiola.dotfiles.empty: {}
+      always:
+        - benfiola.dotfiles.temp_file_cleanup: {}

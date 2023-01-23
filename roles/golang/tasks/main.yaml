@@ -4,7 +4,7 @@
     - when: not (debian or archlinux or darwin)
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
     
     - when: darwin
       block:
@@ -34,6 +34,6 @@
     - when: archlinux or debian or darwin
       block:
         - name: asdf plugin add golang
-          asdf_plugin:
+          benfiola.dotfiles.asdf_plugin:
             name: golang
 ...

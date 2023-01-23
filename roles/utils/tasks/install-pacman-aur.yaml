@@ -18,7 +18,7 @@
           - base-devel
   
     - name: create temp directory
-      temp_file:
+      benfiola.dotfiles.temp_file:
         directory: true
       register: temp_path
     

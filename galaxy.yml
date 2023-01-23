@@ -1,0 +1,12 @@
+namespace: benfiola
+name: dotfiles
+version: "1.0.0"
+readme: "README.md"
+authors:
+  - "Ben Fiola <benfiola@gmail.com>"
+dependencies:
+  "community.crypto": "*"
+  "community.general": "*"
+license:
+  - "MIT"
+repository: "https://www.github.com/benfiola/dotfiles"

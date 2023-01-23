@@ -4,7 +4,7 @@
     - when: not true
       block:
         - name: unimplemented
-          empty: {}
+          benfiola.dotfiles.empty: {}
     
     - when: true
       block:
@@ -23,10 +23,15 @@
             size: 2048
         
         - name: add benfiola.github.com ssh config
+          vars:
+            groups:
+              darwin: "staff"
+            group: "{{groups.get(os_family, omit)}}"
           community.general.ssh_config:
             host: "benfiola.github.com"
             hostname: "github.com"
             identity_file: "{{user.home}}/.ssh/benfiola.github.com"
             state: present
             user: "{{user.name}}"
+            group: "{{group}}"
 ...

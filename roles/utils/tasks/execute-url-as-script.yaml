@@ -10,7 +10,7 @@
   when: not binary_exists.stat.exists
   block:
   - name: create temp file
-    temp_file:
+    benfiola.dotfiles.temp_file: {}
     register: temp_path
 
   - name: make temp file executable
