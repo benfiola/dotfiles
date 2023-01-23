@@ -1,7 +1,10 @@
 - hosts: all
   tasks:
     - include_role:
-        role: "{{item}}"
-      with_items: "{{roles}}"
+        role: "{{role}}"
+      loop: "{{roles}}"
+      loop_control:
+        loop_var: role
+
 
 - ansible.builtin.import_playbook: benfiola.dotfiles.after
