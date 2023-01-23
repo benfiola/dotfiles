@@ -1,6 +1,4 @@
 #!/usr/bin/env zsh
-export LS_BIN="$(which ls)"
-
 if ! command -v realpath > /dev/null 2>&1; then
     debug_msg "realpath not found"
     return
@@ -20,7 +18,6 @@ for cmd in "$dircolors_cmd" "$ls_cmd"; do
     fi
 done
 
-export LS_CAN_USE_COLORS="1"
-export LS_BIN="$(which "$ls_cmd")"
 directory="$(dirname "$(realpath "${(%):-%x}")")"
 eval "$("$dircolors_cmd" "$directory/dircolors")"
+alias ls="$ls_cmd --color=auto"

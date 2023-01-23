@@ -14,8 +14,9 @@
             name: net.davidotek.pupgui2
 
         - name: symlink symlink-user-settings bin script
+          become: true
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/proton/files/symlink-user-settings.py"
-            dest: "{{user_bin_path}}/proton-symlink-user-settings"
+            dest: "/usr/local/bin/proton-symlink-user-settings"
             state: link
 ...

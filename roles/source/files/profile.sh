@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
-SOURCE_DIRECTORY="$HOME/source"
+source_directory="$HOME/source"
 
 src() {
-    script="$ZSHRC_BIN_PATH/src"
-    source "$script" "$@"
+    mkdir -p "$source_directory"
+    cd "$source_directory"
 }

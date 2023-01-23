@@ -30,7 +30,7 @@
           become: true
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/bismuth/files/toggle.sh"
-            path: "{{user_bin_path}}/bismuth-toggle"
+            path: "/usr/local/bin/bismuth-toggle"
             state: link
 
         - name: create bismuth-toggle.desktop
@@ -38,7 +38,7 @@
             name: utils
             tasks_from: create-desktop.yaml
           vars:
-            command: "{{user_bin_path}}/bismuth-toggle"
+            command: "/usr/local/bin/bismuth-toggle"
             name: bismuth-toggle
             scope: user
 ...

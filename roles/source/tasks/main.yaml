@@ -13,10 +13,4 @@
             src: "{{dotfiles_path}}/roles/source/files/profile.sh"
             path: "{{user_profiled_path}}/00-source.sh"
             state: link
-
-        - name: link src bin file
-          ansible.builtin.file:
-            src: "{{dotfiles_path}}/roles/source/files/src.sh"
-            path: "{{user_bin_path}}/src"
-            state: link
 ...

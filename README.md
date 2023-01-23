@@ -30,13 +30,14 @@ However, I wanted to achieve the following:
 
 While all of the above is scriptable, it also comes for free with [ansible](https://docs.ansible.com/ansible).  Thus, _ansible_ seemed like the right tool for the job.
 
-# Expected outcome
+# Expected outcome and conventions
 
 When this ansible playbook is run, the following outcomes are expected:
 
 * This git repository is copied (or symlinked) to _$HOME_/.dotfiles
-* Files at _$HOME_/.bin are available on _PATH_
 * Files at _$HOME_/.profile.d are sourced when terminal sessions are created
+* Helper shell scripts are implemented as functions/aliases provided via sourced files in _$HOME_/.profile.d
+* Helper scripts that exist beyond the terminal session are installed to _/usr/local/bin_
 * File-based configuration is symlinked/hardlinked _from_ _$HOME_/.dotfiles _to_ their expected location (such that local configuration change leaves the repo at _$HOME_/.dotfiles in a dirty state)
 * Script-based configuration is applied on every playbook execution (e.g., _gsettings_)
 * All necessary, supported applications are installed
