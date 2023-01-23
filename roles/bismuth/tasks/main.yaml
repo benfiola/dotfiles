@@ -40,4 +40,5 @@
           vars:
             command: "{{user_bin_path}}/bismuth-toggle"
             name: bismuth-toggle
+            scope: user
 ...

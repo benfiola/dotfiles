@@ -12,7 +12,7 @@ default_settings = {
     "PROTON_ENABLE_NVAPI": "1",
     "VKD3D_FEATURE_LEVEL": "12_2",
     "VKD3D_CONFIG": "dxr,dxr11",
-    "DXVK_HUD": "fps",
+    "DXVK_ASYNC": "1",
 }
 
 

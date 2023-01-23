@@ -1,7 +1,15 @@
 # creates a systemd service unit with "{{name}}" at "{{scope}}"
+# "{{scope}}" must be either 'user' or 'system' (default is 'system')
 - name: create {{scope}} systemd service {{name}}
-  become: true
+  become: "{{become}}"
   ansible.builtin.template:
     src: systemd.service.j2
-    dest: /usr/lib/systemd/{{scope}}/{{name}}.service
+    dest: "{{path}}"
     mode: '0644'
+  vars:
+    scope: "{{scope | default('system')}}"
+    become: "{{scope == 'system'}}"
+    paths:
+      user: "{{user.home}}/.config/systemd/user/{{name}}.service"
+      systemd: /usr/lib/systemd/system/{{name}}.service
+    path: "{{paths[scope]}}"

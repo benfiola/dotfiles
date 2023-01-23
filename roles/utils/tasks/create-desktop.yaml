@@ -1,7 +1,15 @@
-# creates a desktop file for "{{name}}"
+# creates a desktop file for "{{name}}" with scope "{{scope}}".
+# "{{scope}}" can be 'user' or 'system' (defaults to 'system')
 - name: create {{name}}.desktop
-  become: true
+  become: "{{become}}"
   ansible.builtin.template:
     src: desktop.j2
-    dest: /usr/share/applications/{{name}}.desktop
+    dest: "{{path}}"
     mode: '0644'
+  vars:
+    scope: "{{scope | default('system')}}"
+    become: "{{scope == 'system'}}"
+    paths:
+      user: "{{user.home}}/.local/share/applications/{{name}}.desktop"
+      system: /usr/share/applications/{{name}}.desktop
+    path: "{{paths[scope]}}"
