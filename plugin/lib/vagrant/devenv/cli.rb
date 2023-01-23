@@ -24,7 +24,7 @@ module Vagrant
 
                 desc "list", "List devenvs"
                 def list
-
+                    Vagrant::Devenv::Core.new(self.vagrant_home_path).list
                 end
 
                 no_commands do
