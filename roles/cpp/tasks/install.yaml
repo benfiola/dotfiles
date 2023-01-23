@@ -1,3 +1,0 @@
-- name: install | install apt packages
-  become: true
-  apt: pkg=gcc,g++,make,cmake state=present

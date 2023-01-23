@@ -1,3 +1,0 @@
-- name: install | install snap app
-  become: true
-  snap: name=chromium state=present

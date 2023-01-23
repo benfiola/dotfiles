@@ -1,5 +1,0 @@
-- name: install | install apt packages
-  become: true
-  apt:
-    pkg: "{{graphviz_apt_packages}}"
-    state: present

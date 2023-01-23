@@ -1,0 +1,4 @@
+org.gnome.desktop.interface gtk-theme 'theme'
+org.gnome.desktop.wm.preferences theme 'theme'
+org.gnome.desktop.interface monospace-font-name 'FiraCode Nerd Font Mono 12'
+org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/ulauncher-toggle/']"
