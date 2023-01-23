@@ -15,6 +15,7 @@
 - ansible.builtin.include_tasks: ./components/sops.yaml
 - ansible.builtin.include_tasks: ./components/tanka.yaml
 - ansible.builtin.include_tasks: ./components/docker.yaml
+- ansible.builtin.include_tasks: ./components/arduino.yaml
 
 - ansible.builtin.include_tasks: ./components/lscolors.yaml
 - ansible.builtin.include_tasks: ./components/kde.yaml

@@ -1,0 +1,15 @@
+- when: archlinux
+  block:
+    - name: add user to uucp group
+      become: true
+      ansible.builtin.user:
+        append: true
+        user: "{{user.name}}"
+        groups:
+          - uucp
+
+    - name: install arduino
+      become: true
+      community.general.pacman:
+        name:
+          - arduino-cli
