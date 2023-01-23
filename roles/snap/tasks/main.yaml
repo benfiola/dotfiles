@@ -23,7 +23,7 @@
           vars:
             url: https://aur.archlinux.org/snapd.git
             package: snapd
-        
+
         - name: enable snapd socket
           become: true
           ansible.builtin.systemd:
@@ -37,4 +37,10 @@
             src: /var/lib/snapd/snap
             path: /snap
             state: link
+
+        - name: wait for snapd to be seeded
+          become: true
+          changed_when: false
+          ansible.builtin.command:
+            cmd: "snap wait system seed.loaded"
 ...
