@@ -1,8 +1,8 @@
 ---
 dependencies:
-  - role: facts
-  - role: apt
-  - role: pacman
-  - role: dotfiles
-  - role: user
+  - role: benfiola.dotfiles.facts
+  - role: benfiola.dotfiles.apt
+  - role: benfiola.dotfiles.pacman
+  - role: benfiola.dotfiles.dotfiles
+  - role: benfiola.dotfiles.user
 ...

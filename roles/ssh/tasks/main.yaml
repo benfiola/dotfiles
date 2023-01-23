@@ -13,7 +13,7 @@
             ssh_user: benfiola
             ssh_host: github.com
           ansible.builtin.include_role: 
-            role: ssh
+            role: benfiola.dotfiles.utils
             tasks_from: create-ssh-key.yaml
           with_items:
             - {ssh_user: benfiola, ssh_host: github.com}

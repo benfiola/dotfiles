@@ -19,7 +19,7 @@
           
         - name: install brew from url
           ansible.builtin.include_role: 
-            role: utils
+            role: benfiola.dotfiles.utils
             tasks_from: execute-url-as-script.yaml
           vars:        
             url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh

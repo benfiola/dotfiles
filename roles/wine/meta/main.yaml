@@ -1,5 +1,5 @@
 ---
 dependencies:
-  - role: facts
-  - role: pacman
+  - role: benfiola.dotfiles.facts
+  - role: benfiola.dotfiles.pacman
 ...

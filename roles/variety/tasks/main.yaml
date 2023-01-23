@@ -49,7 +49,7 @@
 
         - name: install variety systemd service unit file
           ansible.builtin.include_role:
-            role: utils
+            role: benfiola.dotfiles.utils
             tasks_from: create-systemd-service.yaml
           vars:
             name: variety

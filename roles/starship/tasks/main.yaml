@@ -10,7 +10,7 @@
       block:
         - name: install starship from url
           ansible.builtin.include_role: 
-            name: utils
+            name: benfiola.dotfiles.utils
             tasks_from: execute-url-as-script.yaml
           vars:
             url: https://raw.githubusercontent.com/starship/starship/v1.10.3/install/install.sh

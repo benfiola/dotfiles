@@ -1,10 +1,10 @@
 ---
 dependencies:
-  - role: facts
-  - role: asdf
-  - role: brew
-  - role: apt
-  - role: pacman
-  - role: dotfiles
-  - role: user
+  - role: benfiola.dotfiles.facts
+  - role: benfiola.dotfiles.asdf
+  - role: benfiola.dotfiles.brew
+  - role: benfiola.dotfiles.apt
+  - role: benfiola.dotfiles.pacman
+  - role: benfiola.dotfiles.dotfiles
+  - role: benfiola.dotfiles.user
 ...

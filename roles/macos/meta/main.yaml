@@ -1,5 +1,5 @@
 ---
 dependencies:
-  - role: facts
-  - role: dotfiles
+  - role: benfiola.dotfiles.facts
+  - role: benfiola.dotfiles.dotfiles
 ...

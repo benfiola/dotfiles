@@ -18,7 +18,7 @@
       block:
         - name: pacman aur install bismuth
           ansible.builtin.include_role: 
-            name: utils
+            name: benfiola.dotfiles.utils
             tasks_from: install-pacman-aur.yaml
           vars:
             url: https://aur.archlinux.org/kwin-bismuth-bin.git
@@ -35,7 +35,7 @@
 
         - name: create bismuth-toggle.desktop
           ansible.builtin.include_role:
-            name: utils
+            name: benfiola.dotfiles.utils
             tasks_from: create-desktop.yaml
           vars:
             command: "/usr/local/bin/bismuth-toggle"

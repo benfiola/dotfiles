@@ -1,7 +1,7 @@
 ---
 dependencies:
-  - role: facts
-  - role: dotfiles
-  - role: kde
-  - role: user
+  - role: benfiola.dotfiles.facts
+  - role: benfiola.dotfiles.dotfiles
+  - role: benfiola.dotfiles.kde
+  - role: benfiola.dotfiles.user
 ...

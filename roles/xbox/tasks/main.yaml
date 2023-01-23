@@ -10,7 +10,7 @@
       block:
         - name: pacman aur install xone-dkms
           ansible.builtin.include_role: 
-            name: utils
+            name: benfiola.dotfiles.utils
             tasks_from: install-pacman-aur.yaml
           vars:
             url: https://aur.archlinux.org/xone-dkms.git
