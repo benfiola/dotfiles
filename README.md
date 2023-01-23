@@ -12,13 +12,18 @@ This is my personal dotfiles project and supports macOS, Ubuntu, Archlinux opera
 Running the following command will fully personalize your local machine.  
 
 ```shell
-mkdir -p ~/.ansible/collections/benfiola
-
+# clone dotfiles repo to target location
 git clone git@github.com:benfiola/dotfiles.git ~/.dotfiles
-ansible-galaxy install -r ~/.dotfiles/requirements.yaml
-ln -s "~/.dotfiles" ~/.ansible/collections/benfiola/dotfiles
+cd ~/.dotfiles
 
-cd "~/.dotfiles"
+# install ansible galaxy dependencies
+ansible-galaxy install -r requirements.yaml
+
+# symlink collection into ansible galaxy install location
+mkdir -p ~/.ansible/collections/benfiola
+ln -s "$(pwd)" ~/.ansible/collections/benfiola/dotfiles
+
+# run collection
 LOCAL=1 ansible-playbook benfiola.dotfiles.main
 ```
 
@@ -38,10 +43,9 @@ When this ansible playbook is run, the following outcomes are expected:
 * All necessary, supported applications are installed
 * OS, desktop environments, and applications are all configured and themed appropriately
 
-# Configuration
+# Inventory
 
-Configuration is defined in the environment, and consumed via [dynamic inventory](./inventories/env.py).
-
+Inventory is defined from the environment via the [benfiola.dotfiles.environmnent](./plugins/inventory/environment.py) inventory plugin.
 
 | Envioronment Variable | Description |
 | - | - |
@@ -50,7 +54,7 @@ Configuration is defined in the environment, and consumed via [dynamic inventory
 
 # Playbook
 
-The [main playbook](./playbooks/main.yaml) lists all available roles alphabetically to ensure that no roles are accidentally ignored.
+The [benfiola.dotfiles.main](./playbooks/main.yaml) playbook lists all available roles alphabetically to ensure that no roles are accidentally ignored.
 
 [Tags](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html) ultimately filter down the roles that are executed, and [role dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies) ensure that roles are executed in a topologically sorted order.
 
@@ -70,7 +74,6 @@ Dependencies on other roles are explicitly defined via [role dependencies](https
 
 * The role depends on another role's installed binary in order to install itself (e.g., [python](./roles/python/tasks/main.yaml) indirectly depends on the [asdf](./roles/asdf/tasks/main.yaml) role's binary)
 * The role depends on a fact exposed by installing another role (e.g., [ls](./roles/ls/tasks/main.yaml) depends on the [user](./roles/user/tasks/main.yaml)'s fact _user_profiled_path_).  All roles depend on the [facts](./roles/facts/tasks/main.yaml) role.
-
 
 # Tags
 
@@ -129,16 +132,16 @@ As a result, role task lists often look like the following:
 ...
 ```
 
-# Custom tasks
+# Custom modules
 
 Generally, tasks that require a bit of processing or state aren't a great fit for ansible task lists.  To avoid needlessly complex common tasks within ansible, some functionality is instead implemented as [custom ansible modules](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html).
 
 | Task | Description |
 | - | - |
-| [asdf_plugin](./library/asdf_plugin.py) | Helps manage (un)installation of [asdf plugins](https://github.com/asdf-vm/asdf-plugins) |
-| [empty](./library/empty.py) | No-op task - used primarily to identify 'unimplemented' paths within role implementations |
-| [temp_file](./library/temp_file.py) | Creates a temp file on the target machine |
-| [temp_file_cleanup](./library/temp_file_cleanup.py) | Cleans up created temp files on the target machine - _must_ be manually run before the end of the playbook run |
+| [benfiola.dotfiles.asdf_plugin](./plugins/modules/asdf_plugin.py) | Helps manage (un)installation of [asdf plugins](https://github.com/asdf-vm/asdf-plugins) |
+| [benfiola.dotfiles.empty](./plugins/modules/empty.py) | No-op task - used primarily to identify 'unimplemented' paths within role implementations |
+| [benfiola.dotfiles.temp_file](./plugins/modules/temp_file.py) | Creates a temp file on the target machine |
+| [benfiola.dotfiles.temp_file_cleanup](./plugins/modules/temp_file_cleanup.py) | Cleans up created temp files on the target machine - _must_ be manually run before the end of the playbook run |
 
 # Notes
 

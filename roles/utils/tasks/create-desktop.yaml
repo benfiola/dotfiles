@@ -1,15 +1,23 @@
 # creates a desktop file for "{{name}}" with scope "{{scope}}".
 # "{{scope}}" can be 'user' or 'system' (defaults to 'system')
-- name: create {{name}}.desktop
-  become: "{{become}}"
-  ansible.builtin.template:
-    src: desktop.j2
-    dest: "{{path}}"
-    mode: '0644'
-  vars:
+- vars:
     scope: "{{scope | default('system')}}"
     become: "{{scope == 'system'}}"
-    paths:
-      user: "{{user.home}}/.local/share/applications/{{name}}.desktop"
-      system: /usr/share/applications/{{name}}.desktop
-    path: "{{paths[scope]}}"
+    folders:
+      user: "{{user.home}}/.local/share/applications"
+      system: /usr/share/applications
+    folder: "{{folders[scope]}}"
+  block:
+    - name: create {{folder}}
+      become: "{{become}}"
+      ansible.builtin.file:
+        recurse: true
+        path: "{{folder}}"
+        state: directory
+
+    - name: create {{name}}.desktop
+      become: "{{become}}"
+      ansible.builtin.template:
+        src: desktop.j2
+        dest: "{{folder}}/{{name}}.desktop"
+        mode: '0644'
