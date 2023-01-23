@@ -22,3 +22,7 @@ Run the following command:
 ```shell
 ansible-pull -U https://github.com/benfiola/development-environment.git full.yaml
 ```
+
+# TODO
+* Fix discord screen sharing audio (?)
+* Fix KDE opening windows off-screen
