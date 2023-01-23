@@ -1,0 +1,42 @@
+---
+- name: "({{ username }}) Get user info"
+  become: true
+  user:
+    name: "{{ username }}"
+  register: user
+
+- name: "Install apt packages"
+  become: true
+  apt:
+    state: present 
+    pkg: 
+      - git
+    update_cache: true
+  
+- name: "({{ user.name }}) Clone oh-my-zsh repo"
+  become: true
+  become_user: "{{ user.name }}"
+  git: 
+    repo: "https://github.com/ohmyzsh/ohmyzsh.git" 
+    dest: "{{ user.home }}/.oh-my-zsh"
+
+- name: "({{ user.name }}) Copy theme"
+  become: true
+  become_user: "{{ user.name }}"
+  copy: 
+    src: "files/ben.zsh-theme"
+    dest: "{{ user.home }}/.oh-my-zsh/custom/themes/ben.zsh-theme"
+    owner: "{{ user.name }}"
+
+- name: "({{ user.name }}) Add oh-my-zsh data to .zshrc"
+  become: true
+  become_user: "{{ user.name }}"
+  blockinfile:
+    create: true
+    owner: "{{ user.name }}"
+    dest: "{{ user.home }}/.zshrc"
+    block: "{{ lookup('template', 'templates/ohmyzsh.zshrc.j2') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK for {{ role_name }}"
+  vars:
+    oh_my_zsh_path: "{{ user.home }}/.oh-my-zsh"
+  

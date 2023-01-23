@@ -1,43 +1,29 @@
 ---
 - hosts: all
-  tasks:
-  - fail:
-      msg: "username unset"
-    when: "not username"
-  
+  vars:
+    username: "{{ ansible_user_id }}"
+  tasks:  
   - fail:
       msg: "directory unset"
     when: "not directory"
 
-  - name: "Create ansible user"
+  - name: "({{ username }}) Get user information"
     user:
       name: "{{ username }}"
-      state: present
     register: user
-  
-  - name: "Enable passwordless sudo for {{ user.name }}"
-    become: true
-    lineinfile:
-      path: "/etc/sudoers.d/{{ user.name }}"
-      create: true
-      state: present
-      line: "{{ user.name }} ALL=(ALL) NOPASSWD: ALL"
-      validate: 'visudo -cf %s'
-  
-  - name: "Disable remote login for {{ user.name }}"
-    become: true
-    lineinfile:
-      path: "/etc/security/access.conf"
-      create: true
-      state: present
-      line: "-:{{ user.name }}:ALL EXCEPT LOCAL"
 
-  - name: "Clone {{ repo }} to {{ directory }}"
+  - name: "Install apt packages"
+    become: true
+    apt:
+      state: present 
+      pkg:
+        - git
+      update_cache: true
+
+  - name: "Clone development environment repository"
     become: true
     become_user: "{{ user.name }}"
-    ansible.builtin.git:
-      repo: "{{ repo }}"
-      dest: "{{ directory }}"
-      update: no
-    vars:
+    git:
       repo: "https://github.com/benfiola/development_environment.git"
+      dest: "{{ directory }}"
+      update: yes

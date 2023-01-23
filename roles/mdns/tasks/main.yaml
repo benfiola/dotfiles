@@ -1,16 +1,15 @@
 ---
-- block:
-  - name: "Update apt-cache"
-    apt: update_cache=yes
-    become: true
+- name: "Install apt packages"
+  become: true
+  apt:
+    update_cache: true
+    state: present 
+    pkg:
+    - avahi-daemon
 
-  - name: "Install apt packages"
-    become: true
-    apt:
-      state: present 
-      pkg:
-        - avahi-daemon
-
-  - name: "Start avahi-daemon.service"
-    become: true
-    systemd: name=avahi-daemon state=started enabled=yes
+- name: "Start avahi-daemon.service"
+  become: true
+  systemd: 
+    name: avahi-daemon
+    state: started
+    enabled: yes
