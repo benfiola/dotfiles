@@ -15,6 +15,7 @@
     - docker
     - git
     - goland
+    - gpg
     - mdns
     - pycharm
     - qemu
