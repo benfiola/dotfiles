@@ -62,5 +62,6 @@
       scope: user
       enabled: true
       state: restarted
+    when: ansible_user == user
   vars:
     gpg_home_dir: "{{ user_home }}/.gnupg"
