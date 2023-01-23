@@ -1,5 +1,8 @@
 ---
 - hosts: all
   tasks:
-  - ansible.builtin.include_role: 
-      name: common
+  - block:
+      - ansible.builtin.include_role:
+          name: common
+    always:
+      - temp_file_cleanup: {}

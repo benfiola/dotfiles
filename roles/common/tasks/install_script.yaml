@@ -1,0 +1,24 @@
+# installs a '{{binary}}' via a script provided at '{{url}}', supplying '{{args}}' if specified
+# if '{{binary}}' exists, install is skipped
+- name: check binary exists
+  ansible.builtin.stat:
+    path: "{{binary}}"
+  register: binary_exists
+
+- name: install binary
+  when: binary_exists.stat.exists
+  block:
+  - name: create temp file
+    temp_file:
+    register: temp_path
+
+  - name: downlad script
+    ansible.builtin.get_url:
+      url: "{{url}}"
+      dest: "{{temp_path.path}}"
+      mode: 0755
+
+  - name: run script
+    ansible.builtin.command:
+      cmd: "{{temp_path.path}} {{args | default('')}}"
+      creates: "{{binary}}"

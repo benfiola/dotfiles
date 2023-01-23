@@ -1,27 +1,29 @@
 ---
 - name: set system facts
-  ansible.builtin.set_fact:
-    os_family: "{{ansible_facts['os_family'] | lower}}"
-    system: "{{ansible_system | lower}}"
-    architecture: "{{ansible_architecture | lower}}"
-    distribution: "{{ansible_distribution | lower}}"
-    release: "{{ansible_distribution_release | lower}}"
-    username: "{{ansible_user_id}}"
-    vm: true
-  
-- name: set system facts
-  when: architecture == 'aarch64'
-  ansible.builtin.set_fact:
-    architecture: arm64
+  block:
+    - name: set system facts - base data
+      ansible.builtin.set_fact:
+        os_family: "{{ansible_facts['os_family'] | lower}}"
+        system: "{{ansible_system | lower}}"
+        architecture: "{{ansible_architecture | lower}}"
+        distribution: "{{ansible_distribution | lower}}"
+        release: "{{ansible_distribution_release | lower}}"
+        username: "{{ansible_user_id}}"
+        vm: true
 
-- name: set system facts
-  ansible.builtin.set_fact:
-    linux: "{{system == 'linux'}}"
-    darwin: "{{system == 'darwin'}}"
-    debian: "{{os_family == 'debian'}}"
-    ubuntu: "{{distribution == 'ubuntu'}}"
-    x86_64: "{{architecture == 'x86_64'}}"
-    arm64: "{{architecture == 'arm64'}}"
+    - name: set system facts - coerce aarch64 to arm64
+      when: architecture == 'aarch64'
+      ansible.builtin.set_fact:
+        architecture: arm64
+
+    - name: set system facts - convenience
+      ansible.builtin.set_fact:
+        linux: "{{system == 'linux'}}"
+        darwin: "{{system == 'darwin'}}"
+        debian: "{{os_family == 'debian'}}"
+        ubuntu: "{{distribution == 'ubuntu'}}"
+        x86_64: "{{architecture == 'x86_64'}}"
+        arm64: "{{architecture == 'arm64'}}"
 
 - name: get user data
   ansible.builtin.user:
@@ -37,64 +39,60 @@
     line: "{{user.name}} ALL=(ALL) NOPASSWD: ALL"
     validate: visudo -cf %s
 
-- name: (darwin) set brew path fact
+- name: install brew
   when: darwin
-  ansible.builtin.set_fact:
-    brew_path: "{{paths[architecture]}}"
-  vars:
-    paths:
-      x86_64: /usr/local/bin
-      arm64: /opt/homebrew/bin
+  block:
+    - name: set brew path fact
+      ansible.builtin.set_fact:
+        brew_path: "{{paths[architecture]}}"
+      vars:
+        paths:
+          x86_64: /usr/local/bin
+          arm64: /opt/homebrew/bin
+      
+    - name: install brew with script
+      include_tasks: ./install_script.yaml
+      vars:
+        url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+        binary: "{{brew_path}}"
 
-- name: (darwin) download brew install script
-  when: darwin
-  ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh"
-    dest: /tmp/install-brew
-    mode: 0755
-
-- name: (darwin) install brew
-  when: darwin
-  ansible.builtin.command:
-    cmd: /tmp/install-brew
-    creates: "{{brew_path}}"
-
-- name: (debian) update apt cache
+- name: update apt cache
   become: true
   changed_when: false
   when: debian
   ansible.builtin.apt:
     update_cache: true
 
-- name: (debian) install locale dependencies
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package:
-      - locales
+- name: set locale
+  block:
+    - name: install locale dependencies with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - locales
 
-- name: (linux) generate system locale
-  become: true
-  when: linux
-  community.general.locale_gen:
-    name: en_US.UTF-8
-    state: present
+    - name: generate system locale with localegen
+      become: true
+      when: linux
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
 
-- name: (linux) set system locale
-  become: true
-  when: linux
-  ansible.builtin.lineinfile:
-    dest: /etc/default/locale
-    regexp: "^LANG="
-    line: "LANG=en_US.UTF-8"
+    - name: set system locale
+      become: true
+      when: linux
+      ansible.builtin.lineinfile:
+        dest: /etc/default/locale
+        regexp: "^LANG="
+        line: "LANG=en_US.UTF-8"
 
-- name: (linux) set timezone
+- name: set timezone
   become: true
-  when: linux
   community.general.timezone:
     name: America/Los_Angeles
 
-- name: (debian) remove unattended upgrades
+- name: remove unattended upgrades with apt
   become: true
   when: debian
   ansible.builtin.apt:
@@ -102,7 +100,7 @@
       - unattended-upgrades
     state: absent
 
-- name: (debian and vm) install open-vm-tools
+- name: install open-vm-tools with apt
   become: true
   when: debian and vm
   ansible.builtin.apt:
@@ -110,577 +108,609 @@
       - open-vm-tools
       - open-vm-tools-desktop
 
-- name: (debian) install snapd
+- name: install snapd with apt
   become: true
   when: debian
   ansible.builtin.apt:
     package:
       - snapd
 
-- name: (debian) install vim
+- name: install git with apt
   become: true
   when: debian
   ansible.builtin.apt:
-    package: 
-      - vim
-
-- name: (debian) install git
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package: 
+    package:
       - git
 
-- name: (debian) install zsh
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package: 
-      - zsh
-
-- name: (darwin) install coreutils
-  when: darwin
-  community.general.homebrew:
-    name: 
-      - coreutils
-    path: "{{brew_path}}"
-
-- name: clone development environment repo
-  ansible.builtin.git:
-    repo: https://github.com/benfiola/development-environment.git
-    dest: "{{user.home}}/.development-environment"
-  notify:
-  - restart ulauncher
-  - restart variety
-
-- name: set dotfiles fact
-  ansible.builtin.set_fact:
-    dotfiles_path: "{{user.home}}/.development-environment/dotfiles"
-
-- name: set user shell to zsh
-  become: true
-  ansible.builtin.user:
-    name: "{{user.name}}"
-    shell: /bin/zsh
-  register: user
-
-- name: create user source directory
-  ansible.builtin.file:
-    path: "{{user.home}}/source"
-    state: directory
-
-- name: install user shell profile
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/.zshrc"
-    path: "{{user.home}}/.zshrc"
-    state: link
-
-- name: (debian) install gnome
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package:
-      - gnome-shell
-      - gnome-shell-extensions
-      - gnome-session
-      - gnome-themes-extra
-      - gnome-tweaks
-      - fonts-cantarell
-      - adwaita-icon-theme-full
-
-- name: find fonts
-  ansible.builtin.find:
-    paths: "{{dotfiles_path}}/fonts"
-    patterns: "*.ttf"
-  register: fonts
-
-- name: install fonts
-  become: true
-  ansible.builtin.file:
-    src: "{{item}}"
-    dest: "{{paths[system]}}/{{item | basename}}"
-    state: hard
-  vars:
-    paths:
-      linux: /usr/local/share/fonts
-      darwin: /Library/Fonts
-  loop: "{{fonts.files | map(attribute='path') }}"
-
-- name: (linux) install desktop theme
-  become: true
-  when: linux
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/gnome/theme"
-    dest: /usr/share/themes/theme
-    state: link
-
-- name: (linux) install desktop configuration
-  when: linux
-  ansible.builtin.shell:
-    cmd: "cat {{dotfiles_path}}/gnome/settings.gsettings | xargs -l -t gsettings set"
-
-- name: (debian) install terminal
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package: 
-      - gnome-terminal
-
-- name: (linux) install terminal configuration
-  when: linux
-  ansible.builtin.shell:
-    cmd: "cat {{dotfiles_path}}/gnome-terminal/settings.gsettings | xargs -l -t gsettings set"
-
-- name: (darwin) install terminal
-  become: true
-  when: darwin
-  ansible.builtin.unarchive:
-    src: https://iterm2.com/downloads/stable/iTerm2-3_4_16.zip
-    remote_src: true
-    dest: /Applications
-    creates: /Applications/iTerm.app
-
-- name: (darwin) set terminal defaults
-  community.general.osx_defaults:
-    domain: com.googlecode.iterm2
-    key: "{{item.key}}"
-    type: "{{item.type}}"
-    value: "{{item.value}}"
-  loop:
-    - key: PrefsCustomFolder
-      type: string
-      value: "{{dotfiles_path}}/iterm"
-    - key: LoadPrefsFromCustomFolder
-      type: bool
-      value: true
-  
-- name: download starship prompt install script
-  ansible.builtin.get_url:
-    url: https://raw.githubusercontent.com/starship/starship/v1.10.3/install/install.sh
-    dest: /tmp/install-starship-prompt
-    mode: 0755
-
-- name: install starship prompt
-  become: true
-  ansible.builtin.command:
-    cmd: /tmp/install-starship-prompt --yes
-    creates: /usr/local/bin/starship
-
-- name: install starship prompt configuration
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/starship/starship.toml"
-    dest: "{{user.home}}/.config/starship.toml"
-    state: link
-
-- name: (debian) install ulauncher dependencies
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package:
-      - wmctrl
-
-- name: (debian) install ulauncher
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    deb: https://github.com/Ulauncher/Ulauncher/releases/download/5.15.0/ulauncher_5.15.0_all.deb
-
-- name: (linux) create ulauncher user theme directory
-  when: linux
-  ansible.builtin.file:
-    path: "{{user.home}}/.config/ulauncher/user-themes"
-    state: directory
-    recurse: true
-  
-- name: (linux) install ulauncher theme
-  when: linux
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/ulauncher/theme"
-    dest: "{{user.home}}/.config/ulauncher/user-themes/theme"
-    state: link
-
-- name: (linux) install ulauncher configuration
-  when: linux
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/ulauncher/settings.json"
-    dest: "{{user.home}}/.config/ulauncher/settings.json"
-    state: link
-
-- name: (linux) install ulauncher keybindings
-  when: linux
-  ansible.builtin.shell:
-    cmd: "cat {{dotfiles_path}}/ulauncher/keybindings.gsettings | xargs -l -t gsettings set"
-
-- name: (debian) start ulauncher service
-  when: debian
-  ansible.builtin.systemd:
-    name: ulauncher
-    scope: user
-    state: started
-    enabled: true
-
-- name: (debian) install vscode
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    deb: "{{urls[architecture]}}"
-  vars:
-    urls:
-      x86_64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
-      arm64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-arm64
-
-- name: (darwin) install vscode
-  become: true
-  when: darwin
-  ansible.builtin.unarchive:
-    src: https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal
-    remote_src: true
-    dest: /Applications
-    creates: /Applications/Visual Studio Code.app
-
-- name: (darwin) install google-chrome
-  become: true
-  when: darwin
-  dmg_unarchive:
-    src: https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg
-    dest: /Applications
-    creates: /Applications/Google Chrome.app
-
-- name: (darwin) remove existing google-chrome policy
-  become: true
-  when: darwin
-  failed_when: false
-  ansible.builtin.command:
-    cmd: profiles -R -F {{dotfiles_path}}/chromium/macos.mobileconfig
-  
-- name: (darwin) install google-chrome policy
-  become: true
-  when: darwin
-  ansible.builtin.command:
-    cmd: open {{dotfiles_path}}/chromium/macos.mobileconfig
-
-- name: (linux) install chromium
-  become: true
-  when: linux
-  community.general.snap:
-    name: chromium
-
-- name: (linux) create chromium policy folder
-  become: true
-  when: linux
-  ansible.builtin.file:
-    path: /etc/chromium-browser/policies/managed
-    state: directory
-
-- name: (linux) install chromium policy
-  become: true
-  when: linux
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/chromium/policy.json"
-    dest: /etc/chromium-browser/policies/managed/policy.json
-    state: hard
-
-- name: (linux and x86_64) install bitwarden
-  become: true
-  when: linux and x86_64
-  community.general.snap:
-    name: bitwarden
-
-- name: (darwin) install bitwarden
-  when: darwin
-  dmg_unarchive:
-    src: https://vault.bitwarden.com/download/?app=desktop&platform=macos&variant=dmg
-    remote_src: true
-    dest: /Applications
-    creates: /Applications/Bitwarden.app
-
-- name: (linux and x86_64) install authy
-  become: true
-  when: linux and x86_64
-  community.general.snap:
-    name: authy
-  
-- name: (darwin) install authy
-  when: darwin
-  dmg_unarchive:
-    src: https://s3.amazonaws.com/authy-electron-repository-production/authy/stable/2.2.1/darwin/x64/Authy%20Desktop-2.2.1.dmg
-    dest: /Applications
-    creates: /Applications/Authy Desktop.app
-
-- name: (debian) add variety ppa
-  become: true
-  when: debian
-  ansible.builtin.apt_repository:
-    repo: ppa:variety/stable
-
-- name: (debian) install variety
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    update_cache: true
-    package: 
-      - variety
-
-- name: (linux) create variety configuration folder
-  when: linux
-  ansible.builtin.file:
-    path: "{{user.home}}/.config/variety"
-    recurse: true
-    state: directory
-
-- name: (linux) create variety first-run file
-  when: linux
-  ansible.builtin.shell:
-    cmd: date > {{user.home}}/.config/variety/.firstrun
-    creates: "{{user.home}}/.config/variety/.firstrun"
-
-- name: (linux) install variety configuration
-  when: linux
-  ansible.builtin.file:
-    src: "{{dotfiles_path}}/variety/variety.conf"
-    dest: "{{user.home}}/.config/variety/variety.conf"
-    state: link
-  
-- name: (debian) create variety service
-  become: true
-  when: debian
-  ansible.builtin.template:
-    src: systemd.service.j2
-    dest: "/usr/lib/systemd/user/variety.service"
-  vars:
-    description: variety
-    command: /usr/bin/variety --profile %h/.config/variety/
-
-- name: (debian) start variety service
-  when: debian
-  ansible.builtin.systemd:
-    name: variety
-    scope: user
-    state: started
-    enabled: true
-
-- name: (debian) install asdf dependencies
-  when: debian
-  become: true
-  ansible.builtin.apt:
-    package:
-      - curl
-      - git
-
-- name: install asdf
-  ansible.builtin.git:
-    repo: https://github.com/asdf-vm/asdf.git
-    dest: "{{user.home}}/.asdf"
-
-- name: create asdf .tool-versions file
-  ansible.builtin.file:
-    path: "{{user.home}}/.tool-versions"
-    state: touch
-    modification_time: preserve
-    access_time: preserve
-    
-- name: (debian) install python build dependencies
-  when: debian
-  become: true
-  ansible.builtin.apt:
-    package:
-      - make
-      - build-essential
-      - libssl-dev
-      - zlib1g-dev
-      - libbz2-dev
-      - libreadline-dev
-      - libsqlite3-dev
-      - wget
-      - curl
-      - llvm
-      - libncursesw5-dev
-      - xz-utils
-      - tk-dev
-      - libxml2-dev
-      - libxmlsec1-dev
-      - libffi-dev
-      - liblzma-dev
-
-- name: (darwin) install python build dependencies
+- name: install coreutils with brew
   when: darwin
   community.general.homebrew:
     name:
-      - openssl 
-      - readline 
-      - sqlite3 
-      - xz 
-      - zlib 
-      - tcl-tk
+      - coreutils
     path: "{{brew_path}}"
 
-- name: install asdf python plugin
-  asdf_plugin:
-    name: python
-    state: present
+- name: install development environment repo
+  block:
+    - name: clone development environment repo
+      ansible.builtin.git:
+        repo: https://github.com/benfiola/development-environment.git
+        dest: "{{user.home}}/.development-environment"
+      notify:
+        - restart ulauncher
+        - restart variety
 
-- name: install asdf nodejs plugin
+    - name: set dotfiles fact
+      ansible.builtin.set_fact:
+        dotfiles_path: "{{user.home}}/.development-environment/dotfiles"
+
+- name: install user shell
+  block:
+    - name: install zsh with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - zsh
+      
+    - name: set user shell
+      become: true
+      ansible.builtin.user:
+        name: "{{user.name}}"
+        shell: /bin/zsh
+      register: user
+
+    - name: install user shell profile
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/zshrc"
+        path: "{{user.home}}/.zshrc"
+        state: link
+
+- name: install vim
+  block:
+    - name: install vim with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - vim
+
+    - name: install vimrc
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/vim/vimrc"
+        path: "{{user.home}}/.vimrc"
+        state: link
+  
+- name: install fonts
+  block:
+    - name: find fonts
+      ansible.builtin.find:
+        paths: "{{dotfiles_path}}/fonts"
+        patterns: "*.ttf"
+      register: fonts
+
+    - name: install fonts
+      become: true
+      ansible.builtin.file:
+        src: "{{item}}"
+        dest: "{{paths[system]}}/{{item | basename}}"
+        state: hard
+      vars:
+        paths:
+          linux: /usr/local/share/fonts
+          darwin: /Library/Fonts
+      loop: "{{fonts.files | map(attribute='path') }}"
+
+- name: install gnome
+  when: linux
+  block:
+    - name: install gnome with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - gnome-shell
+          - gnome-shell-extensions
+          - gnome-session
+          - gnome-themes-extra
+          - gnome-tweaks
+          - fonts-cantarell
+          - adwaita-icon-theme-full
+
+    - name: install gnome theme
+      become: true
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/gnome/theme"
+        dest: /usr/share/themes/theme
+        state: link
+
+    - name: run gnome configuration script
+      ansible.builtin.shell:
+        cmd: "{{dotfiles_path}}/gnome/gsettings.sh"
+
+- name: install gnome-terminal
+  when: linux
+  block:
+    - name: install gnome-terminal with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - gnome-terminal
+
+    - name: run gnome-terminal configuration script
+      ansible.builtin.shell:
+        cmd: "{{dotfiles_path}}/gnome-terminal/gsettings.sh"
+
+- name: install iTerm2.app
+  when: darwin
+  block:
+    - name: install iTerm2.app
+      become: true
+      ansible.builtin.unarchive:
+        src: https://iterm2.com/downloads/stable/iTerm2-3_4_16.zip
+        remote_src: true
+        dest: /Applications
+        creates: /Applications/iTerm.app
+
+    - name: install terminal configuration
+      ansible.builtin.shell:
+        cmd: "{{dotfiles_path}}/iterm/defaults.sh"
+
+- name: install starship
+  block:
+    - name: install starship with script
+      include_tasks: ./install_script.yaml
+      vars:
+        url: https://raw.githubusercontent.com/starship/starship/v1.10.3/install/install.sh
+        binary: /usr/local/bin/starship
+        args: --yes
+    
+    - name: create starship prompt configuration directory
+      ansible.builtin.file:
+        path: "{{user.home}}/.config"
+        recurse: true
+        state: directory
+
+    - name: install starship prompt configuration
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/starship/starship.toml"
+        dest: "{{user.home}}/.config/starship.toml"
+        state: link
+
+- name: install ulauncher
+  when: linux
+  block:
+    - name: install ulauncher with apt
+      when: debian
+      block:
+        - name: install ulauncher dependencies with apt
+          become: true
+          ansible.builtin.apt:
+            package:
+              - wmctrl
+
+        - name: install ulauncher with apt
+          become: true
+          ansible.builtin.apt:
+            deb: https://github.com/Ulauncher/Ulauncher/releases/download/5.15.0/ulauncher_5.15.0_all.deb
+
+    - name: create ulauncher user theme directory
+      ansible.builtin.file:
+        path: "{{user.home}}/.config/ulauncher/user-themes"
+        state: directory
+        recurse: true
+
+    - name: install ulauncher theme
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/ulauncher/theme"
+        dest: "{{user.home}}/.config/ulauncher/user-themes/theme"
+        state: link
+
+    - name: install ulauncher configuration
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/ulauncher/settings.json"
+        dest: "{{user.home}}/.config/ulauncher/settings.json"
+        state: link
+
+    - name: install ulauncher keybindings
+      ansible.builtin.command:
+        cmd: "{{dotfiles_path}}/ulauncher/gsettings.sh"
+
+    - name: start ulauncher systemd service
+      when: debian
+      ansible.builtin.systemd:
+        name: ulauncher
+        scope: user
+        state: started
+        enabled: true
+
+- name: install vscode
+  block:
+    - name: install vscode with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        deb: "{{urls[architecture]}}"
+      vars:
+        urls:
+          x86_64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64
+          arm64: https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-arm64
+      
+    - name: install vscode with dmg
+      when: darwin
+      include_tasks: ./install_app_from_dmg_url.yaml
+      vars:
+        url: https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal
+        app: Visual Studio Code.app
+
+- name: install google-chrome
+  when: darwin
+  block:
+    - name: install google-chrome with dmg
+      when: darwin
+      include_tasks: ./install_app_from_dmg_url.yaml
+      vars:
+        url: https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg
+        app: Google Chrome.app
+
+    - name: remove existing google-chrome policy
+      become: true
+      failed_when: false
+      ansible.builtin.command:
+        cmd: profiles -R -F {{dotfiles_path}}/chromium/macos.mobileconfig
+
+    - name: install google-chrome policy
+      ansible.builtin.command:
+        cmd: open {{dotfiles_path}}/chromium/macos.mobileconfig
+
+- name: install chromium
+  when: linux
+  block:
+    - name: install chromium with snap
+      become: true
+      community.general.snap:
+        name: chromium
+
+    - name: create chromium policy folder
+      become: true
+      ansible.builtin.file:
+        path: /etc/chromium-browser/policies/managed
+        recurse: true
+        state: directory
+
+    - name: install chromium policy
+      become: true
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/chromium/policy.json"
+        dest: /etc/chromium-browser/policies/managed/policy.json
+        state: hard
+
+- name: install bitwarden
+  block:
+    - name: install bitwarden with snap
+      become: true
+      when: linux and x86_64
+      community.general.snap:
+        name: bitwarden
+
+    - name: install bitwarden with dmg
+      when: darwin
+      include_tasks: ./install_app_dmg.yaml
+      vars:
+        url: https://vault.bitwarden.com/download/?app=desktop&platform=macos&variant=dmg
+        app: Bitwarden.app
+
+
+- name: install authy
+  block:
+    - name: install authy with snap
+      become: true
+      when: linux and x86_64
+      community.general.snap:
+        name: authy
+    
+    - name: install authy with dmg
+      when: darwin
+      include_tasks: ./install_app_dmg.yaml
+      vars:
+        url: https://s3.amazonaws.com/authy-electron-repository-production/authy/stable/2.2.1/darwin/x64/Authy%20Desktop-2.2.1.dmg
+        app: Authy Desktop.app
+
+- name: install variety
+  when: linux
+  block:
+    - name: install variety with apt
+      when: debian
+      block:
+        - name: add variety ppa
+          become: true
+          ansible.builtin.apt_repository:
+            repo: ppa:variety/stable
+
+        - name: install variety
+          become: true
+          ansible.builtin.apt:
+            update_cache: true
+            package:
+              - variety
+
+    - name: create variety configuration folder
+      ansible.builtin.file:
+        path: "{{user.home}}/.config/variety"
+        recurse: true
+        state: directory
+
+    - name: create variety first-run file
+      ansible.builtin.shell:
+        cmd: date > {{user.home}}/.config/variety/.firstrun
+        creates: "{{user.home}}/.config/variety/.firstrun"
+
+    - name: install variety configuration
+      ansible.builtin.file:
+        src: "{{dotfiles_path}}/variety/variety.conf"
+        dest: "{{user.home}}/.config/variety/variety.conf"
+        state: link
+
+    - name: install variety systemd service
+      when: debian
+      block:
+        - name: install variety systemd service unit file
+          become: true
+          ansible.builtin.template:
+            src: systemd.service.j2
+            dest: "/usr/lib/systemd/user/variety.service"
+          vars:
+            description: variety
+            command: /usr/bin/variety --profile %h/.config/variety/
+
+        - name: start variety systemd service
+          ansible.builtin.systemd:
+            name: variety
+            scope: user
+            state: started
+            enabled: true
+
+- name: install asdf
+  block:
+    - name: install asdf dependencies with apt
+      when: debian
+      become: true
+      ansible.builtin.apt:
+        package:
+          - curl
+          - git
+      
+    - name: clone asdf repo
+      ansible.builtin.git:
+        repo: https://github.com/asdf-vm/asdf.git
+        dest: "{{user.home}}/.asdf"
+
+    - name: create asdf .tool-versions file
+      ansible.builtin.file:
+        path: "{{user.home}}/.tool-versions"
+        state: touch
+        modification_time: preserve
+        access_time: preserve
+
+- name: install asdf-python
+  block:
+    - name: install python build dependencies with apt
+      when: debian
+      become: true
+      ansible.builtin.apt:
+        package:
+          - make
+          - build-essential
+          - libssl-dev
+          - zlib1g-dev
+          - libbz2-dev
+          - libreadline-dev
+          - libsqlite3-dev
+          - wget
+          - curl
+          - llvm
+          - libncursesw5-dev
+          - xz-utils
+          - tk-dev
+          - libxml2-dev
+          - libxmlsec1-dev
+          - libffi-dev
+          - liblzma-dev
+
+    - name: install python build dependencies with brew
+      when: darwin
+      community.general.homebrew:
+        name:
+          - openssl
+          - readline
+          - sqlite3
+          - xz
+          - zlib
+          - tcl-tk
+        path: "{{brew_path}}"
+
+    - name: install asdf python plugin
+      asdf_plugin:
+        name: python
+        state: present
+
+- name: install asdf-nodejs
   asdf_plugin:
     name: nodejs
     state: present
 
-- name: (debian) install java build dependencies
-  when: debian
-  become: true
-  ansible.builtin.apt:
-    package:
-      - bash
-      - curl
-      - coreutils
-      - unzip
-      - jq
+- name: install asdf-java
+  block:
+    - name: install java build dependencies with apt
+      when: debian
+      become: true
+      ansible.builtin.apt:
+        package:
+          - bash
+          - curl
+          - coreutils
+          - unzip
+          - jq
 
-- name: install asdf java plugin
-  asdf_plugin:
-    name: java
-    state: present
+    - name: install asdf-java
+      asdf_plugin:
+        name: java
+        state: present
 
-- name: (debian) install golang build dependencies
-  when: debian
-  become: true
-  ansible.builtin.apt:
-    package:
-      - curl
-      - coreutils
-  
-- name: install asdf golang plugin
-  asdf_plugin:
-    name: golang
-    state: present
+- name: install asdf-golang
+  block:
+    - name: install golang build dependencies with apt
+      when: debian
+      become: true
+      ansible.builtin.apt:
+        package:
+          - curl
+          - coreutils
 
-- name: install asdf kubectl plugin
+    - name: install asdf-golang
+      asdf_plugin:
+        name: golang
+        state: present
+
+- name: install asdf-kubectl
   asdf_plugin:
     name: kubectl
     state: present
 
-- name: (debian) install c dependencies
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package:
-      - gcc
-      - libc-dev
-      - g++
-      - libc++-dev
-      - make
-      - cmake
+- name: install c/c++ dependencies
+  block:
+    - name: install c dependencies with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - gcc
+          - libc-dev
+          - g++
+          - libc++-dev
+          - make
+          - cmake
 
-- name: (darwin) install c dependencies
-  when: darwin
-  community.general.homebrew:
-    name:
-      - cmake
-    path: "{{brew_path}}"
-  
-- name: (debian) install jsonnet
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package:
-      - jsonnet
+    - name: install c dependencies with brew
+      when: darwin
+      community.general.homebrew:
+        name:
+          - cmake
+        path: "{{brew_path}}"
 
-- name: (darwin) install jsonnet
-  when: darwin
-  community.general.homebrew:
-    package:
-      - jsonnet
-    path: "{{brew_path}}"
+- name: install jsonnet
+  block:
+    - name: install jsonnet with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - jsonnet
+    
+    - name: install jsonnet with brew
+      when: darwin
+      community.general.homebrew:
+        package:
+          - jsonnet
+        path: "{{brew_path}}"
 
-- name: (linux) install jsonnet-bundler
-  become: true
-  when: linux
-  ansible.builtin.get_url:
-    url: "{{urls[architecture]}}"
-    dest: /usr/local/bin/jb
-    mode: 0755
-  vars:
-    urls:
-      x86_64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64
-      arm64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-arm64
+- name: install jsonnet-bundler
+  block:
+    - name: install jsonnet-bundler with url
+      become: true
+      when: linux
+      ansible.builtin.get_url:
+        url: "{{urls[architecture]}}"
+        dest: /usr/local/bin/jb
+        mode: 0755
+      vars:
+        urls:
+          x86_64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-amd64
+          arm64: https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v0.5.1/jb-linux-arm64
 
-- name: (darwin) install jsonnet-bundler
-  when: darwin
-  community.general.homebrew:
-    name:
-      - jsonnet-bundler
-    path: "{{brew_path}}"
+    - name: install jsonnet-bundler with brew
+      when: darwin
+      community.general.homebrew:
+        name:
+          - jsonnet-bundler
+        path: "{{brew_path}}"
 
-- name: (linux) install tanka
-  become: true
-  when: linux
-  ansible.builtin.get_url:
-    url: "{{urls[architecture]}}"
-    dest: /usr/local/bin/tk
-    mode: 0755
-  vars:
-    urls:
-      x86_64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-amd64
-      arm64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-arm64
+- name: install tanka
+  block:
+    - name: install tanka with url
+      become: true
+      when: linux
+      ansible.builtin.get_url:
+        url: "{{urls[architecture]}}"
+        dest: /usr/local/bin/tk
+        mode: 0755
+      vars:
+        urls:
+          x86_64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-amd64
+          arm64: https://github.com/grafana/tanka/releases/latest/download/tk-linux-arm64
 
-- name: (darwin) install tanka
-  when: darwin
-  community.general.homebrew:
-    name:
-      - tanka
-    path: "{{brew_path}}"
+    - name: install tanka with brew
+      when: darwin
+      community.general.homebrew:
+        name:
+          - tanka
+        path: "{{brew_path}}"
 
+- name: install docker
+  block:
+    - name: configure ubuntu apt repo
+      when: ubuntu
+      block:
+        - name: add ubuntu docker signing key
+          become: true
+          when: ubuntu
+          ansible.builtin.apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
 
-- name: (ubuntu) add docker signing key
-  become: true
-  when: ubuntu
-  ansible.builtin.apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+        - name: add ubuntu docker repository
+          become: true
+          when: ubuntu
+          ansible.builtin.apt_repository:
+            repo: "{{repositories[architecture]}}"
+            state: present
+          vars:
+            repositories:
+              x86_64: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable"
+              arm64: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable"
 
-- name: (ubuntu) add docker repository
-  become: true
-  when: ubuntu
-  ansible.builtin.apt_repository:
-    repo: "{{repositories[architecture]}}"
-    state: present
-  vars:
-    repositories:
-      x86_64: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{release}} stable"
-      arm64: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{release}} stable"
+    - name: install docker with apt
+      become: true
+      when: debian
+      ansible.builtin.apt:
+        package:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
 
-- name: (debian) install docker
-  become: true
-  when: debian
-  ansible.builtin.apt:
-    package:
-      - docker-ce 
-      - docker-ce-cli 
-      - containerd.io 
-      - docker-compose-plugin
+    - name: install docker with dmg
+      when: darwin
+      include_tasks: ./install_app_dmg.yaml
+      vars:
+        urls:
+          x86_64: "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
+          arm64: "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+        url: "{{urls[architecture]}}"
+        app: Docker.app
 
-- name: (darwin) install docker
-  become: true
-  when: darwin
-  dmg_unarchive:
-    src: "{{urls[architecture]}}"
-    dest: /Applications
-    creates: /Applications/Docker.app
-  vars:
-    urls:
-      x86_64: "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
-      arm64: "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+    - name: grant user docker access
+      when: linux
+      block:
+        - name: add docker group
+          become: true
+          ansible.builtin.group:
+            name: docker
+            state: present
 
-- name: (linux) add docker group
-  become: true
-  when: linux
-  ansible.builtin.group:
-    name: docker
-    state: present
-
-- name: (linux) add user to docker group
-  become: true
-  when: linux
-  ansible.builtin.user:
-    name: "{{user.name}}"
-    append: true
-    groups: docker
+        - name: add user to docker group
+          become: true
+          ansible.builtin.user:
+            name: "{{user.name}}"
+            append: true
+            groups: docker
