@@ -224,8 +224,13 @@
         state: link
 
     - name: run gnome configuration script
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "{{dotfiles_path}}/gnome/gsettings.sh"
+
+- name: configure macos 
+  when: darwin
+  ansible.builtin.command:
+    cmd: "{{dotfiles_path}}/macos/defaults.sh"
 
 - name: install gnome-terminal
   when: linux
@@ -238,7 +243,7 @@
           - gnome-terminal
 
     - name: run gnome-terminal configuration script
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "{{dotfiles_path}}/gnome-terminal/gsettings.sh"
 
 - name: install iTerm2.app
@@ -253,7 +258,7 @@
         creates: /Applications/iTerm.app
 
     - name: install terminal configuration
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: "{{dotfiles_path}}/iterm/defaults.sh"
 
 - name: install starship
@@ -338,7 +343,7 @@
       
     - name: install vscode with dmg
       when: darwin
-      include_tasks: ./install_app_from_dmg_url.yaml
+      include_tasks: ./install_app_dmg.yaml
       vars:
         url: https://code.visualstudio.com/sha/download?build=stable&os=darwin-universal
         app: Visual Studio Code.app
@@ -348,7 +353,7 @@
   block:
     - name: install google-chrome with dmg
       when: darwin
-      include_tasks: ./install_app_from_dmg_url.yaml
+      include_tasks: ./install_app_dmg.yaml
       vars:
         url: https://dl.google.com/chrome/mac/universal/stable/GGRO/googlechrome.dmg
         app: Google Chrome.app
@@ -399,7 +404,6 @@
       vars:
         url: https://vault.bitwarden.com/download/?app=desktop&platform=macos&variant=dmg
         app: Bitwarden.app
-
 
 - name: install authy
   block:
