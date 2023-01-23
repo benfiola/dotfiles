@@ -26,7 +26,11 @@ mount /dev/vg-os/os /mnt
 mount --mkdir /dev/sda1 /mnt/boot
 
 # install packages
-pacstrap -K /mnt base linux linux-firmware vim lvm2 grub-bios efibootmgr sudo networkmanager
+pacstrap -K /mnt base linux linux-headers linux-firmware vim lvm2 grub-bios efibootmgr sudo networkmanager
+# NOTE: amd CPU, install deps
+pacstrap /mnt amd-ucode
+# NOTE: nvidia GPU, install deps
+pacstrap /mnt nvidia nvidia-dkms
 # NOTE: arm, install arm64 deps
 pacstrap /mnt archlinuxarm-keyring
 
@@ -54,7 +58,13 @@ echo "%wheel ALL=(ALL:ALL) ALL" > /etc/sudoers.d/01-enable-wheel-sudo
 # recreate initramfs
 vim /etc/mkinitcpio.conf
 # add lvm2 (before filesystems) to HOOKS
+# NOTE: nvidia GPU, add nvidia nvidia_modeset nvidia_uvm nvidia_drm to MODULES
 mkinitcpio -P
+
+# NOTE: nvidia GPU, add pacman hook
+mkdir -p /etc/pacman.d/hook
+vim /etc/pacman.d/hooks/nvidia.hook
+# find hook here: https://wiki.archlinux.org/title/NVIDIA
 
 # NOTE: arm64, ensure grub can find initramfs
 echo "GRUB_EARLY_INITRD_LINUX_CUSTOM=initramfs-linux.img" >> /etc/default/grub
