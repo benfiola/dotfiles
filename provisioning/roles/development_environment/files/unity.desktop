@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name==Unity
+Name=Unity
 Icon=/opt/unity/unity.png
 Exec="/opt/unity/UnityHub.AppImage" %f
 Comment=

@@ -32,7 +32,9 @@ While this is generally designed to accommodate my personal tastes and desired c
 
 # Plugin
 
-I felt that a plugin is the cleanest way to isolate custom data processing and logic.  Without a plugin, all of this activity would need to be embedded directly into the `Vagrantfile` which should be primarily be concerned with defining and provisioning VMs.  Additionally, a plugin grants us access into Vagrant's internals, allowing us to provide custom functionality as well as the ability to store metadata within the Vagrant home path.
+While you can run `vagrant up` directly (and receive a `default` VM), using the provided plugin turns the `Vagrantfile` into a template capable of generating different named VMs.
+
+Sure, this could have been done by adding hooks into the `Vagrantfile`, but I've found this approach to be messy and brittle.  Plus, having access to Vagrant's internals makes it easier to add additional functionality in the future. 
 
 ## Development
 
