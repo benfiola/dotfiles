@@ -1,6 +1,11 @@
 ---
 - tags: [optional]
   block:
+    - when: not archlinux
+      block:
+        - name: unimplemented
+          empty: {}
+    
     - when: archlinux
       block:
       - name: pacman install wine

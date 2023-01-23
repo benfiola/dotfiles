@@ -1,3 +1,4 @@
+# creates a systemd service unit with "{{name}}" at "{{scope}}"
 - name: create {{scope}} systemd service {{name}}
   become: true
   ansible.builtin.template:

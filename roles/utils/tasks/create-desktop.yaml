@@ -1,3 +1,4 @@
+# creates a desktop file for "{{name}}"
 - name: create {{name}}.desktop
   become: true
   ansible.builtin.template:
