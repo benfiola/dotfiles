@@ -34,10 +34,10 @@ While all of the above is scriptable, it also comes for free with [ansible](http
 
 When this ansible playbook is run, the following outcomes are expected:
 
-* This git repository is copied (or symlinked) to _HOME_/.dotfiles
+* This git repository is copied (or symlinked) to _$HOME_/.dotfiles
 * Files at _$HOME_/.bin are available on _PATH_
 * Files at _$HOME_/.profile.d are sourced when terminal sessions are created
-* File-based configuration is symlinked/hardlinked _from_ _HOME_/.dotfiles _to_ their expected location (such that local configuration change leaves the repo at _HOME_/.dotfiles in a dirty state)
+* File-based configuration is symlinked/hardlinked _from_ _$HOME_/.dotfiles _to_ their expected location (such that local configuration change leaves the repo at _$HOME_/.dotfiles in a dirty state)
 * Script-based configuration is applied on every playbook execution (e.g., _gsettings_)
 * All necessary, supported applications are installed
 * OS, desktop environments, and applications are all configured and themed appropriately
@@ -142,3 +142,7 @@ Generally, tasks that require a bit of processing or state aren't a great fit fo
 | [empty](./library/empty.py) | No-op task - used primarily to identify 'unimplemented' paths within role implementations |
 | [temp_file](./library/temp_file.py) | Creates a temp file on the target machine |
 | [temp_file_cleanup](./library/temp_file_cleanup.py) | Cleans up created temp files on the target machine - _must_ be manually run before the end of the playbook run |
+
+# Notes
+
+* [This](./archlinux-instructions.sh) is the rough sequence of steps I go through to install arch linux from scratch.  You'll need to substitute details where necessary (i.e., device paths).  
