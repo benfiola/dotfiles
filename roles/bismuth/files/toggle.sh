@@ -1,4 +1,4 @@
-#!/bin/zsh -ex
+#!/bin/sh -e
 file="$HOME/.config/kwinrc"
 group="Plugins"
 key="bismuthEnabled"
