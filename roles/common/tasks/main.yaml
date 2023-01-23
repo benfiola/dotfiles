@@ -427,7 +427,7 @@
       when: darwin
       include_tasks: ./install_app_dmg.yaml
       vars:
-        url: https://s3.amazonaws.com/authy-electron-repository-production/authy/stable/2.2.1/darwin/x64/Authy%20Desktop-2.2.1.dmg
+        url: https://pkg.authy.com/authy/stable/2.2.1/darwin/x64/Authy%20Desktop-2.2.1.dmg
         app: Authy Desktop.app
 
 - name: install variety
