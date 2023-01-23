@@ -69,15 +69,27 @@
         - gsettings set org.gnome.desktop.interface icon-theme 'breeze-dark'
         - gsettings set org.gnome.desktop.interface cursor-theme 'breeze_cursors'
         - gsettings set org.gnome.desktop.interface monospace-font-name 'FiraCode Nerd Font Mono 12'
-        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Plugins --key bismuthEnabled --type bool true
         - kwriteconfig5 --file "{{user.home}}/.config/kdeglobals" --group KDE --key SingleClick --type bool false
         - kwriteconfig5 --file "{{user.home}}/.config/kdeglobals" --group KDE --key ScrollbarLeftClickNavigatesByPage --type bool false
+        - kwriteconfig5 --file "{{user.home}}/.config/kcminputrc" --group Keyboard --key RepeatDelay 200
+        - kwriteconfig5 --file "{{user.home}}/.config/kcminputrc" --group Keyboard --key RepeatRate 40
+
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Plugins --key bismuthEnabled --type bool true
         - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Windows --key ElectricBorderMaximize --type bool false
         - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Windows --key ElectricBorderTiling --type bool false
         - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Windows --key FocusPolicy FocusFollowsMouse
         - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Windows --key NextFocusPrefersMouse --type bool true
-        - kwriteconfig5 --file "{{user.home}}/.config/kcminputrc" --group Keyboard --key RepeatDelay 200
-        - kwriteconfig5 --file "{{user.home}}/.config/kcminputrc" --group Keyboard --key RepeatRate 40
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Script-bismuth --key screenGapBottom 20
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Script-bismuth --key screenGapLeft 20
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Script-bismuth --key screenGapRight 20
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Script-bismuth --key screenGapTop 20
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrc" --group Script-bismuth --key tileLayoutGap 20
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrulesrc" --group General --key count 1
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrulesrc" --group General --key rules fca92cf7-673b-4e39-abb7-aae2aa4cb538
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrulesrc" --group fca92cf7-673b-4e39-abb7-aae2aa4cb538 --key Description "Minimum Window Size"
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrulesrc" --group fca92cf7-673b-4e39-abb7-aae2aa4cb538 --key minsizerule 2
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrulesrc" --group fca92cf7-673b-4e39-abb7-aae2aa4cb538 --key minsize 0,0
+        - kwriteconfig5 --file "{{user.home}}/.config/kwinrulesrc" --group fca92cf7-673b-4e39-abb7-aae2aa4cb538 --key types 1
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key decrease_window_width "Meta+Ctrl+H,Meta+Ctrl+H,Increase Window Width"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key increase_window_height "Meta+Ctrl+J,Meta+Ctrl+J,Increase Window Height"
         - kwriteconfig5 --file "{{user.home}}/.config/kglobalshortcutsrc" --group bismuth --key decrease_window_height "Meta+Ctrl+K,Meta+Ctrl+K,Decrease Window Height"
