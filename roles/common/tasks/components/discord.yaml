@@ -1,0 +1,6 @@
+- name: install discord via pacman
+  become: true
+  when: archlinux
+  community.general.pacman:
+    name:
+      - discord
