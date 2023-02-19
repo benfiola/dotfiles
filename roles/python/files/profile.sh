@@ -5,9 +5,18 @@ python-mkve() {
     # parse args
     if [ "$#" != "2" ]; then
         1>&2 echo "usage: $0 <version> <name>"
+        1>&2 echo "usage: $0 asdf:<version> <name>"
+        1>&2 echo "usage: $0 path:<python-bin-path> <name>"
         return 1
     fi
-    venv_version="$1"
+    IFS=":" read -rA venv_python_data <<< "$1"
+    if [ "${#venv_python_data[@]}" = "1" ]; then
+        venv_python="${venv_python_data[1]}"
+        venv_python_provider="asdf"
+    else
+        venv_python_provider="${venv_python_data[1]}"
+        venv_python="${venv_python_data[2]}"
+    fi
     venv_name="$2"
 
     # ensure venv does not exist
@@ -17,20 +26,34 @@ python-mkve() {
         return 1
     fi
 
-    # ensure asdf exists
-    if ! command -v asdf > /dev/null 2>&1; then
-        1>&2 echo "error: asdf not found"
+    # find venv python location
+    echo "venv python provider: $venv_python_provider (python: $venv_python)"
+    if [ "$venv_python_provider" = "asdf" ]; then        
+        # ensure asdf exists
+        if ! command -v asdf > /dev/null 2>&1; then
+            1>&2 echo "error: asdf not found"
+            return 1
+        fi
+    
+        # find asdf python executable
+        python_dir="$(asdf where python $venv_python)"
+        python_not_found="$?"
+        if [ ! "$python_not_found" = "0" ] ; then
+            1>&2 echo "error: python not found: $venv_python"
+            return 1
+        fi
+        python_bin="$python_dir/bin/python"
+    elif [ "$venv_python_provider" = "path" ]; then
+        # ensure explicit path exists
+        if [ ! -f "$venv_python" ]; then
+            1>&2 echo "error: python not found: $venv_python"
+            return 1
+        fi
+        python_bin="$venv_python"
+    else
+        1>&2 echo "error: unknown venv python provider: $venv_python_provider"
         return 1
     fi
-
-    # determine python location
-    python_dir="$(asdf where python $venv_version)"
-    python_not_found="$?"
-    if [ ! "$python_not_found" = "0" ] ; then
-        1>&2 echo "error: python not found: $venv_version"
-        return 1
-    fi
-    python_bin="$python_dir/bin/python"
 
     # create venv
     echo "creating venv: $venv_name with python $venv_version ($venv_dir)"

@@ -72,6 +72,7 @@ vim /etc/pacman.d/hooks/nvidia.hook
 # NOTE: arm64, ensure grub can find initramfs GRUB_EARLY_INITRD_LINUX_CUSTOM=initramfs-linux.img
 # add GRUB_CMDLINE_LINUX=... resume=<swap partition>
 # NOTE: 4k, cap grub gfx mode to 1920x1080 - GRUB_GFX_MODE=1920x1080
+# NOTE: nvidia, add GRUB_CMDLINE_LINUX=... nvidia_drm.modeset=1
 
 # install bootloader
 # NOTE: x86_64, use x86_64-efi target
