@@ -1,6 +1,7 @@
 ---
 - hosts: all
   roles:
+    - benfiola.dotfiles.alfred
     - benfiola.dotfiles.amethyst
     - benfiola.dotfiles.apt
     - benfiola.dotfiles.arduino
@@ -17,6 +18,7 @@
     - benfiola.dotfiles.flatpak
     - benfiola.dotfiles.fonts
     - benfiola.dotfiles.gimp
+    - benfiola.dotfiles.gcloud
     - benfiola.dotfiles.golang
     - benfiola.dotfiles.gpg
     - benfiola.dotfiles.iterm2
@@ -32,6 +34,7 @@
     - benfiola.dotfiles.open_vm_tools
     - benfiola.dotfiles.pacman
     - benfiola.dotfiles.proton
+    - benfiola.dotfiles.pulumi
     - benfiola.dotfiles.python
     - benfiola.dotfiles.snap
     - benfiola.dotfiles.sops

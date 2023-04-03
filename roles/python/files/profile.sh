@@ -24,13 +24,17 @@ python-mkve() {
     fi
 
     # determine python location
-    python_dir="$(asdf where python $venv_version)"
-    python_not_found="$?"
-    if [ ! "$python_not_found" = "0" ] ; then
-        1>&2 echo "error: python not found: $venv_version"
-        return 1
+    if [ "$venv_version" = "system" ]; then
+        python_bin="/Library/Frameworks/Python.framework/Versions/3.9/bin/python3"
+    else
+        python_dir="$(asdf where python $venv_version)"
+        python_not_found="$?"
+        if [ ! "$python_not_found" = "0" ] ; then
+            1>&2 echo "error: python not found: $venv_version"
+            return 1
+        fi
+        python_bin="$python_dir/bin/python"
     fi
-    python_bin="$python_dir/bin/python"
 
     # create venv
     echo "creating venv: $venv_name with python $venv_version ($venv_dir)"

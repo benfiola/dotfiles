@@ -1,0 +1,21 @@
+---
+- tags: [graphical, gcloud]
+  block:
+    - when: not darwin
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew cask install google-cloud-sdk
+          community.general.homebrew_cask:
+            name: google-cloud-sdk
+            path: "{{brew_path}}"
+        
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/gcloud/files/profile.sh"
+            path: "{{user_profiled_path}}/00-gcloud.sh"
+            state: link
+...

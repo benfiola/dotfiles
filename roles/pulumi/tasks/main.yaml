@@ -1,0 +1,21 @@
+---
+- tags: [graphical, pulumi]
+  block:
+    - when: not darwin
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew install pulumi
+          community.general.homebrew:
+            name: pulumi
+            path: "{{brew_path}}"
+        
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/pulumi/files/profile.sh"
+            path: "{{user_profiled_path}}/00-pulumi.sh"
+            state: link
+...
