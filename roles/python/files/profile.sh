@@ -104,3 +104,5 @@ python-lsve() {
 
     echo "$venv_list"
 }
+
+export PYTHON_VENV_HOME="$python_venv_home"

@@ -45,4 +45,12 @@
           community.general.homebrew_cask:
             name: visual-studio-code
             path: "{{brew_path}}"
+
+    - when: archlinux or debian or darwin
+      block:
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/vscode/files/profile.sh"
+            path: "{{user_profiled_path}}/00-vscode.sh"
+            state: link
 ...
