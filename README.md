@@ -20,8 +20,8 @@ cd ~/.dotfiles
 ansible-galaxy install -r requirements.yaml
 
 # symlink collection into ansible galaxy install location
-mkdir -p ~/.ansible/collections/benfiola
-ln -s "$(pwd)" ~/.ansible/collections/benfiola/dotfiles
+mkdir -p ~/.ansible/collections/ansible_collections/benfiola
+ln -s "$(pwd)" ~/.ansible/collections/ansible_collections/benfiola/dotfiles
 
 # run collection
 LOCAL=1 ansible-playbook benfiola.dotfiles.main
