@@ -39,6 +39,7 @@
           community.general.pacman:
             name:
               - docker
+              - docker-buildx
         
         - name: systemd enable docker service
           become: true
