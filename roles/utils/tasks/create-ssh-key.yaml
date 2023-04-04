@@ -25,4 +25,7 @@
     state: present
     user: "{{user.name}}"
     group: "{{group}}"
+  register: ssh_config_result
+  ignore_errors: true
+  failed_when: ssh_config_result.failed and ssh_config_result.msg != "chgrp failed"
 ...
