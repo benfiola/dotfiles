@@ -1,6 +1,0 @@
----
-dependencies:
-  - role: benfiola.dotfiles.facts
-  - role: benfiola.dotfiles.fonts
-  - role: benfiola.dotfiles.kde
-...

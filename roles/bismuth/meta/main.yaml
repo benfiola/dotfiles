@@ -1,6 +1,0 @@
----
-dependencies:
-  - role: benfiola.dotfiles.facts
-  - role: benfiola.dotfiles.kde
-  - role: benfiola.dotfiles.user
-...

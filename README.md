@@ -54,9 +54,10 @@ Inventory is defined from the environment via the [benfiola.dotfiles.environmnen
 
 # Playbook
 
-The [benfiola.dotfiles.main](./playbooks/main.yaml) playbook lists all available roles alphabetically to ensure that no roles are accidentally ignored.
+The [benfiola.dotfiles.main](./playbooks/main.yaml) playbook lists all available roles in vague dependency order to ensure that downstream roles are fulfilled
+ by upstream roles
 
-[Tags](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html) ultimately filter down the roles that are executed, and [role dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies) ensure that roles are executed in a topologically sorted order.
+[Tags](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html) ultimately filter down the roles that are executed.
 
 # Roles
 
@@ -70,10 +71,7 @@ As an example of a role's functionality, the [zsh role](./roles/zsh/tasks/main.y
 
 The decision to create a role (versus adding to an existing role's task list) is arbitrary - but is generally a decision made on a mix of complexity (e.g., [wine](./roles/wine/tasks/main.yaml) has a lot of explicit package dependencies) or replaceability (e.g., [konsole](./roles/konsole/tasks/main.yaml) could get swapped out for another terminal emulator).
 
-Dependencies on other roles are explicitly defined via [role dependencies](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#using-role-dependencies).  A role might depend on another role if:
-
-* The role depends on another role's installed binary in order to install itself (e.g., [python](./roles/python/tasks/main.yaml) indirectly depends on the [asdf](./roles/asdf/tasks/main.yaml) role's binary)
-* The role depends on a fact exposed by installing another role (e.g., [ls](./roles/ls/tasks/main.yaml) depends on the [user](./roles/user/tasks/main.yaml)'s fact _user_profiled_path_).  All roles depend on the [facts](./roles/facts/tasks/main.yaml) role.
+Dependencies on other roles are manually enforced at the playbook level - care should be taken to ensure that facts used by the role are fulfilled by an upstream role.
 
 # Tags
 

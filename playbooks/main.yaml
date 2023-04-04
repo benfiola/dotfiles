@@ -1,59 +1,73 @@
 ---
 - hosts: all
-  roles:
-    - benfiola.dotfiles.alfred
-    - benfiola.dotfiles.amethyst
-    - benfiola.dotfiles.apt
-    - benfiola.dotfiles.arduino
-    - benfiola.dotfiles.asdf
-    - benfiola.dotfiles.authy
-    - benfiola.dotfiles.bismuth
-    - benfiola.dotfiles.bitwarden
-    - benfiola.dotfiles.brew
-    - benfiola.dotfiles.c
-    - benfiola.dotfiles.chromium
-    - benfiola.dotfiles.discord
-    - benfiola.dotfiles.docker
-    - benfiola.dotfiles.facts
-    - benfiola.dotfiles.flatpak
-    - benfiola.dotfiles.fonts
-    - benfiola.dotfiles.gimp
-    - benfiola.dotfiles.gcloud
-    - benfiola.dotfiles.golang
-    - benfiola.dotfiles.gpg
-    - benfiola.dotfiles.iterm2
-    - benfiola.dotfiles.java
-    - benfiola.dotfiles.kde
-    - benfiola.dotfiles.konsole
-    - benfiola.dotfiles.kubectl
-    - benfiola.dotfiles.locale
-    - benfiola.dotfiles.ls
-    - benfiola.dotfiles.lutris
-    - benfiola.dotfiles.macos
-    - benfiola.dotfiles.nodejs
-    - benfiola.dotfiles.open_vm_tools
-    - benfiola.dotfiles.pacman
-    - benfiola.dotfiles.proton
-    - benfiola.dotfiles.pulumi
-    - benfiola.dotfiles.python
-    - benfiola.dotfiles.snap
-    - benfiola.dotfiles.sops
-    - benfiola.dotfiles.source
-    - benfiola.dotfiles.spotify
-    - benfiola.dotfiles.ssh
-    - benfiola.dotfiles.starship
-    - benfiola.dotfiles.steam
-    - benfiola.dotfiles.tanka
-    - benfiola.dotfiles.user
-    - benfiola.dotfiles.variety
-    - benfiola.dotfiles.vim
-    - benfiola.dotfiles.vscode
-    - benfiola.dotfiles.wine
-    - benfiola.dotfiles.xbox
-    - benfiola.dotfiles.zsh
   tasks:
     - block:
-        - benfiola.dotfiles.empty: {}
+        # base facts
+        - include_role: name=benfiola.dotfiles.facts
+
+        # user (provides facts for user profile personalization)
+        - include_role: name=benfiola.dotfiles.user
+
+        # package managers
+        - include_role: name=benfiola.dotfiles.apt
+        - include_role: name=benfiola.dotfiles.brew
+        - include_role: name=benfiola.dotfiles.pacman
+
+        # package managers installed by other package managers
+        - include_role: name=benfiola.dotfiles.flatpak
+        - include_role: name=benfiola.dotfiles.snap
+
+        # system personalization and configuration
+        - include_role: name=benfiola.dotfiles.fonts
+        - include_role: name=benfiola.dotfiles.locale
+        - include_role: name=benfiola.dotfiles.kde
+        - include_role: name=benfiola.dotfiles.macos
+
+        # version manager for several tools below
+        - include_role: name=benfiola.dotfiles.asdf
+
+        # wine + proton needed for lutris + steam
+        - include_role: name=benfiola.dotfiles.wine
+        - include_role: name=benfiola.dotfiles.proton
+
+        # misc applications and tools
+        - include_role: name=benfiola.dotfiles.arduino
+        - include_role: name=benfiola.dotfiles.c
+        - include_role: name=benfiola.dotfiles.alfred
+        - include_role: name=benfiola.dotfiles.amethyst
+        - include_role: name=benfiola.dotfiles.authy
+        - include_role: name=benfiola.dotfiles.bismuth
+        - include_role: name=benfiola.dotfiles.bitwarden
+        - include_role: name=benfiola.dotfiles.chromium
+        - include_role: name=benfiola.dotfiles.discord
+        - include_role: name=benfiola.dotfiles.docker
+        - include_role: name=benfiola.dotfiles.gimp
+        - include_role: name=benfiola.dotfiles.gcloud
+        - include_role: name=benfiola.dotfiles.golang
+        - include_role: name=benfiola.dotfiles.gpg
+        - include_role: name=benfiola.dotfiles.iterm2
+        - include_role: name=benfiola.dotfiles.java
+        - include_role: name=benfiola.dotfiles.konsole
+        - include_role: name=benfiola.dotfiles.kubectl
+        - include_role: name=benfiola.dotfiles.ls
+        - include_role: name=benfiola.dotfiles.lutris
+        - include_role: name=benfiola.dotfiles.nodejs
+        - include_role: name=benfiola.dotfiles.open_vm_tools
+        - include_role: name=benfiola.dotfiles.proton
+        - include_role: name=benfiola.dotfiles.pulumi
+        - include_role: name=benfiola.dotfiles.python
+        - include_role: name=benfiola.dotfiles.sops
+        - include_role: name=benfiola.dotfiles.source
+        - include_role: name=benfiola.dotfiles.spotify
+        - include_role: name=benfiola.dotfiles.ssh
+        - include_role: name=benfiola.dotfiles.starship
+        - include_role: name=benfiola.dotfiles.steam
+        - include_role: name=benfiola.dotfiles.tanka
+        - include_role: name=benfiola.dotfiles.variety
+        - include_role: name=benfiola.dotfiles.vim
+        - include_role: name=benfiola.dotfiles.vscode
+        - include_role: name=benfiola.dotfiles.xbox
+        - include_role: name=benfiola.dotfiles.zsh
       always:
         - benfiola.dotfiles.temp_file_cleanup: {}
 ...
