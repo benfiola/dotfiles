@@ -12,7 +12,12 @@
           community.general.homebrew_cask:
             name: google-cloud-sdk
             path: "{{brew_path}}"
-        
+
+        - name: install gke-gcloud-auth-plugin
+          ansible.builtin.command:
+            cmd: "{{brew_path}}/gcloud components install gke-gcloud-auth-plugin"
+            creates: "{{brew_prefix}}/share/google-cloud-sdk/bin/gke-gcloud-auth-plugin"
+          
         - name: link zshrc file
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/gcloud/files/profile.sh"
