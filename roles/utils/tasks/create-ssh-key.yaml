@@ -1,4 +1,6 @@
 # creates an ssh key {{ssh_user}}.{{ssh_host}} in {{user.home}}/.ssh
+# adds a record for {{ssh_user}}.{{ssh_host}} in {{user.home}}/.ssh/config
+# if {{is_default}} is True, adds a record for {{ssh_host}} in {{user.home}}/.ssh/config
 - name: install stormssh python dependency
   pip:
     name: stormssh
@@ -13,19 +15,34 @@
     path: "{{user.home}}/.ssh/{{ssh_user}}.{{ssh_host}}"
     size: 2048
 
-- name: add {{ssh_user}}.{{ssh_host}} ssh config
-  vars:
+- vars:
     groups:
       darwin: "staff"
     group: "{{groups.get(os_family, omit)}}"
-  community.general.ssh_config:
-    host: "{{ssh_user}}.{{ssh_host}}"
-    hostname: "{{ssh_host}}"
-    identity_file: "{{user.home}}/.ssh/{{ssh_user}}.{{ssh_host}}"
-    state: present
-    user: "{{user.name}}"
-    group: "{{group}}"
-  register: ssh_config_result
-  ignore_errors: true
-  failed_when: ssh_config_result.failed and ssh_config_result.msg != "chgrp failed"
+    _is_default: "{{is_default | default(False) | bool}}"
+  block:
+    - name: add {{ssh_user}}.{{ssh_host}} ssh config
+      community.general.ssh_config:
+        host: "{{ssh_user}}.{{ssh_host}}"
+        hostname: "{{ssh_host}}"
+        identity_file: "{{user.home}}/.ssh/{{ssh_user}}.{{ssh_host}}"
+        state: present
+        user: "{{user.name}}"
+        group: "{{group}}"
+      register: ssh_config_result
+      ignore_errors: true
+      failed_when: ssh_config_result.failed and ssh_config_result.msg != "chgrp failed"
+
+    - name: add {{ssh_host}} ssh config
+      when: _is_default
+      community.general.ssh_config:
+        host: "{{ssh_host}}"
+        hostname: "{{ssh_host}}"
+        identity_file: "{{user.home}}/.ssh/{{ssh_user}}.{{ssh_host}}"
+        state: present
+        user: "{{user.name}}"
+        group: "{{group}}"
+      register: ssh_config_result
+      ignore_errors: true
+      failed_when: ssh_config_result.failed and ssh_config_result.msg != "chgrp failed"
 ...

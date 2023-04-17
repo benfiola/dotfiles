@@ -12,11 +12,12 @@
           vars: 
             ssh_user: "{{ssh_item.ssh_user}}"
             ssh_host: "{{ssh_item.ssh_host}}"
+            is_default: "{{ssh_item.is_default}}"
           ansible.builtin.include_role: 
             role: benfiola.dotfiles.utils
             tasks_from: create-ssh-key.yaml
           loop:
-            - {ssh_user: benfiola, ssh_host: github.com}
+            - {ssh_user: benfiola, ssh_host: github.com, is_default: true}
           loop_control:
             label: "{{ssh_item.ssh_user}}@{ssh_item.ssh_host}}"
             loop_var: ssh_item
