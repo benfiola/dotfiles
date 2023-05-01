@@ -66,6 +66,7 @@
         - import_role: name=benfiola.dotfiles.variety
         - import_role: name=benfiola.dotfiles.vim
         - import_role: name=benfiola.dotfiles.vscode
+        - import_role: name=benfiola.dotfiles.whatsapp
         - import_role: name=benfiola.dotfiles.xbox
         - import_role: name=benfiola.dotfiles.zsh
       always:
