@@ -16,10 +16,6 @@
 
     - name: create .profile.d directory
       ansible.builtin.file:
-        path: "{{user.home}}/.profile.d"
+        path: "{{user_profiled_path}}"
         state: directory
-    
-    - name: set path facts
-      ansible.builtin.set_fact:
-        user_profiled_path: "{{user.home}}/.profile.d"
 ...

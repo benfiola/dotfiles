@@ -1,5 +1,5 @@
 ---
-- tags: [minimal, facts]
+- tags: always
   block:
     - name: set configuration facts
       ansible.builtin.set_fact:
@@ -36,10 +36,14 @@
         amd64: "{{architecture == 'amd64'}}"
         arm64: "{{architecture == 'arm64'}}"
 
-    - name: set user
+    - name: set user fact
       ansible.builtin.user:
         name: "{{username}}"
       register: user
+
+    - name: set user profile.d facts
+      ansible.builtin.set_fact:
+        user_profiled_path: "{{user.home}}/.profile.d"
 
     - when: linux
       block:
@@ -48,8 +52,20 @@
             src: /sys/devices/virtual/dmi/id/product_name
           register: product_name
 
-        - name: set vm flag
+        - name: set vm fact
           when: "'vmware' in (product_name['content'] | b64decode | lower)"
           ansible.builtin.set_fact:
             vm: true
+    
+    - when: darwin
+      block:
+        - name: set brew path fact
+          ansible.builtin.set_fact:
+            brew_prefix: "{{prefix}}"
+            brew_path: "{{prefix}}/bin"
+          vars:
+            prefixes:
+              amd64: /usr/local
+              arm64: /opt/homebrew
+            prefix: "{{prefixes[architecture]}}"
 ...

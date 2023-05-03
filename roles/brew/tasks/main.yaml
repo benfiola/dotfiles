@@ -7,17 +7,7 @@
           benfiola.dotfiles.empty: {}
     
     - when: darwin
-      block:
-        - name: set brew path fact
-          ansible.builtin.set_fact:
-            brew_prefix: "{{prefix}}"
-            brew_path: "{{prefix}}/bin"
-          vars:
-            prefixes:
-              amd64: /usr/local
-              arm64: /opt/homebrew
-            prefix: "{{prefixes[architecture]}}"
-          
+      block:          
         - name: install brew from url
           ansible.builtin.include_role: 
             role: benfiola.dotfiles.utils
