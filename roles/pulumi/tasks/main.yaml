@@ -1,10 +1,18 @@
 ---
 - tags: [graphical, pulumi]
   block:
-    - when: not darwin
+    - when: not (darwin or archlinux)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
+    
+    - when: archlinux
+      block:
+        - name: pacman install pulumi
+          become: true
+          community.general.pacman:
+            name:
+              - pulumi
     
     - when: darwin
       block:
