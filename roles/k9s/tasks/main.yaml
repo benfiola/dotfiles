@@ -1,0 +1,23 @@
+---
+- tags: [graphical, k9s]
+  block:
+    - when: not (darwin or archlinux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: archlinux
+      block:
+        - name: pacman install k9s
+          become: true
+          community.general.pacman:
+            name:
+              - k9s
+
+    - when: darwin
+      block:
+        - name: brew install derailed/k9s/k9s
+          community.general.homebrew_cask:
+            name: derailed/k9s/k9s
+            path: "{{brew_path}}"
+...

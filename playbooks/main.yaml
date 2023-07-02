@@ -49,6 +49,7 @@
         - import_role: name=benfiola.dotfiles.java
         - import_role: name=benfiola.dotfiles.konsole
         - import_role: name=benfiola.dotfiles.kubectl
+        - import_role: name=benfiola.dotfiles.k9s
         - import_role: name=benfiola.dotfiles.ls
         - import_role: name=benfiola.dotfiles.lutris
         - import_role: name=benfiola.dotfiles.nodejs

@@ -1,11 +1,45 @@
 ---
 - tags: [graphical, gcloud]
   block:
-    - when: not darwin
+    - when: not (darwin or linux)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
     
+    - when: linux
+      block:
+        - name: download gcloud cli
+          ansible.builtin.get_url:
+            url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-437.0.1-linux-x86_64.tar.gz
+            dest: /tmp/google-cloud-cli.tar.gz
+        
+        - name: extract gcloud cli
+          become: true
+          ansible.builtin.unarchive:
+            remote_src: true
+            src: /tmp/google-cloud-cli.tar.gz
+            dest: /opt
+            creates: /opt/google-cloud-sdk/bin/gcloud
+
+        - name: run gcloud cli install script
+          become: true
+          ansible.builtin.command:
+            cmd: /opt/google-cloud-sdk/install.sh --quiet
+            creates: /usr/bin/gcloud
+  
+        - name: symlink gcloud cli to path
+          become: true
+          ansible.builtin.file:
+            src: /opt/google-cloud-sdk/bin/gcloud
+            dest: /usr/bin/gcloud
+            state: link
+        
+        - name: install gke-gcloud-auth-plugin
+          become: true
+          ansible.builtin.command:
+            cmd: "/usr/bin/gcloud components install gke-gcloud-auth-plugin"
+            creates: "/opt/google-cloud-sdk/bin/gke-gcloud-auth-plugin"
+
     - when: darwin
       block:
         - name: brew cask install google-cloud-sdk
@@ -17,7 +51,9 @@
           ansible.builtin.command:
             cmd: "{{brew_path}}/gcloud components install gke-gcloud-auth-plugin"
             creates: "{{brew_prefix}}/share/google-cloud-sdk/bin/gke-gcloud-auth-plugin"
-          
+    
+    - when: darwin or linux
+      block:
         - name: link zshrc file
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/gcloud/files/profile.sh"
