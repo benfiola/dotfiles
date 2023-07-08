@@ -15,6 +15,7 @@
         release: "{{ansible_distribution_release | lower}}"
         username: "{{ansible_user_id}}"
         vm: false
+        wsl: false
 
     - name: coerce aarch64 to arm64
       when: architecture == 'aarch64'
@@ -47,13 +48,29 @@
 
     - when: linux
       block:
+        - name: check wsl interop path
+          ansible.builtin.stat:
+            path: /proc/sys/fs/binfmt_misc/WSLInterop
+          register: wsl_interop_file
+
+        - name: set wsl fact
+          when: wsl_interop_file.stat.exists
+          ansible.builtin.set_fact:
+            wsl: true
+
+        - name: check system product name path
+          ansible.builtin.stat:
+            path: /sys/devices/virtual/dmi/id/product_name
+          register: product_name_file
+
         - name: read system product name
           ansible.builtin.slurp:
             src: /sys/devices/virtual/dmi/id/product_name
           register: product_name
+          when: product_name_file.stat.exists
 
         - name: set vm fact
-          when: "'vmware' in (product_name['content'] | b64decode | lower)"
+          when: "product_name_file.stat.exists and 'vmware' in (product_name['content'] | b64decode | lower)"
           ansible.builtin.set_fact:
             vm: true
     
