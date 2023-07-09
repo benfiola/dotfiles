@@ -37,7 +37,7 @@
         - name: install gke-gcloud-auth-plugin
           become: true
           ansible.builtin.command:
-            cmd: "/usr/bin/gcloud components install gke-gcloud-auth-plugin"
+            cmd: "/usr/bin/gcloud components install gke-gcloud-auth-plugin --quiet"
             creates: "/opt/google-cloud-sdk/bin/gke-gcloud-auth-plugin"
 
     - when: darwin
@@ -49,7 +49,7 @@
 
         - name: install gke-gcloud-auth-plugin
           ansible.builtin.command:
-            cmd: "{{brew_path}}/gcloud components install gke-gcloud-auth-plugin"
+            cmd: "{{brew_path}}/gcloud components install gke-gcloud-auth-plugin --quiet"
             creates: "{{brew_prefix}}/share/google-cloud-sdk/bin/gke-gcloud-auth-plugin"
     
     - when: darwin or linux
