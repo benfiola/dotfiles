@@ -74,6 +74,13 @@
           ansible.builtin.set_fact:
             vm: true
     
+        - name: set brew path fact
+          ansible.builtin.set_fact:
+            brew_prefix: "{{prefix}}"
+            brew_path: "{{prefix}}/bin"
+          vars:
+            prefix: /home/linuxbrew/.linuxbrew
+
     - when: darwin
       block:
         - name: set brew path fact

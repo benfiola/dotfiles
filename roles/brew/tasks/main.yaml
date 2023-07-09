@@ -1,12 +1,12 @@
 ---
 - tags: [minimal, brew]
   block:
-    - when: not darwin
+    - when: not (darwin or linux)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
     
-    - when: darwin
+    - when: darwin or linux
       block:          
         - name: install brew from url
           ansible.builtin.include_role: 
