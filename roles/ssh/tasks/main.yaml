@@ -7,18 +7,17 @@
           benfiola.dotfiles.empty: {}
     
     - when: true
-      block:          
-        - name: create ssh keys
-          vars: 
-            ssh_user: "{{ssh_item.ssh_user}}"
-            ssh_host: "{{ssh_item.ssh_host}}"
-            is_default: "{{ssh_item.is_default}}"
-          ansible.builtin.include_role: 
-            role: benfiola.dotfiles.utils
-            tasks_from: create-ssh-key.yaml
+      block:
+        - name: create ssh config
+          vars:
+            ssh_host: "{{ssh_item.ssh_host | default(omit)}}"
+            ssh_hostname: "{{ssh_item.ssh_hostname}}"
+          ansible.builtin.include_role:
+            name: benfiola.dotfiles.utils
+            tasks_from: create-ssh-config.yaml
           loop:
-            - {ssh_user: benfiola, ssh_host: github.com, is_default: true}
+            - {ssh_host: benfiola.github.com, ssh_hostname: github.com}
           loop_control:
-            label: "{{ssh_item.ssh_user}}@{ssh_item.ssh_host}}"
+            label: "{{ssh_host}}"
             loop_var: ssh_item
 ...

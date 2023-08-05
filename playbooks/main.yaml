@@ -42,9 +42,9 @@
         - import_role: name=benfiola.dotfiles.discord
         - import_role: name=benfiola.dotfiles.docker
         - import_role: name=benfiola.dotfiles.gimp
+        - import_role: name=benfiola.dotfiles.git
         - import_role: name=benfiola.dotfiles.gcloud
         - import_role: name=benfiola.dotfiles.golang
-        - import_role: name=benfiola.dotfiles.gpg
         - import_role: name=benfiola.dotfiles.iterm2
         - import_role: name=benfiola.dotfiles.java
         - import_role: name=benfiola.dotfiles.konsole
@@ -69,6 +69,7 @@
         - import_role: name=benfiola.dotfiles.vscode
         - import_role: name=benfiola.dotfiles.whatsapp
         - import_role: name=benfiola.dotfiles.xbox
+        - import_role: name=benfiola.dotfiles.yubikey
         - import_role: name=benfiola.dotfiles.zsh
       always:
         - benfiola.dotfiles.temp_file_cleanup: {}

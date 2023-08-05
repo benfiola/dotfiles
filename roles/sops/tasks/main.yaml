@@ -8,9 +8,11 @@
     
     - when: darwin
       block:
-        - name: brew install gnupg
+        - name: brew install sops
           community.general.homebrew:
-            name: sops
+            name: 
+              - gnupg
+              - sops
             path: "{{brew_path}}"
     
     - when: archlinux
@@ -19,5 +21,6 @@
           become: true
           community.general.pacman:
             name:
+              - gnupg
               - sops
 ...

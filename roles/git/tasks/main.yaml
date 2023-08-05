@@ -1,0 +1,27 @@
+---
+- tags: [minimal, git]
+  block:
+    - when: not (true)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: true
+      block:
+        - name: set git config
+          vars:
+            scope: "{{git_config_item.scope}}"
+            name: "{{git_config_item.name}}"
+            value: "{{git_config_item.value}}"
+          ansible.builtin.git_config:
+            scope: "{{scope}}"
+            name: "{{name}}"
+            value: "{{value}}"
+          loop:
+            - {scope: global, name: user.name, value: Ben Fiola}
+            - {scope: global, name: user.email, value: benfiola@gmail.com}
+            - {scope: global, name: user.signingkey, value: 9431F68902C615C7}
+            - {scope: global, name: commit.gpgsign, value: true}
+          loop_control:
+            loop_var: git_config_item
+...

@@ -1,0 +1,38 @@
+# NOTE: depends on facts from 'facts' module
+# creates a folder at {{user.home}}/.ssh
+# creates a folder at {{user.home}}/.ssh/config.d
+# creates an ssh config file at {{user.home}}/.ssh/config with an 'Include config.d/*' at the top
+# creates an ssh config file at {{user.home}}/.ssh/config.d/{{ssh_host}} using the PKCS11Provider
+# '{{ssh_host}}' should be the remote host
+# '{{ssh_hostname}}' should be the remote hostname
+- name: create .ssh folder
+  ansible.builtin.file:
+    path: "{{user.home}}/.ssh"
+    state: directory
+    recurse: True
+
+- name: create .ssh/config.d folder
+  ansible.builtin.file:
+    path: "{{user.home}}/.ssh/config.d"
+    state: directory
+
+- name: create .ssh/config
+  ansible.builtin.blockinfile:
+    create: true
+    block: Include config.d/*
+    insertbefore: BOF
+    path: "{{user.home}}/.ssh/config"
+
+- name: create .ssh/config.d/{{ssh_host}}
+  vars:
+    opensc_lib:
+      darwin: /usr/local/lib/opensc-pkcs11.so
+      linux: /usr/lib/opensc-pkcs11.so
+  ansible.builtin.blockinfile:
+    create: true
+    path: "{{user.home}}/.ssh/config.d/{{ssh_host}}"
+    insertbefore: BOF
+    block: |
+      Host {{ssh_host}}
+        Hostname {{ssh_hostname}}
+        PKCS11Provider {{opensc_lib[system]}}
