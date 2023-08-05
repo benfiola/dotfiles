@@ -22,6 +22,16 @@
             name:
               - vim
 
+    # NOTE: on darwin, /usr/bin/vi appears to be 'vim'.
+    - when: debian or archlinux
+      block:
+        - name: symlink vim to vi
+          become: true
+          ansible.builtin.file:
+            src: /usr/bin/vim
+            dest: /usr/bin/vi
+            state: link
+
     - when: debian or archlinux or darwin
       block:          
         - name: install vimrc
@@ -34,12 +44,5 @@
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/vim/files/profile.sh"
             path: "{{user_profiled_path}}/00-vim.sh"
-            state: link
-
-        - name: symlink vim to vi
-          become: true
-          ansible.builtin.file:
-            src: /usr/bin/vim
-            dest: /usr/bin/vi
             state: link
 ...

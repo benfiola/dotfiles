@@ -8,9 +8,9 @@
     
     - when: darwin
       block:
-        - name: brew cask install discord
+        - name: brew install homebrew/cask/discord
           community.general.homebrew_cask:
-            name: discord
+            name: homebrew/cask/discord
             path: "{{brew_path}}"
     
     - when: archlinux

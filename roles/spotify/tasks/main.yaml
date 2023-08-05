@@ -15,8 +15,8 @@
     
     - when: darwin
       block:
-        - name: brew cask install spotify
+        - name: brew install homebrew/cask/spotify
           community.general.homebrew_cask:
-            name: spotify
+            name: homebrew/cask/spotify
             path: "{{brew_path}}"
 ...

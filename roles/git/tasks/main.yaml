@@ -7,22 +7,20 @@
           benfiola.dotfiles.empty: {}
     
     - when: true
+      vars:
+        git_config:
+          user.name: "Ben Fiola"
+          user.email: benfiola@gmail.com
+          user.signingkey: 9431F68902C615C7
+          commit.gpgsign: true
+          init.defaultbranch: main
       block:
         - name: create git config
-          vars:
-            directory: "{{git_config_item.directory}}"
-            data: "{{git_config_item.data}}"
           ansible.builtin.include_role:
             name: benfiola.dotfiles.utils
             tasks_from: create-git-config.yaml
           loop:
-            - directory: "{{source_path}}/benfiola.github.com/"
-              data: 
-                user.name: "Ben Fiola"
-                user.email: benfiola@gmail.com
-                user.signingkey: 9431F68902C615C7
-                commit.gpgsign: true
+            - "{{source_path}}/benfiola.github.com/"
           loop_control:
-            label: "{{git_config_item.directory}}"
-            loop_var: git_config_item
+            loop_var: directory
 ...

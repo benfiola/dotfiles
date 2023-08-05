@@ -12,8 +12,13 @@
           community.general.homebrew:
             name: 
               - gnupg
-              - homebrew/cask/opensc
               - ykman
+            path: "{{brew_path}}"
+        
+        - name: brew install yubikey dependencies
+          community.general.homebrew_cask:
+            name: 
+              - homebrew/cask/opensc
             path: "{{brew_path}}"
     
     - when: archlinux

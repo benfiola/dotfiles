@@ -42,9 +42,9 @@
 
     - when: darwin
       block:
-        - name: brew cask install google-cloud-sdk
+        - name: brew install homebrew/cask/google-cloud-sdk
           community.general.homebrew_cask:
-            name: google-cloud-sdk
+            name: homebrew/cask/google-cloud-sdk
             path: "{{brew_path}}"
 
         - name: install gke-gcloud-auth-plugin

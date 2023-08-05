@@ -16,9 +16,9 @@
 
     - when: darwin
       block:
-        - name: brew cask install gimp
+        - name: brew install homebrew/cask/gimp
           community.general.homebrew_cask:
-            name: gimp
+            name: homebrew/cask/gimp
             path: "{{brew_path}}"
     
     - when: archlinux

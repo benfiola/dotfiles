@@ -19,7 +19,10 @@
 - name: create .ssh/config
   ansible.builtin.blockinfile:
     create: true
-    block: Include config.d/*
+    marker: "# {mark} ANSIBLE MANAGED BLOCK ({{ssh_host}})"
+    block: |
+      Host {{ssh_host}}
+        Include {{user.home}}/.ssh/config.d/{{ssh_host}}
     insertbefore: BOF
     path: "{{user.home}}/.ssh/config"
 

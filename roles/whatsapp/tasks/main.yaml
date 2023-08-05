@@ -8,8 +8,8 @@
     
     - when: darwin
       block:
-        - name: brew cask install whatsapp
+        - name: brew install homebrew/cask/whatsapp
           community.general.homebrew_cask:
-            name: whatsapp
+            name: homebrew/cask/whatsapp
             path: "{{brew_path}}"
 ...

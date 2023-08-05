@@ -15,8 +15,8 @@
 
     - when: darwin
       block:
-        - name: brew cask install authy
+        - name: brew install homebrew/cask/authy
           community.general.homebrew_cask:
-            name: authy
+            name: homebrew/cask/authy
             path: "{{brew_path}}"
 ...

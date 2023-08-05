@@ -8,9 +8,9 @@
     
     - when: darwin
       block:
-        - name: brew cask install google-chrome
+        - name: brew install homebrew/cask/google-chrome
           community.general.homebrew_cask:
-            name: google-chrome
+            name: homebrew/cask/google-chrome
             path: "{{brew_path}}"
 
         - name: remove existing google-chrome policy

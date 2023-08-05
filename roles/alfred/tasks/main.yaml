@@ -8,8 +8,8 @@
     
     - when: darwin
       block:
-        - name: brew cask install alfred
+        - name: brew install homebrew/cask/alfred
           community.general.homebrew_cask:
-            name: alfred
+            name: homebrew/cask/alfred
             path: "{{brew_path}}"
 ...

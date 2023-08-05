@@ -67,8 +67,8 @@
           
         - when: darwin
           block:
-            - name: brew cask install docker
+            - name: brew install homebrew/cask/docker
               community.general.homebrew_cask:
-                name: docker
+                name: homebrew/cask/docker
                 path: "{{brew_path}}"
 ...

@@ -8,9 +8,9 @@
     
     - when: darwin
       block:
-        - name: brew cask install amethyst
+        - name: brew install homebrew/cask/amethyst
           community.general.homebrew_cask:
-            name: amethyst
+            name: homebrew/cask/amethyst
             path: "{{brew_path}}"
 
         - name: symlink amethyst configuration

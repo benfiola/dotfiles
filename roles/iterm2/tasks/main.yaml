@@ -8,9 +8,9 @@
     
     - when: darwin
       block:
-        - name: brew cask install iterm2
+        - name: brew install homebrew/cask/iterm2
           community.general.homebrew_cask:
-            name: iterm2
+            name: homebrew/cask/iterm2
             path: "{{brew_path}}"
           
         - name: run configuration commands

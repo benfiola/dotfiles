@@ -8,9 +8,9 @@
     
     - when: darwin
       block:
-        - name: brew cask install steam
+        - name: brew install homebrew/cask/steam
           community.general.homebrew_cask:
-            name: steam
+            name: homebrew/cask/steam
             path: "{{brew_path}}"
     
     - when: archlinux
