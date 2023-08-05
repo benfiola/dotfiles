@@ -10,7 +10,7 @@
       block:
         - name: create ssh config
           vars:
-            ssh_host: "{{ssh_item.ssh_host | default(omit)}}"
+            ssh_host: "{{ssh_item.ssh_host}}"
             ssh_hostname: "{{ssh_item.ssh_hostname}}"
           ansible.builtin.include_role:
             name: benfiola.dotfiles.utils

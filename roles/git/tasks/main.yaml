@@ -8,20 +8,21 @@
     
     - when: true
       block:
-        - name: set git config
+        - name: create git config
           vars:
-            scope: "{{git_config_item.scope}}"
-            name: "{{git_config_item.name}}"
-            value: "{{git_config_item.value}}"
-          ansible.builtin.git_config:
-            scope: "{{scope}}"
-            name: "{{name}}"
-            value: "{{value}}"
+            directory: "{{git_config_item.directory}}"
+            data: "{{git_config_item.data}}"
+          ansible.builtin.include_role:
+            name: benfiola.dotfiles.utils
+            tasks_from: create-git-config.yaml
           loop:
-            - {scope: global, name: user.name, value: Ben Fiola}
-            - {scope: global, name: user.email, value: benfiola@gmail.com}
-            - {scope: global, name: user.signingkey, value: 9431F68902C615C7}
-            - {scope: global, name: commit.gpgsign, value: true}
+            - directory: "{{source_path}}/benfiola.github.com/"
+              data: 
+                user.name: "Ben Fiola"
+                user.email: benfiola@gmail.com
+                user.signingkey: 9431F68902C615C7
+                commit.gpgsign: true
           loop_control:
+            label: "{{git_config_item.directory}}"
             loop_var: git_config_item
 ...

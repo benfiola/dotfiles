@@ -22,6 +22,7 @@
         - import_role: name=benfiola.dotfiles.locale
         - import_role: name=benfiola.dotfiles.kde
         - import_role: name=benfiola.dotfiles.macos
+        - import_role: name=benfiola.dotfiles.source
 
         # version manager for several tools below
         - import_role: name=benfiola.dotfiles.asdf
@@ -58,7 +59,6 @@
         - import_role: name=benfiola.dotfiles.pulumi
         - import_role: name=benfiola.dotfiles.python
         - import_role: name=benfiola.dotfiles.sops
-        - import_role: name=benfiola.dotfiles.source
         - import_role: name=benfiola.dotfiles.spotify
         - import_role: name=benfiola.dotfiles.ssh
         - import_role: name=benfiola.dotfiles.starship

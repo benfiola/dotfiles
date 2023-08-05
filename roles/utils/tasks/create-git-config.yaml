@@ -1,0 +1,32 @@
+# NOTE: depends on facts from 'facts' module
+# creates a folder at {{user.home}}/.gitconfig.d
+# creates an git config file at {{user.home}}/.gitconfig/{{directory}} where 'directory' has '/' replaced with '-'
+# creates an git config file at {{user.home}}/.gitconfig with an 'includeIf' directive pointing to the above git config file
+# {{directory}} is the directory the git config targets
+# {{config}} is the git.config settings
+- name: create .gitconfig.d folder
+  ansible.builtin.file:
+    path: "{{user.home}}/.gitconfig.d"
+    state: directory
+
+- vars:
+    gitconfig_path: "{{user.home}}/.gitconfig.d/{{directory[1:-1] | replace('/', '-')}}"
+  block:
+    - name: create {{directory}}
+      ansible.builtin.file:
+        path: "{{directory}}"
+        state: directory
+
+    - name: add entry to .gitconfig file
+      ansible.builtin.blockinfile:
+        path: "{{user.home}}/.gitconfig"
+        block: |
+          [includeIf "gitdir:{{directory}}"]
+            path = {{gitconfig_path}}
+    
+    - name: update {{gitconfig_path}}        
+      ansible.builtin.command:
+        cmd: git config --file {{gitconfig_path}} "{{item.key}}" "{{item.value}}"
+      loop: "{{data | dict2items}}"
+      loop_control:
+        loop_var: item
