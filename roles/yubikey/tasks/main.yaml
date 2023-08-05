@@ -8,11 +8,12 @@
     
     - when: darwin
       block:
-        - name: brew install gnupg
+        - name: brew install yubikey dependencies
           community.general.homebrew:
             name: 
               - gnupg
               - homebrew/cask/opensc
+              - ykman
             path: "{{brew_path}}"
     
     - when: archlinux
