@@ -54,6 +54,16 @@
             path: "{{user.home}}/.gnupg/scdaemon.conf"
             line: pcsc-shared
         
+        - name: symlink blue yubikey public gpg key
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/yubikey/files/pub.asc"
+            dest: "{{user.home}}/.gnupg/blue-yubikey.asc"
+            state: link
+        
+        - name: import blue yubikey public gpg key
+          ansible.builtin.command:
+            cmd: gpg --import {{user.home}}/.gnupg/blue-yubikey.asc
+        
         - name: restart gpg
           ansible.builtin.command:
             cmd: gpgconf --kill all
