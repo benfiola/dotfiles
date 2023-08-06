@@ -7,17 +7,23 @@
           benfiola.dotfiles.empty: {}
     
     - when: true
+      vars:
+        opensc_lib:
+          darwin: /usr/local/lib/opensc-pkcs11.so
+          linux: /usr/lib/opensc-pkcs11.so
       block:
         - name: create ssh config
           vars:
             ssh_host: "{{ssh_item.ssh_host}}"
-            ssh_hostname: "{{ssh_item.ssh_hostname}}"
+            ssh_config: "{{ssh_item.ssh_config}}"
           ansible.builtin.include_role:
             name: benfiola.dotfiles.utils
             tasks_from: create-ssh-config.yaml
           loop:
-            - {ssh_host: benfiola.github.com, ssh_hostname: github.com}
+            - ssh_host: benfiola.github.com
+              ssh_config:
+                Hostname: github.com
+                PKCS11Provider: "{{opensc_lib[system]}}"
           loop_control:
-            label: "{{ssh_host}}"
             loop_var: ssh_item
 ...

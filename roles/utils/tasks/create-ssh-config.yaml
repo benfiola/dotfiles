@@ -4,7 +4,6 @@
 # creates an ssh config file at {{user.home}}/.ssh/config with an 'Include config.d/*' at the top
 # creates an ssh config file at {{user.home}}/.ssh/config.d/{{ssh_host}} using the PKCS11Provider
 # '{{ssh_host}}' should be the remote host
-# '{{ssh_hostname}}' should be the remote hostname
 - name: create .ssh folder
   ansible.builtin.file:
     path: "{{user.home}}/.ssh"
@@ -28,14 +27,11 @@
 
 - name: create .ssh/config.d/{{ssh_host}}
   vars:
-    opensc_lib:
-      darwin: /usr/local/lib/opensc-pkcs11.so
-      linux: /usr/lib/opensc-pkcs11.so
+    ssh_config_str: "{{ ssh_config.items() | map('join', ' ') | join('\n')}}"
   ansible.builtin.blockinfile:
     create: true
     path: "{{user.home}}/.ssh/config.d/{{ssh_host}}"
     insertbefore: BOF
     block: |
       Host {{ssh_host}}
-        Hostname {{ssh_hostname}}
-        PKCS11Provider {{opensc_lib[system]}}
+      {{ssh_config_str}}

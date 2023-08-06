@@ -13,6 +13,7 @@
             name: 
               - gnupg
               - ykman
+              - pcsc-lite
             path: "{{brew_path}}"
         
         - name: brew install yubikey dependencies
@@ -39,4 +40,22 @@
             name: pcscd
             state: started
             enabled: true
+    
+    - when: archlinux or darwin
+      block:
+        - name: create .gnupg folder
+          ansible.builtin.file:
+            path: "{{user.home}}/.gnupg"
+            state: directory
+            recurse: true
+
+        - name: configure scdaemon
+          ansible.builtin.lineinfile:
+            path: "{{user.home}}/.gnupg/scdaemon.conf"
+            line: pcsc-shared
+        
+        - name: restart gpg
+          ansible.builtin.command:
+            cmd: gpgconf --kill all
+          changed_when: false
 ...
