@@ -7,13 +7,12 @@
           benfiola.dotfiles.empty: {}
     
     - when: true
-      vars:
-        opensc_lib:
-          darwin: /usr/local/lib/opensc-pkcs11.so
-          linux: /usr/lib/opensc-pkcs11.so
       block:
         - name: create ssh config
           vars:
+            opensc_lib:
+              darwin: /usr/local/lib/opensc-pkcs11.so
+              linux: /usr/lib/opensc-pkcs11.so
             ssh_host: "{{ssh_item.ssh_host}}"
             ssh_config: "{{ssh_item.ssh_config}}"
           ansible.builtin.include_role:
