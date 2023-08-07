@@ -55,6 +55,7 @@
         - import_role: name=benfiola.dotfiles.lutris
         - import_role: name=benfiola.dotfiles.nodejs
         - import_role: name=benfiola.dotfiles.open_vm_tools
+        - import_role: name=benfiola.dotfiles.pgp
         - import_role: name=benfiola.dotfiles.proton
         - import_role: name=benfiola.dotfiles.pulumi
         - import_role: name=benfiola.dotfiles.python

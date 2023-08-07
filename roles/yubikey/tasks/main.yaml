@@ -8,64 +8,17 @@
     
     - when: darwin
       block:
-        - name: brew install yubikey dependencies
+        - name: brew install ykman
           community.general.homebrew:
             name: 
-              - gnupg
               - ykman
-              - pcsc-lite
-            path: "{{brew_path}}"
-        
-        - name: brew install yubikey dependencies
-          community.general.homebrew_cask:
-            name: 
-              - homebrew/cask/opensc
             path: "{{brew_path}}"
     
     - when: archlinux
       block:
-        - name: pacman install yubikey dependencies
+        - name: pacman install ykman
           become: true
           community.general.pacman:
             name:
-              - ccid
-              - gnupg
-              - opensc
-              - pcsclite
               - yubikey-manager
-    
-        - name: start pcscd service
-          become: true
-          ansible.builtin.systemd:
-            name: pcscd
-            state: started
-            enabled: true
-    
-    - when: archlinux or darwin
-      block:
-        - name: create .gnupg folder
-          ansible.builtin.file:
-            path: "{{user.home}}/.gnupg"
-            state: directory
-            recurse: true
-
-        - name: configure scdaemon
-          ansible.builtin.lineinfile:
-            path: "{{user.home}}/.gnupg/scdaemon.conf"
-            line: pcsc-shared
-        
-        - name: symlink blue yubikey public gpg key
-          ansible.builtin.file:
-            src: "{{dotfiles_path}}/roles/yubikey/files/pub.asc"
-            dest: "{{user.home}}/.gnupg/blue-yubikey.asc"
-            state: link
-        
-        - name: import blue yubikey public gpg key
-          ansible.builtin.command:
-            cmd: gpg --import {{user.home}}/.gnupg/blue-yubikey.asc
-        
-        - name: restart gpg
-          ansible.builtin.command:
-            cmd: gpgconf --kill all
-          changed_when: false
 ...

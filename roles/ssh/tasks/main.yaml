@@ -10,19 +10,11 @@
       block:
         - name: create ssh config
           vars:
-            opensc_lib:
-              darwin: /usr/local/lib/opensc-pkcs11.so
-              linux: /usr/lib/opensc-pkcs11.so
-            ssh_host: "{{ssh_item.ssh_host}}"
-            ssh_config: "{{ssh_item.ssh_config}}"
+            ssh_host: "{{item.ssh_host}}"
+            ssh_hostname: "{{item.ssh_hostname}}"
           ansible.builtin.include_role:
-            name: benfiola.dotfiles.utils
-            tasks_from: create-ssh-config.yaml
+            name: benfiola.dotfiles.ssh
+            tasks_from: configure-ssh-host.yaml
           loop:
-            - ssh_host: benfiola.github.com
-              ssh_config:
-                Hostname: github.com
-                PKCS11Provider: "{{opensc_lib[system]}}"
-          loop_control:
-            loop_var: ssh_item
+            - {ssh_host: benfiola.github.com, ssh_hostname: github.com}
 ...

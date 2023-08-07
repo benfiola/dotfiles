@@ -1,0 +1,48 @@
+---
+- tags: [minimal, pgp]
+  block:
+    - when: not (darwin or archlinux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: brew install gnupg
+          community.general.homebrew:
+            name: 
+              - gnupg
+            path: "{{brew_path}}"
+    
+    - when: archlinux
+      block:
+        - name: pacman install gnupg
+          become: true
+          community.general.pacman:
+            name:
+              - gnupg
+    
+    - when: archlinux or darwin
+      block:
+        - name: create .gnupg folder
+          ansible.builtin.file:
+            path: "{{user.home}}/.gnupg"
+            state: directory
+            recurse: true
+        
+        - name: symlink blue yubikey public gpg key
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/pgp/files/pub.asc"
+            dest: "{{user.home}}/.gnupg/blue-yubikey.asc"
+            state: link
+        
+        - name: import blue yubikey public gpg key
+          ansible.builtin.command:
+            cmd: gpg --import {{user.home}}/.gnupg/blue-yubikey.asc
+          changed_when: false
+        
+        - name: restart gpg
+          ansible.builtin.command:
+            cmd: gpgconf --kill all
+          changed_when: false
+...

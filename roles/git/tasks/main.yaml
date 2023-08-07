@@ -9,18 +9,19 @@
     - when: true
       vars:
         git_config:
-          user.name: "Ben Fiola"
-          user.email: benfiola@gmail.com
-          user.signingkey: 9431F68902C615C7
           commit.gpgsign: true
+          gpg.format: ssh
           init.defaultbranch: main
+          user.name: Ben Fiola
+          user.email: benfiola@gmail.com
+          user.signingkey: "{{user.home}}/.ssh/{{git_remote}}"
       block:
         - name: create git config
           ansible.builtin.include_role:
-            name: benfiola.dotfiles.utils
+            name: benfiola.dotfiles.git
             tasks_from: create-git-config.yaml
           loop:
-            - "{{source_path}}/benfiola.github.com/"
+            - benfiola.github.com
           loop_control:
-            loop_var: directory
+            loop_var: git_remote
 ...

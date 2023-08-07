@@ -1,0 +1,35 @@
+# NOTE: depends on facts from 'facts' module
+# Creates {{user.home}}/.ssh folder
+# Symlinks {{user.home}}/.ssh/{{ssh_host}} private keys
+# Symlinks {{user.home}}/.ssh/{{ssh_host}}.pub public keys
+# Creates {{user.home}}/.ssh/config configuration
+# Adds ssh configuration entry for {{ssh_host}} using {{user.home}}/.ssh/{{ssh_host}} IdentityFile
+# '{{ssh_host}}' is the ssh host
+# '{{ssh_hostname}}' is the server hostname (if different from ssh_host)
+- name: create .ssh folder
+  ansible.builtin.file:
+    path: "{{user.home}}/.ssh"
+    state: directory
+    recurse: True
+
+- name: symlink private ssh key
+  ansible.builtin.file:
+    src: "{{dotfiles_path}}/roles/ssh/files/{{ssh_host}}"
+    path: "{{user.home}}/.ssh/{{ssh_host}}"
+    state: link
+  
+- name: symlink public ssh key
+  ansible.builtin.file:
+    src: "{{dotfiles_path}}/roles/ssh/files/{{ssh_host}}.pub"
+    path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
+    state: link
+  
+- name: create .ssh/config
+  ansible.builtin.blockinfile:
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED BLOCK ({{ssh_host}})"
+    block: |
+      Host {{ssh_host}}
+        Hostname {{ssh_hostname | default(ssh_host)}}
+        IdentityFile {{user.home}}/.ssh/{{ssh_host}}
+    path: "{{user.home}}/.ssh/config"

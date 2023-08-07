@@ -1,0 +1,47 @@
+# NOTE: depends on facts from 'facts' module
+# creates a folder at {{user.home}}/.gitconfig.d
+# creates an git config file at {{user.home}}/.gitconfig.d/{{git_remote}} where 'directory' has '/' replaced with '-'
+# creates an git config file at {{user.home}}/.gitconfig with an 'includeIf' directive pointing to the above git config file
+# {{git_remote}} is the git remote these settings apply to
+# {{git_config}} is the git.config settings
+- name: create .gitconfig.d folder
+  ansible.builtin.file:
+    path: "{{user.home}}/.gitconfig.d"
+    state: directory
+
+- name: add entry to .gitconfig file
+  ansible.builtin.blockinfile:
+    path: "{{user.home}}/.gitconfig"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK ({{git_remote}})"
+    block: |
+      [includeIf "hasconfig:remote.*.url:git@{{git_remote}}:*/**"]
+        path = {{user.home}}/.gitconfig.d/{{git_remote}}
+
+- name: configure commit signing
+  block:
+    - name: read public signing key
+      ansible.builtin.slurp:
+        src: "{{git_config['user.signingkey']}}.pub"
+      register: git_public_signing_key_slurp
+    
+    - name: add public signing key to .git_allowed_signers
+      vars:
+        git_user_email: "{{git_config['user.email']}}"
+        git_public_signing_key: "{{git_public_signing_key_slurp['content'] | b64decode}}"
+      ansible.builtin.blockinfile:
+        create: true
+        marker: "# {mark} ANSIBLE MANAGED BLOCK ({})"
+        block: "{{git_user_email}} {{git_public_signing_key}}"
+        path: "{{user.home}}/.git_allowed_signers"
+
+    - name: update remote .gitconfig to use .git_allowed_signers
+      ansible.builtin.command:
+        cmd: git config --file "{{user.home}}/.gitconfig.d/{{git_remote}}" "gpg.ssh.allowedSignersFile" "{{user.home}}/.git_allowed_signers"
+      changed_when: false
+  when: "'user.signingkey' in git_config and 'user.email' in git_config"
+
+- name: update remote .gitconfig with git_config input 
+  ansible.builtin.command:
+    cmd: git config --file "{{user.home}}/.gitconfig.d/{{git_remote}}" "{{item.key}}" "{{item.value}}"
+  changed_when: false
+  loop: "{{git_config | dict2items}}"
