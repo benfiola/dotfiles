@@ -59,8 +59,10 @@
           become: true
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/kde/files/root_config.sh"
+          changed_when: false
 
         - name: run configuration commands
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/kde/files/config.sh"
+          changed_when: false
 ...

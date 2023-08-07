@@ -45,3 +45,4 @@
         - name: run configuration script
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/konsole/files/config.sh"
+          changed_when: false
