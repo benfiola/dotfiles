@@ -6,6 +6,7 @@
 # Adds ssh configuration entry for {{ssh_host}} using {{user.home}}/.ssh/{{ssh_host}} IdentityFile
 # '{{ssh_host}}' is the ssh host
 # '{{ssh_hostname}}' is the server hostname (if different from ssh_host)
+# '{{ssh_private_key}}' is the path to the private key
 - name: create .ssh folder
   ansible.builtin.file:
     path: "{{user.home}}/.ssh"
@@ -14,13 +15,13 @@
 
 - name: symlink private ssh key
   ansible.builtin.file:
-    src: "{{dotfiles_path}}/roles/ssh/files/{{ssh_host}}"
+    src: "{{ssh_private_key}}"
     path: "{{user.home}}/.ssh/{{ssh_host}}"
     state: link
   
 - name: symlink public ssh key
   ansible.builtin.file:
-    src: "{{dotfiles_path}}/roles/ssh/files/{{ssh_host}}.pub"
+    src: "{{ssh_private_key}}.pub"
     path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
     state: link
   

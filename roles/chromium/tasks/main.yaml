@@ -18,10 +18,12 @@
           failed_when: false
           ansible.builtin.command:
             cmd: profiles -R -F {{dotfiles_path}}/roles/chromium/files/macos.mobileconfig
+          changed_when: false
 
         - name: install google-chrome policy
           ansible.builtin.command:
             cmd: open {{dotfiles_path}}/roles/chromium/files/macos.mobileconfig
+          changed_when: false
 
     - when: linux
       block:

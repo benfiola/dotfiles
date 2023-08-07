@@ -11,4 +11,5 @@
         - name: run configuration script
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/macos/files/config.sh"
+          changed_when: false
 ...

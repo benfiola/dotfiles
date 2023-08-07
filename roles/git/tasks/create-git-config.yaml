@@ -27,10 +27,11 @@
     - name: add public signing key to .git_allowed_signers
       vars:
         git_user_email: "{{git_config['user.email']}}"
+        git_public_signing_key_path: "{{git_config['user.signingkey']}}.pub"
         git_public_signing_key: "{{git_public_signing_key_slurp['content'] | b64decode}}"
       ansible.builtin.blockinfile:
         create: true
-        marker: "# {mark} ANSIBLE MANAGED BLOCK ({})"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK ({{git_user_email}}:{{git_public_signing_key_path}})"
         block: "{{git_user_email}} {{git_public_signing_key}}"
         path: "{{user.home}}/.git_allowed_signers"
 
@@ -38,7 +39,7 @@
       ansible.builtin.command:
         cmd: git config --file "{{user.home}}/.gitconfig.d/{{git_remote}}" "gpg.ssh.allowedSignersFile" "{{user.home}}/.git_allowed_signers"
       changed_when: false
-  when: "'user.signingkey' in git_config and 'user.email' in git_config"
+  when: "'user.signingkey' in git_config and 'user.email' in git_config and git_config.get('gpg.format', '') == 'ssh'"
 
 - name: update remote .gitconfig with git_config input 
   ansible.builtin.command:

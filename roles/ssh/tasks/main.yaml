@@ -6,12 +6,26 @@
         - name: unimplemented
           benfiola.dotfiles.empty: {}
     
+    - when: darwin
+      block:
+        - name: brew install openssh
+          community.general.homebrew:
+            name: openssh
+            path: "{{brew_path}}"
+
+        - name: link zshrc file
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/ssh/files/profile.sh"
+            path: "{{user_profiled_path}}/00-ssh.sh"
+            state: link
+  
     - when: true
       block:
         - name: create ssh config
           vars:
             ssh_host: "{{item.ssh_host}}"
             ssh_hostname: "{{item.ssh_hostname}}"
+            ssh_private_key: "{{dotfiles_path}}/roles/ssh/files/{{ssh_host}}"
           ansible.builtin.include_role:
             name: benfiola.dotfiles.ssh
             tasks_from: configure-ssh-host.yaml
