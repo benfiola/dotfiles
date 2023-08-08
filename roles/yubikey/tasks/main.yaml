@@ -12,6 +12,7 @@
           community.general.homebrew:
             name: 
               - ykman
+              - libfido2
             path: "{{brew_path}}"
     
     - when: archlinux
@@ -21,4 +22,5 @@
           community.general.pacman:
             name:
               - yubikey-manager
+              - libfido2
 ...
