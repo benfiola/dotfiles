@@ -29,8 +29,8 @@ mount --mkdir /dev/sda1 /mnt/boot
 pacstrap -K /mnt base linux linux-headers linux-firmware vim man-db man-pages lvm2 grub-bios efibootmgr sudo networkmanager
 # NOTE: amd CPU, install deps
 pacstrap /mnt amd-ucode
-# NOTE: nvidia GPU, install deps (enable multilib repo for lib32-nvidia-utils)
-pacstrap /mnt nvidia nvidia-dkms nvidia-settings lib32-nvidia-utils
+# NOTE: nvidia GPU, install deps
+pacstrap /mnt nvidia nvidia-dkms nvidia-settings
 # NOTE: arm, install arm64 deps
 pacstrap /mnt archlinuxarm-keyring
 
@@ -84,3 +84,5 @@ grub-mkconfig -o /boot/grub/grub.cfg
 systemctl enable NetworkManager
 
 # reboot
+# NOTE: dual booting windows, instruct arch to use local time w/ hw clock
+timedatectl set-local-rtc 1
