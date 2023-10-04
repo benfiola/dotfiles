@@ -9,6 +9,11 @@
     path: "{{user.home}}/.gitconfig.d"
     state: directory
 
+- name: create .gitconfig file
+  ansible.builtin.file:
+    path: "{{user.home}}/.gitconfig"
+    state: file
+
 - name: add entry to .gitconfig file
   ansible.builtin.blockinfile:
     path: "{{user.home}}/.gitconfig"
