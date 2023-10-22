@@ -13,22 +13,15 @@
     state: directory
     recurse: True
 
-- name: set private ssh key permissions
-  ansible.builtin.file:
-    path: "{{user.home}}/.ssh/{{ssh_host}}"
-    state: file
-    mode: '0600'
-
 - name: symlink private ssh key
   ansible.builtin.file:
     src: "{{ssh_private_key}}"
     path: "{{user.home}}/.ssh/{{ssh_host}}"
     state: link
   
-
-- name: set public ssh key permissions
+- name: set private ssh key permissions
   ansible.builtin.file:
-    path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
+    path: "{{user.home}}/.ssh/{{ssh_host}}"
     state: file
     mode: '0600'
 
@@ -37,6 +30,12 @@
     src: "{{ssh_private_key}}.pub"
     path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
     state: link
+  
+- name: set public ssh key permissions
+  ansible.builtin.file:
+    path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
+    state: file
+    mode: '0600'
   
 - name: create .ssh/config
   ansible.builtin.blockinfile:
