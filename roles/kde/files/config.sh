@@ -9,7 +9,7 @@ kwriteconfig5 --file "$HOME/.config/kdeglobals" --group KDE --key SingleClick --
 kwriteconfig5 --file "$HOME/.config/kdeglobals" --group KDE --key ScrollbarLeftClickNavigatesByPage --type bool false
 kwriteconfig5 --file "$HOME/.config/kcminputrc" --group Keyboard --key RepeatDelay 200
 kwriteconfig5 --file "$HOME/.config/kcminputrc" --group Keyboard --key RepeatRate 40
-kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group org.kde.krunner.desktop --key _launch 'Alt+Space\tAlt+F2\tSearch\tCtrl+Space,Alt+Space\tAlt+F2\tSearch,KRunner'
+kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group org.kde.krunner.desktop --key _launch 'Alt+Space\tSearch\tAlt+F2,Alt+Space\tAlt+F2\tSearch,KRunner'
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group General --key FreeFloating --type bool true
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key PowerDevilEnabled --type bool false
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key appstreamEnabled --type bool false
