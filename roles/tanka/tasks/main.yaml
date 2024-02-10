@@ -1,12 +1,12 @@
 ---
 - tags: [minimal, tanka]
   block:
-    - when: not (darwin or archlinux)
+    - when: not (darwin or archlinux or debian)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
     
-    - when: darwin
+    - when: darwin or debian
       block:
         - name: brew install tanka
           community.general.homebrew:

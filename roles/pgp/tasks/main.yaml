@@ -1,7 +1,7 @@
 ---
 - tags: [minimal, pgp]
   block:
-    - when: not (darwin or archlinux)
+    - when: not (darwin or archlinux or debian)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
@@ -14,6 +14,13 @@
               - gnupg
             path: "{{brew_path}}"
     
+    - when: debian
+      block:
+        - name: apt install gnupg
+          become: true
+          ansible.builtin.apt:
+            name: gnupg
+          
     - when: archlinux
       block:
         - name: pacman install gnupg
@@ -22,7 +29,7 @@
             name:
               - gnupg
     
-    - when: archlinux or darwin
+    - when: archlinux or darwin or debian
       block:
         - name: create .gnupg folder
           ansible.builtin.file:

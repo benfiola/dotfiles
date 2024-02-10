@@ -1,12 +1,12 @@
 ---
 - tags: [minimal, arduino]
   block:
-    - when: not (archlinux or darwin)
+    - when: not (archlinux or darwin or debian)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
 
-    - when: darwin
+    - when: darwin or debian
       block:
         - name: brew install arduino-cli
           community.general.homebrew:
