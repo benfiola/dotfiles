@@ -13,14 +13,14 @@
             name: openssh
             path: "{{brew_path}}"
 
+    - when: true
+      block:
         - name: link zshrc file
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/ssh/files/profile.sh"
             path: "{{user_profiled_path}}/00-ssh.sh"
             state: link
-  
-    - when: true
-      block:
+
         - name: create ssh config
           vars:
             ssh_host: "{{item.ssh_host}}"
