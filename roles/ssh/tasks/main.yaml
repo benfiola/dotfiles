@@ -30,5 +30,5 @@
             name: benfiola.dotfiles.ssh
             tasks_from: configure-ssh-host.yaml
           loop:
-            - {ssh_host: benfiola.github.com, ssh_hostname: github.com}
+            - {ssh_host: github.com}
 ...

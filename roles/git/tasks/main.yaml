@@ -21,7 +21,7 @@
             name: benfiola.dotfiles.git
             tasks_from: create-git-config.yaml
           loop:
-            - benfiola.github.com
+            - github.com
           loop_control:
             loop_var: git_remote
 ...
