@@ -24,7 +24,6 @@
         - name: create ssh config
           vars:
             ssh_host: "{{item.ssh_host}}"
-            ssh_hostname: "{{item.ssh_hostname}}"
             ssh_private_key: "{{dotfiles_path}}/roles/ssh/files/{{ssh_host}}"
           ansible.builtin.include_role:
             name: benfiola.dotfiles.ssh
