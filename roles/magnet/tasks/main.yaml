@@ -1,0 +1,22 @@
+---
+- tags: [graphical, magnet]
+  block:
+    - when: not darwin
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+    
+    - when: darwin
+      block:
+        - name: mas install magnet
+          community.general.mas:
+            id: 441258766
+            state: present
+          environment:
+            PATH: /usr/local/bin:{{ ansible_facts.env.PATH }}
+          
+        - name: run configuration commands
+          ansible.builtin.command:
+            cmd: "{{dotfiles_path}}/roles/iterm2/files/config.sh"
+          changed_when: false
+...

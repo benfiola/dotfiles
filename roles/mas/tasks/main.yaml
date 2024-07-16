@@ -1,0 +1,15 @@
+---
+- tags: [minimal, mas]
+  block:
+    - when: not (darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+          
+    - when: darwin
+      block:
+        - name: brew install mas
+          community.general.homebrew:
+            name:
+              - mas
+...

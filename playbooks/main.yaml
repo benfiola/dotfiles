@@ -15,6 +15,7 @@
 
         # package managers installed by other package managers
         - import_role: name=benfiola.dotfiles.flatpak
+        - import_role: name=benfiola.dotfiles.mas
         - import_role: name=benfiola.dotfiles.snap
 
         # system personalization and configuration
@@ -37,7 +38,6 @@
         - import_role: name=benfiola.dotfiles.arduino
         - import_role: name=benfiola.dotfiles.c
         - import_role: name=benfiola.dotfiles.alfred
-        - import_role: name=benfiola.dotfiles.amethyst
         - import_role: name=benfiola.dotfiles.authy
         - import_role: name=benfiola.dotfiles.bismuth
         - import_role: name=benfiola.dotfiles.bitwarden
@@ -55,18 +55,17 @@
         - import_role: name=benfiola.dotfiles.k9s
         - import_role: name=benfiola.dotfiles.ls
         - import_role: name=benfiola.dotfiles.lutris
+        - import_role: name=benfiola.dotfiles.magnet
         - import_role: name=benfiola.dotfiles.nodejs
         - import_role: name=benfiola.dotfiles.open_vm_tools
         - import_role: name=benfiola.dotfiles.pgp
         - import_role: name=benfiola.dotfiles.proton
         - import_role: name=benfiola.dotfiles.pulumi
         - import_role: name=benfiola.dotfiles.python
-        - import_role: name=benfiola.dotfiles.sops
         - import_role: name=benfiola.dotfiles.source
         - import_role: name=benfiola.dotfiles.spotify
         - import_role: name=benfiola.dotfiles.starship
         - import_role: name=benfiola.dotfiles.steam
-        - import_role: name=benfiola.dotfiles.tanka
         - import_role: name=benfiola.dotfiles.variety
         - import_role: name=benfiola.dotfiles.vim
         - import_role: name=benfiola.dotfiles.vscode

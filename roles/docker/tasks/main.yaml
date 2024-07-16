@@ -67,8 +67,31 @@
           
         - when: darwin
           block:
-            - name: brew install homebrew/cask/docker
-              community.general.homebrew_cask:
-                name: homebrew/cask/docker
+            - name: brew install docker
+              community.general.homebrew:
+                name:
+                  - colima
+                  - docker
+                  - docker-buildx
+                  - docker-compose
+                  - docker-credential-helper
                 path: "{{brew_path}}"
+
+            - name: create docker cli-plugins directory
+              ansible.builtin.file:
+                path: "{{user.home}}/.docker/cli-plugins"
+                state: directory
+                recurse: true
+            
+            - name: symlink docker-buildx to docker cli plugins
+              ansible.builtin.file:
+                src: "{{brew_path}}/docker-buildx"
+                path: "{{user.home}}/.docker/cli-plugins/docker-buildx"
+                state: link
+              
+            - name: symlink docker-compose to docker cli plugins
+              ansible.builtin.file:
+                src: "{{brew_path}}/docker-compose"
+                path: "{{user.home}}/.docker/cli-plugins/docker-compose"
+                state: link
 ...
