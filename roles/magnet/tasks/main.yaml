@@ -12,8 +12,6 @@
           community.general.mas:
             id: 441258766
             state: present
-          environment:
-            PATH: /usr/local/bin:{{ ansible_facts.env.PATH }}
           
         - name: run configuration commands
           ansible.builtin.command:

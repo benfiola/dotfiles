@@ -15,8 +15,8 @@
 
     - when: darwin
       block:
-        - name: brew install homebrew/cask/bitwarden
-          community.general.homebrew_cask:
-            name: homebrew/cask/bitwarden
-            path: "{{brew_path}}"
+        - name: mas install bitwarden
+          community.general.mas:
+            id: 1352778147
+            state: present
 ...
