@@ -10,6 +10,11 @@ kwriteconfig5 --file "$HOME/.config/kdeglobals" --group KDE --key ScrollbarLeftC
 kwriteconfig5 --file "$HOME/.config/kcminputrc" --group Keyboard --key RepeatDelay 200
 kwriteconfig5 --file "$HOME/.config/kcminputrc" --group Keyboard --key RepeatRate 40
 kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group org.kde.krunner.desktop --key _launch 'Alt+Space\tSearch\tAlt+F2,Alt+Space\tAlt+F2\tSearch,KRunner'
+kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group kwin --key 'Window Quick Tile Left' 'Meta+Left,Meta+Left,Quick Tile Window to the Left'
+kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group kwin --key 'Window Quick Tile Right' 'Meta+Right,Meta+Right,Quick Tile Window to the Right'
+kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group kwin --key 'Window Quick Tile Up' 'Meta+Up,Meta+Up,Quick Tile Window to the Up'
+kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group kwin --key 'Window Quick Tile Bottom' 'Meta+Down,Meta+Down,Quick Tile Window to the Bottom'
+kwriteconfig5 --file "$HOME/.config/kglobalshortcutsrc" --group kwin --key 'Window Maximize' 'Meta+Alt+Return,Meta+PgUp,Maximize Window'
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group General --key FreeFloating --type bool true
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key PowerDevilEnabled --type bool false
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key appstreamEnabled --type bool false
@@ -26,7 +31,6 @@ kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key plasma-desk
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key recentdocumentsEnabled --type bool false
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key shellEnabled --type bool false
 kwriteconfig5 --file "$HOME/.config/krunnerrc" --group Plugins --key windowsEnabled --type bool false
-
 
 # 'kwriteconfig5' will internally convert '\t' to '\\t' which is incorrect
 # the following command reverts this behavior
