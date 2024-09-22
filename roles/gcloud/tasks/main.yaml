@@ -10,7 +10,7 @@
       block:
         - name: download gcloud cli
           ansible.builtin.get_url:
-            url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-437.0.1-linux-x86_64.tar.gz
+            url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-452.0.1-linux-x86_64.tar.gz
             dest: /tmp/google-cloud-cli.tar.gz
           changed_when: false
         

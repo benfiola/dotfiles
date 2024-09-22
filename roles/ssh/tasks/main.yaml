@@ -13,6 +13,13 @@
             name: openssh
             path: "{{brew_path}}"
 
+    - when: archlinux
+      block:
+        - name: pacman install openssh
+          become: true
+          community.general.pacman:
+            name: openssh
+
     - when: true
       block:
         - name: link zshrc file
