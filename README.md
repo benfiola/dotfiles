@@ -7,6 +7,10 @@ This is my personal dotfiles project and supports macOS, Ubuntu, Archlinux opera
 * `ansible`
 * `git`
 
+If running on MacOS, additionally:
+
+* 'Full-disk access' Terminal permissions
+
 # Basic usage
 
 Running the following command will fully personalize your local machine.  
