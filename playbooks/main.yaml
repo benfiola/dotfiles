@@ -40,6 +40,7 @@
         - import_role: name=benfiola.dotfiles.alfred
         - import_role: name=benfiola.dotfiles.bitwarden
         - import_role: name=benfiola.dotfiles.chromium
+        - import_role: name=benfiola.dotfiles.contexts
         - import_role: name=benfiola.dotfiles.discord
         - import_role: name=benfiola.dotfiles.docker
         - import_role: name=benfiola.dotfiles.fat
