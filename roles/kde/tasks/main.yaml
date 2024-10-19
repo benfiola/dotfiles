@@ -15,9 +15,9 @@
               - sddm
               - kde-plasma-desktop
               - plasma-workspace-wayland
-              - pulseaudio
-              - pavucontrol
-              - plasma-pa
+              - pipewire
+              - wireplumber
+              - pipewire-pulse
               - kscreen
               - dolphin
               - fonts-noto-color-emoji
@@ -25,7 +25,12 @@
               - kwallet-pam
               - kde-spectacle
               - powerdevil
-        
+
+        - name: flatpak install pwvucontrol
+          become: true
+          community.general.flatpak:
+            name: com.saivert.pwvucontrol
+
     - when: kde and archlinux
       block:
       - name: pacman install kde + dependencies
@@ -36,9 +41,9 @@
             - sddm-kcm
             - plasma-desktop
             - plasma-workspace
-            - pulseaudio
-            - pavucontrol
-            - plasma-pa
+            - pipewire
+            - wireplumber
+            - pipewire-pulse
             - kscreen
             - dolphin
             - noto-fonts-emoji
@@ -46,6 +51,11 @@
             - kwallet-pam
             - spectacle
             - powerdevil
+
+      - name: flatpak install pwvucontrol
+        become: true
+        community.general.flatpak:
+          name: com.saivert.pwvucontrol
 
     - when: archlinux or debian
       block:

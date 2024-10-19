@@ -1,7 +1,7 @@
 ---
 - tags: [optional, discord]
   block:
-    - when: not (darwin or archlinux)
+    - when: not (darwin or linux)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
@@ -13,11 +13,10 @@
             name: homebrew/cask/discord
             path: "{{brew_path}}"
     
-    - when: archlinux
+    - when: linux
       block:
-        - name: pacman install discord
+        - name: flatpak install vesktop
           become: true
-          community.general.pacman:
-            name:
-              - discord
+          community.general.flatpak:
+            name: dev.vencord.Vesktop
 ...
