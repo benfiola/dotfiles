@@ -21,6 +21,6 @@
             name: benfiola.dotfiles.utils
             tasks_from: install-pacman-aur.yaml
           vars:
-            url: https://aur.archlinux.org/xone-dkms.git
+            url: https://aur.archlinux.org/xone-dlundqvist-dkms-git.git
             package: xone-dkms
 ...

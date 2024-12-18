@@ -15,7 +15,7 @@
               - python3
               - g++
               - make
-              - python-pip
+              - python3-pip
 
     - when: archlinux
       block:
