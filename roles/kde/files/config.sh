@@ -31,6 +31,7 @@ kwriteconfig6 --file "$HOME/.config/krunnerrc" --group Plugins --key plasma-desk
 kwriteconfig6 --file "$HOME/.config/krunnerrc" --group Plugins --key recentdocumentsEnabled --type bool false
 kwriteconfig6 --file "$HOME/.config/krunnerrc" --group Plugins --key shellEnabled --type bool false
 kwriteconfig6 --file "$HOME/.config/krunnerrc" --group Plugins --key windowsEnabled --type bool false
+kwriteconfig6 --file "$HOME/.config/ksmserverrc" --group General --key loginMode emptySession
 
 # 'kwriteconfig6' will internally convert '\t' to '\\t' which is incorrect
 # the following command reverts this behavior
