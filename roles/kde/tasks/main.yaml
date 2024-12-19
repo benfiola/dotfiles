@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: kde and debian
       block:
         - name: apt install kde + dependencies
@@ -18,6 +18,7 @@
               - pipewire
               - wireplumber
               - pipewire-pulse
+              - pavucontrol
               - kscreen
               - dolphin
               - fonts-noto-color-emoji
@@ -26,36 +27,27 @@
               - kde-spectacle
               - powerdevil
 
-        - name: flatpak install pwvucontrol
-          become: true
-          community.general.flatpak:
-            name: com.saivert.pwvucontrol
-
     - when: kde and archlinux
       block:
-      - name: pacman install kde + dependencies
-        become: true
-        community.general.pacman:
-          name:
-            - sddm
-            - sddm-kcm
-            - plasma-desktop
-            - plasma-workspace
-            - pipewire
-            - wireplumber
-            - pipewire-pulse
-            - kscreen
-            - dolphin
-            - noto-fonts-emoji
-            - noto-fonts-cjk
-            - kwallet-pam
-            - spectacle
-            - powerdevil
-
-      - name: flatpak install pwvucontrol
-        become: true
-        community.general.flatpak:
-          name: com.saivert.pwvucontrol
+        - name: pacman install kde + dependencies
+          become: true
+          community.general.pacman:
+            name:
+              - sddm
+              - sddm-kcm
+              - plasma-desktop
+              - plasma-workspace
+              - pipewire
+              - wireplumber
+              - pipewire-pulse
+              - pavucontrol
+              - kscreen
+              - dolphin
+              - noto-fonts-emoji
+              - noto-fonts-cjk
+              - kwallet-pam
+              - spectacle
+              - powerdevil
 
     - when: archlinux or debian
       block:
@@ -75,4 +67,3 @@
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/kde/files/config.sh"
           changed_when: false
-...
