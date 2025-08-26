@@ -8,6 +8,13 @@
     
     - when: darwin or debian or archlinux
       block:
+        - name: create starship install directory
+          become: true
+          ansible.builtin.file:
+            path: /usr/local/bin
+            recurse: true
+            state: directory
+
         - name: install starship from url
           ansible.builtin.include_role: 
             name: benfiola.dotfiles.utils
