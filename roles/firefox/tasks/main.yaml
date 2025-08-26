@@ -1,0 +1,29 @@
+---
+- tags: [graphical, firefox]
+  block:
+    - when: not (darwin or linux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+
+    - when: (darwin or linux)
+      block:
+        - name: brew install homebrew/cask/firefox
+          community.general.homebrew_cask:
+            name: homebrew/cask/firefox
+            path: "{{brew_path}}"
+
+        - name: install enterprise profile
+          ansible.builtin.unarchive:
+            dest: "{{profile_path}}"
+            src: "{{dotfiles_path}}/roles/firefox/files/enterprise_policy.zip"
+
+        - name: unquarantine firefox
+          when: darwin
+          ansible.builtin.command:
+            cmd: xattr -d com.apple.quarantine /Applications/Firefox.app
+          changed_when: false
+      vars:
+        profile_paths:
+          darwin: /Applications/Firefox.app/Contents/Resources
+        profile_path: "{{profile_paths[system]}}"

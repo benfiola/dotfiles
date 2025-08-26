@@ -35,11 +35,11 @@
         - import_role: name=benfiola.dotfiles.c
         - import_role: name=benfiola.dotfiles.alfred
         - import_role: name=benfiola.dotfiles.bitwarden
-        - import_role: name=benfiola.dotfiles.chromium
         - import_role: name=benfiola.dotfiles.contexts
         - import_role: name=benfiola.dotfiles.discord
         - import_role: name=benfiola.dotfiles.docker
         - import_role: name=benfiola.dotfiles.fat
+        - import_role: name=benfiola.dotfiles.firefox
         - import_role: name=benfiola.dotfiles.gimp
         - import_role: name=benfiola.dotfiles.git
         - import_role: name=benfiola.dotfiles.iterm2
@@ -62,4 +62,3 @@
         - import_role: name=benfiola.dotfiles.zsh
       always:
         - benfiola.dotfiles.temp_file_cleanup: {}
-...
