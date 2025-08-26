@@ -1,5 +1,5 @@
 ---
-- tags: [graphical, magnet]
+- tags: [graphical, wireguard]
   block:
     - when: not darwin
       block:
@@ -8,8 +8,8 @@
     
     - when: darwin
       block:
-        - name: mas install magnet
+        - name: mas install wireguard
           community.general.mas:
-            id: 441258766
+            id: 1451685025
             state: present
 ...
