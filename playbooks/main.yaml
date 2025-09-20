@@ -16,7 +16,6 @@
         # package managers installed by other package managers
         - import_role: name=benfiola.dotfiles.flatpak
         - import_role: name=benfiola.dotfiles.mas
-        - import_role: name=benfiola.dotfiles.snap
 
         # system personalization and configuration
         - import_role: name=benfiola.dotfiles.fonts
