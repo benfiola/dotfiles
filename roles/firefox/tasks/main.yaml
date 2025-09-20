@@ -1,7 +1,7 @@
 ---
 - tags: [graphical, firefox]
   block:
-    - when: not (darwin or linux)
+    - when: not (darwin or archlinux)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
@@ -25,20 +25,23 @@
           changed_when: false
           failed_when: false
 
-    - when: linux
+    - when: archlinux
       block:
-        - name: flatpak install bitwarden
+        - name: pacman install firefox
           become: true
-          community.general.flatpak:
-            name: org.mozilla.firefox
+          community.general.pacman:
+            name:
+              - firefox
 
         - name: create enterprise profile directory
+          become: true
           ansible.builtin.file:
-            path: "{{user.home}}/.var/app/org.mozilla.firefox/config/firefox"
+            path: "/usr/lib/firefox"
             state: directory
             recurse: true
 
         - name: install enterprise profile
+          become: true
           ansible.builtin.unarchive:
-            dest: "{{user.home}}/.var/app/org.mozilla.firefox/config/firefox"
+            dest: "/usr/lib/firefox"
             src: "{{dotfiles_path}}/roles/firefox/files/enterprise_policy.zip"
