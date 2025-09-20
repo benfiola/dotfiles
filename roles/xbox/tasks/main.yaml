@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: archlinux
       block:
         - name: pacman aur install xone-dongle-firmware
@@ -16,11 +16,10 @@
             url: https://aur.archlinux.org/xone-dongle-firmware.git
             package: xone-dongle-firmware
 
-        - name: pacman aur install xone-dkms
-          ansible.builtin.include_role: 
+        - name: pacman aur install xone-dkms-git
+          ansible.builtin.include_role:
             name: benfiola.dotfiles.utils
             tasks_from: install-pacman-aur.yaml
           vars:
-            url: https://aur.archlinux.org/xone-dlundqvist-dkms-git.git
+            url: https://aur.archlinux.org/xone-dkms-git.git
             package: xone-dkms
-...
