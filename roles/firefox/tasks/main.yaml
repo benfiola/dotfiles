@@ -6,7 +6,7 @@
         - name: unimplemented
           benfiola.dotfiles.empty: {}
 
-    - when: (darwin or linux)
+    - when: darwin
       block:
         - name: brew install homebrew/cask/firefox
           community.general.homebrew_cask:
@@ -15,7 +15,7 @@
 
         - name: install enterprise profile
           ansible.builtin.unarchive:
-            dest: "{{profile_path}}"
+            dest: /Applications/Firefox.app/Contents/Resources
             src: "{{dotfiles_path}}/roles/firefox/files/enterprise_policy.zip"
 
         - name: unquarantine firefox
@@ -24,7 +24,15 @@
             cmd: xattr -d com.apple.quarantine /Applications/Firefox.app
           changed_when: false
           failed_when: false
-      vars:
-        profile_paths:
-          darwin: /Applications/Firefox.app/Contents/Resources
-        profile_path: "{{profile_paths[system]}}"
+
+    - when: linux
+      block:
+        - name: flatpak install bitwarden
+          become: true
+          community.general.flatpak:
+            name: org.mozilla.firefox
+
+        - name: install enterprise profile
+          ansible.builtin.unarchive:
+            dest: "{{user.home}}/.var/app/org.mozilla.firefox/config/firefox"
+            src: "{{dotfiles_path}}/roles/firefox/files/enterprise_policy.zip"
