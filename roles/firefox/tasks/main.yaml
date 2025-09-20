@@ -32,6 +32,12 @@
           community.general.flatpak:
             name: org.mozilla.firefox
 
+        - name: create enterprise profile directory
+          ansible.builtin.file:
+            path: "{{user.home}}/.var/app/org.mozilla.firefox/config/firefox"
+            state: directory
+            recurse: true
+
         - name: install enterprise profile
           ansible.builtin.unarchive:
             dest: "{{user.home}}/.var/app/org.mozilla.firefox/config/firefox"
