@@ -480,7 +480,7 @@ class CallbackModule(CallbackBase):
         self.task_start_preamble = None
         # python2 only
         try:
-            reload(sys).setdefaultencoding("utf8")
+            reload(sys).setdefaultencoding("utf8")  # type: ignore
         # pylint: disable=W0702
         except:
             pass
