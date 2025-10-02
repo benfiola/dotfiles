@@ -5,20 +5,19 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin or linux
-      block:          
+      block:
         - name: install brew from url
-          ansible.builtin.include_role: 
+          ansible.builtin.include_role:
             role: benfiola.dotfiles.utils
             tasks_from: execute-url-as-script.yaml
-          vars:        
+          vars:
             url: https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
             binary: "{{brew_path}}"
-        
+
         - name: link zshrc file
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/brew/files/profile.sh"
             path: "{{user_profiled_path}}/00-brew.sh"
             state: link
-...

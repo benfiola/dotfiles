@@ -5,11 +5,10 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: run configuration script
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/macos/files/config.sh"
           changed_when: false
-...

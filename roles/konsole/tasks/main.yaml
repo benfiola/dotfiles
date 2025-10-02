@@ -29,7 +29,7 @@
             path: "{{user.home}}/.local/share/konsole"
             recurse: true
             state: directory
-          
+
         - name: link konsole colorscheme file
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/konsole/files/theme.colorscheme"
@@ -41,7 +41,7 @@
             src: "{{dotfiles_path}}/roles/konsole/files/theme.profile"
             path: "{{user.home}}/.local/share/konsole/theme.profile"
             state: link
-          
+
         - name: run configuration script
           ansible.builtin.command:
             cmd: "{{dotfiles_path}}/roles/konsole/files/config.sh"

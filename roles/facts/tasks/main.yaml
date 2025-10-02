@@ -73,7 +73,7 @@
           when: "product_name_file.stat.exists and 'vmware' in (product_name['content'] | b64decode | lower)"
           ansible.builtin.set_fact:
             vm: true
-    
+
         - name: set brew path fact
           ansible.builtin.set_fact:
             brew_prefix: "{{prefix}}"
@@ -92,4 +92,3 @@
               amd64: /usr/local
               arm64: /opt/homebrew
             prefix: "{{prefixes[architecture]}}"
-...

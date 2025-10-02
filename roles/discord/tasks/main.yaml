@@ -5,18 +5,17 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: brew install homebrew/cask/discord
           community.general.homebrew_cask:
             name: homebrew/cask/discord
             path: "{{brew_path}}"
-    
+
     - when: linux
       block:
         - name: flatpak install vesktop
           become: true
           community.general.flatpak:
             name: dev.vencord.Vesktop
-...

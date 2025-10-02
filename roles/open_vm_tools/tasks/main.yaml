@@ -14,7 +14,7 @@
             package:
               - open-vm-tools
               - open-vm-tools-desktop
-    
+
     - when: vm and archlinux
       block:
         - name: pacman install open-vm-tools
@@ -22,7 +22,7 @@
           community.general.pacman:
             name:
               - open-vm-tools
-    
+
         - name: start and enable open-vm-tools services
           become: true
           ansible.builtin.systemd:
@@ -30,6 +30,5 @@
             state: started
             enabled: true
           loop:
-            - vmtoolsd 
+            - vmtoolsd
             - vmware-vmblock-fuse
-...

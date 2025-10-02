@@ -1,7 +1,7 @@
 # installs a pacman package '{{package}}' via AUR '{{url}}'
 # if '{{package}}' exists, install is skipped
 - name: check if package exists
-  ansible.builtin.command: 
+  ansible.builtin.command:
     cmd: pacman -Qi "{{package}}"
   failed_when: false
   changed_when: false
@@ -16,17 +16,17 @@
         name:
           - git
           - base-devel
-  
+
     - name: create temp directory
       benfiola.dotfiles.temp_file:
         directory: true
       register: temp_path
-    
+
     - name: clone AUR repo
       ansible.builtin.git:
         repo: "{{url}}"
         dest: "{{temp_path.path}}"
-    
+
     - name: install package
       ansible.builtin.command:
         cmd: makepkg -sri --noconfirm

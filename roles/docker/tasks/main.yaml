@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: not wsl
       block:
         - when: debian
@@ -43,7 +43,7 @@
                   - docker
                   - docker-buildx
                   - docker-compose
-            
+
             - name: systemd enable docker service
               become: true
               ansible.builtin.systemd:
@@ -64,7 +64,7 @@
                 name: "{{user.name}}"
                 append: true
                 groups: docker
-          
+
         - when: darwin
           block:
             - name: brew install docker
@@ -82,16 +82,15 @@
                 path: "{{user.home}}/.docker/cli-plugins"
                 state: directory
                 recurse: true
-            
+
             - name: symlink docker-buildx to docker cli plugins
               ansible.builtin.file:
                 src: "{{brew_path}}/docker-buildx"
                 path: "{{user.home}}/.docker/cli-plugins/docker-buildx"
                 state: link
-              
+
             - name: symlink docker-compose to docker cli plugins
               ansible.builtin.file:
                 src: "{{brew_path}}/docker-compose"
                 path: "{{user.home}}/.docker/cli-plugins/docker-compose"
                 state: link
-...

@@ -5,11 +5,10 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: mas install magnet
           community.general.mas:
             id: 441258766
             state: present
-...

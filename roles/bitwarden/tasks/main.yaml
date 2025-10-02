@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: linux
       block:
         - name: flatpak install bitwarden
@@ -19,4 +19,3 @@
           community.general.mas:
             id: 1352778147
             state: present
-...

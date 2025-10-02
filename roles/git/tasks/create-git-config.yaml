@@ -28,7 +28,7 @@
       ansible.builtin.slurp:
         src: "{{git_config['user.signingkey']}}.pub"
       register: git_public_signing_key_slurp
-    
+
     - name: add public signing key to .git_allowed_signers
       vars:
         git_user_email: "{{git_config['user.email']}}"
@@ -46,7 +46,7 @@
       changed_when: false
   when: "'user.signingkey' in git_config and 'user.email' in git_config and git_config.get('gpg.format', '') == 'ssh'"
 
-- name: update remote .gitconfig with git_config input 
+- name: update remote .gitconfig with git_config input
   ansible.builtin.command:
     cmd: git config --file "{{user.home}}/.gitconfig.d/{{git_remote}}" "{{item.key}}" "{{item.value}}"
   changed_when: false

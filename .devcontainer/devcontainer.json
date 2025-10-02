@@ -1,0 +1,32 @@
+{
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "ms-python.black-formatter",
+        "ms-python.python",
+        "ms-python.isort",
+        "rohit-gohri.format-code-action"
+      ],
+      "settings": {
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter"
+        },
+        "editor.codeActionsOnSave": [
+          "source.organizeImports",
+          "source.unusedImports",
+          "source.formatDocument"
+        ],
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "isort.args": ["--profile", "black"]
+      }
+    }
+  },
+  "image": "ubuntu:jammy",
+  "features": {
+    "ghcr.io/devcontainers/features/python": {
+      "version": "3.13.7"
+    }
+  },
+  "postCreateCommand": ".devcontainer/post-create.sh"
+}

@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: linux or darwin
       block:
         - name: find fonts
@@ -22,7 +22,7 @@
                 path: "{{directory}}"
                 recurse: true
                 state: directory
-              
+
             - name: install fonts
               become: true
               ansible.builtin.file:
@@ -36,4 +36,3 @@
               linux: /usr/local/share/fonts
               darwin: /Library/Fonts
             directory: "{{directories[system]}}"
-...

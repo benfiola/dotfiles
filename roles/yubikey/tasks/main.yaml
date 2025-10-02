@@ -5,16 +5,16 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin or debian
       block:
         - name: brew install ykman
           community.general.homebrew:
-            name: 
+            name:
               - ykman
               - libfido2
             path: "{{brew_path}}"
-    
+
     - when: archlinux
       block:
         - name: pacman install ykman
@@ -23,4 +23,3 @@
             name:
               - yubikey-manager
               - libfido2
-...

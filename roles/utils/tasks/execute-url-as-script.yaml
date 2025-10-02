@@ -9,23 +9,23 @@
 - name: install binary
   when: not binary_exists.stat.exists
   block:
-  - name: create temp file
-    benfiola.dotfiles.temp_file: {}
-    register: temp_path
+    - name: create temp file
+      benfiola.dotfiles.temp_file: {}
+      register: temp_path
 
-  - name: make temp file executable
-    ansible.builtin.file:
-      path: "{{temp_path.path}}"
-      mode: 0755
+    - name: make temp file executable
+      ansible.builtin.file:
+        path: "{{temp_path.path}}"
+        mode: 0755
 
-  - name: downlad script
-    ansible.builtin.get_url:
-      url: "{{url}}"
-      dest: "{{temp_path.path}}"
-      force: true
+    - name: downlad script
+      ansible.builtin.get_url:
+        url: "{{url}}"
+        dest: "{{temp_path.path}}"
+        force: true
 
-  - name: run script
-    become: "{{become | default(false)}}"
-    ansible.builtin.command:
-      cmd: "{{temp_path.path}} {{args | default('')}}"
-      creates: "{{binary}}"
+    - name: run script
+      become: "{{become | default(false)}}"
+      ansible.builtin.command:
+        cmd: "{{temp_path.path}} {{args | default('')}}"
+        creates: "{{binary}}"

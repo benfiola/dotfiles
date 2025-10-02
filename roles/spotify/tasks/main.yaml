@@ -5,18 +5,17 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: linux
       block:
         - name: flatpak install spotify
           become: true
           community.general.flatpak:
             name: com.spotify.Client
-    
+
     - when: darwin
       block:
         - name: brew install homebrew/cask/spotify
           community.general.homebrew_cask:
             name: homebrew/cask/spotify
             path: "{{brew_path}}"
-...

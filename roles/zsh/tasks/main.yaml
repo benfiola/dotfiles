@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: debian
       block:
         - name: apt install zsh
@@ -13,7 +13,7 @@
           ansible.builtin.apt:
             package:
               - zsh
-    
+
     - when: archlinux
       block:
         - name: pacman install zsh
@@ -36,4 +36,3 @@
             src: "{{dotfiles_path}}/roles/zsh/files/profile.sh"
             path: "{{user.home}}/.zshrc"
             state: link
-...

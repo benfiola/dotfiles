@@ -5,11 +5,10 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: mas install wireguard
           community.general.mas:
             id: 1451685025
             state: present
-...

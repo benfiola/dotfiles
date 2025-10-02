@@ -5,13 +5,12 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: archlinux
       block:
-      - name: pacman install fat file system support
-        become: true
-        community.general.pacman:
-          name:
-            - mtools
-            - dosfstools
-...
+        - name: pacman install fat file system support
+          become: true
+          community.general.pacman:
+            name:
+              - mtools
+              - dosfstools

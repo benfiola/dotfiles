@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: debian
       block:
         - name: apt install gimp
@@ -20,7 +20,7 @@
           community.general.homebrew_cask:
             name: homebrew/cask/gimp
             path: "{{brew_path}}"
-    
+
     - when: archlinux
       block:
         - name: pacman install gimp
@@ -28,4 +28,3 @@
           community.general.pacman:
             name:
               - gimp
-...

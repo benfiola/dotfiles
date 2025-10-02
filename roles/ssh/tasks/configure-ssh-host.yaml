@@ -18,25 +18,25 @@
     src: "{{ssh_private_key}}"
     path: "{{user.home}}/.ssh/{{ssh_host}}"
     state: link
-  
+
 - name: set private ssh key permissions
   ansible.builtin.file:
     path: "{{user.home}}/.ssh/{{ssh_host}}"
     state: file
-    mode: '0600'
+    mode: "0600"
 
 - name: symlink public ssh key
   ansible.builtin.file:
     src: "{{ssh_private_key}}.pub"
     path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
     state: link
-  
+
 - name: set public ssh key permissions
   ansible.builtin.file:
     path: "{{user.home}}/.ssh/{{ssh_host}}.pub"
     state: file
-    mode: '0600'
-  
+    mode: "0600"
+
 - name: create .ssh/config
   ansible.builtin.blockinfile:
     create: true

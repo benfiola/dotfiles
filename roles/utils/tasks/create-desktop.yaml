@@ -20,4 +20,4 @@
       ansible.builtin.template:
         src: desktop.j2
         dest: "{{folder}}/{{name}}.desktop"
-        mode: '0644'
+        mode: "0644"

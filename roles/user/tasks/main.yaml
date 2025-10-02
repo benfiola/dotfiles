@@ -18,4 +18,3 @@
       ansible.builtin.file:
         path: "{{user_profiled_path}}"
         state: directory
-...

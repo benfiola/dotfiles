@@ -5,11 +5,10 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: brew install homebrew/cask/alfred
           community.general.homebrew_cask:
             name: homebrew/cask/alfred
             path: "{{brew_path}}"
-...

@@ -20,4 +20,4 @@
       ansible.builtin.template:
         src: systemd.service.j2
         dest: "{{folder}}/{{name}}.service"
-        mode: '0644'
+        mode: "0644"

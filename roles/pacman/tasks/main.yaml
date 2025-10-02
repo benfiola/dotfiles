@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: archlinux
       block:
         - name: enable multilib repo
@@ -16,9 +16,8 @@
             block: |
               [multilib]
               Include = /etc/pacman.d/mirrorlist
-              
+
         - name: update pacman cache
           become: true
           community.general.pacman:
             update_cache: true
-...

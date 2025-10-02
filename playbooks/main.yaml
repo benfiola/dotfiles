@@ -39,9 +39,9 @@
         - import_role: name=benfiola.dotfiles.docker
         - import_role: name=benfiola.dotfiles.fat
         - import_role: name=benfiola.dotfiles.firefox
+        - import_role: name=benfiola.dotfiles.ghostty
         - import_role: name=benfiola.dotfiles.gimp
         - import_role: name=benfiola.dotfiles.git
-        - import_role: name=benfiola.dotfiles.iterm2
         - import_role: name=benfiola.dotfiles.konsole
         - import_role: name=benfiola.dotfiles.ls
         - import_role: name=benfiola.dotfiles.lutris

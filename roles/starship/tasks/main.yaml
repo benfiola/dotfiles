@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin or debian or archlinux
       block:
         - name: create starship install directory
@@ -16,7 +16,7 @@
             state: directory
 
         - name: install starship from url
-          ansible.builtin.include_role: 
+          ansible.builtin.include_role:
             name: benfiola.dotfiles.utils
             tasks_from: execute-url-as-script.yaml
           vars:
@@ -42,4 +42,3 @@
             src: "{{dotfiles_path}}/roles/starship/files/profile.sh"
             path: "{{user_profiled_path}}/00-starship.sh"
             state: link
-...

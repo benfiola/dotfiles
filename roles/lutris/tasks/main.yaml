@@ -5,12 +5,11 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: archlinux
       block:
-      - name: pacman install lutris
-        become: true
-        community.general.pacman:
-          name:
-            - lutris
-...
+        - name: pacman install lutris
+          become: true
+          community.general.pacman:
+            name:
+              - lutris

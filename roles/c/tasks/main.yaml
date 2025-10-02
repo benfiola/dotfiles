@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: debian
       block:
         - name: apt install c dependencies
@@ -30,7 +30,7 @@
               - glibc
               - libc++
               - make
-    
+
     - when: darwin
       block:
         - name: brew install c dependencies
@@ -38,4 +38,3 @@
             name:
               - cmake
             path: "{{brew_path}}"
-...

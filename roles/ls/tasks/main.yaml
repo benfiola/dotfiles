@@ -13,7 +13,7 @@
             name:
               - coreutils
             path: "{{brew_path}}"
-    
+
     - when: linux or darwin
       block:
         - name: link zshrc file
@@ -21,4 +21,3 @@
             src: "{{dotfiles_path}}/roles/ls/files/profile.sh"
             path: "{{user_profiled_path}}/00-ls.sh"
             state: link
-...

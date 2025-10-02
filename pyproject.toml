@@ -1,0 +1,9 @@
+[project]
+name = "dotfiles"
+version = "0.0.1"
+dependencies = [
+  "ansible"
+]
+
+[tool.setuptools.packages.find]
+include = ["plugins"]

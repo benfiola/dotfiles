@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: brew install openssh
@@ -36,5 +36,4 @@
             name: benfiola.dotfiles.ssh
             tasks_from: configure-ssh-host.yaml
           loop:
-            - {ssh_host: github.com}
-...
+            - { ssh_host: github.com }

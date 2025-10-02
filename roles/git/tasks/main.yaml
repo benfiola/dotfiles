@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: true
       vars:
         git_config:
@@ -24,4 +24,3 @@
             - github.com
           loop_control:
             loop_var: git_remote
-...

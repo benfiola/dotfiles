@@ -5,14 +5,14 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: darwin
       block:
         - name: brew install homebrew/cask/steam
           community.general.homebrew_cask:
             name: homebrew/cask/steam
             path: "{{brew_path}}"
-    
+
     - when: archlinux
       block:
         - name: pacman install steam
@@ -20,4 +20,3 @@
           community.general.pacman:
             name:
               - steam
-...

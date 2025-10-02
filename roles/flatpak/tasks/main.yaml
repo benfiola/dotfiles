@@ -5,7 +5,7 @@
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
-    
+
     - when: debian
       block:
         - name: apt install flatpak
@@ -13,7 +13,7 @@
           ansible.builtin.apt:
             package:
               - flatpak
-      
+
     - when: archlinux
       block:
         - name: pacman install flatpak
@@ -28,4 +28,3 @@
             name: flathub
             state: present
             flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
-...
