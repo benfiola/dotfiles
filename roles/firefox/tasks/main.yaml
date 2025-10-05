@@ -14,12 +14,13 @@
             path: "{{brew_path}}"
 
         - name: install enterprise profile
-          ansible.builtin.unarchive:
-            dest: /Applications/Firefox.app/Contents/Resources
-            src: "{{dotfiles_path}}/roles/firefox/files/enterprise_policy.zip"
+          ansible.builtin.include_role:
+            role: benfiola.dotfiles.firefox
+            tasks_from: install-policy.yaml
+          vars:
+            policy_path: /Applications/Firefox.app/Contents/Resources
 
         - name: unquarantine firefox
-          when: darwin
           ansible.builtin.command:
             cmd: xattr -d com.apple.quarantine /Applications/Firefox.app
           changed_when: false
@@ -33,15 +34,9 @@
             name:
               - firefox
 
-        - name: create enterprise profile directory
-          become: true
-          ansible.builtin.file:
-            path: "/usr/lib/firefox"
-            state: directory
-            recurse: true
-
-        - name: install enterprise profile
-          become: true
-          ansible.builtin.unarchive:
-            dest: "/usr/lib/firefox"
-            src: "{{dotfiles_path}}/roles/firefox/files/enterprise_policy.zip"
+        - name: install enterprise policy
+          ansible.builtin.include_role:
+            role: benfiola.dotfiles.firefox
+            tasks_from: install-policy.yaml
+          vars:
+            policy_path: /usr/lib/firefox

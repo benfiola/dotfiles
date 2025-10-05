@@ -1,0 +1,34 @@
+{
+  "policies": {
+    "DisablePocket": true,
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DNSOverHTTPS": {
+      "Enabled": false
+    },
+    "CaptivePortal": false,
+    "NetworkPrediction": false,
+    "ExtensionSettings": {
+      "uBlock0@raymondhill.net": {
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
+        "installation_mode": "force_installed"
+      },
+      "{446900e4-71c2-419f-a6a7-df9c091e268b}": {
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi",
+        "installation_mode": "force_installed",
+        "comment": "manual: bitwarden-password-manager"
+      },
+      "{26e789e7-acf2-4346-9381-ad473c245e43}": {
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/nord-theme/latest.xpi",
+        "installation_mode": "force_installed",
+        "comment": "manual: nord-theme"
+      }
+    },
+    "DisableFirefoxAccounts": true,
+    "DisableFormHistory": true,
+    "NewTabPage": false,
+    "SearchEngines": {
+      "Default": "DuckDuckGo"
+    }
+  }
+}

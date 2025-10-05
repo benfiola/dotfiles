@@ -1,0 +1,24 @@
+# helps install a single policy file to the policy path
+# ensures that the target parent directory exists
+# creates the necessary symlink
+# {{policy_file}} is a path to a policy file stored within the role
+# {{policy_path}} is the path that the policy should be installed to
+- block:
+    - name: create firefox policy file directory
+      become: true
+      ansible.builtin.file:
+        path: "{{target | dirname}}"
+        recurse: true
+        state: directory
+
+    - name: symlink firefox policy file
+      become: true
+      ansible.builtin.file:
+        src: "{{policy_file}}"
+        path: "{{target}}"
+        state: link
+        force: true
+  vars:
+    base_path: "{{dotfiles_path}}/roles/firefox/files/policy"
+    rel_policy_file: "{{policy_file | relpath(base_path)}}"
+    target: "{{(policy_path, rel_policy_file) | path_join}}"

@@ -1,0 +1,15 @@
+# finds policy files in the role and installs them to the policy path
+# {{policy_path}} is the path that the policy should be installed to
+- name: find firefox policy files
+  ansible.builtin.find:
+    paths: "{{dotfiles_path}}/roles/firefox/files/policy"
+    recurse: true
+  register: policy_files
+
+- name: install firefox policy file
+  ansible.builtin.include_role:
+    role: benfiola.dotfiles.firefox
+    tasks_from: install-policy-helper.yaml
+  vars:
+    policy_file: "{{item.path}}"
+  loop: "{{policy_files.files}}"
