@@ -15,6 +15,7 @@
           user.name: Ben Fiola
           user.email: benfiola@gmail.com
           user.signingkey: "{{user.home}}/.ssh/{{git_remote}}"
+          push.autoSetupRemote: true
       block:
         - name: create git config
           ansible.builtin.include_role:
