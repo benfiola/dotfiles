@@ -1,7 +1,10 @@
 # NOTE: https://ghostty.org/docs/config.
+
 font-family =
 font-family = "FiraCode Nerd Font"
 font-family = "Courier New"
 font-family = "monospace"
 quit-after-last-window-closed = true
 theme = Nord
+keybind = performable:page_up=scroll_page_up
+keybind = performable:page_down=scroll_page_down
