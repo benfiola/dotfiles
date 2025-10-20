@@ -13,6 +13,7 @@
   ansible.builtin.file:
     path: "{{user.home}}/.gitconfig"
     state: touch
+  changed_when: false
 
 - name: add entry to .gitconfig file
   ansible.builtin.blockinfile:
