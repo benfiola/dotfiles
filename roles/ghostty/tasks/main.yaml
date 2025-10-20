@@ -1,7 +1,7 @@
 ---
 - tags: [graphical, ghostty]
   block:
-    - when: not darwin
+    - when: not (darwin or archlinux)
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
@@ -28,3 +28,27 @@
                 force: true
           vars:
             config_path: "{{user.home}}/Library/Application Support/com.mitchellh.ghostty/config"
+
+    - when: archlinux
+      block:
+        - name: pacman install ghostty
+          become: true
+          community.general.pacman:
+            name:
+              - ghostty
+
+        - block:
+            - name: create config directory
+              ansible.builtin.file:
+                path: "{{config_path | dirname}}"
+                state: directory
+                recurse: true
+
+            - name: symlink config
+              ansible.builtin.file:
+                src: "{{dotfiles_path}}/roles/ghostty/files/config"
+                path: "{{config_path}}"
+                state: link
+                force: true
+          vars:
+            config_path: "{{user.home}}/.config/ghostty/config"
