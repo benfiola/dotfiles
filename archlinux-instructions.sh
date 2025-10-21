@@ -26,7 +26,7 @@ mount /dev/vg-os/os /mnt
 mount --mkdir /dev/sda1 /mnt/boot
 
 # install packages
-pacstrap -K /mnt base linux linux-headers linux-firmware vim man-db man-pages lvm2 grub-bios efibootmgr sudo networkmanager
+pacstrap -K /mnt base linux linux-headers linux-firmware vim man-db man-pages lvm2 grub-bios efibootmgr sudo networkmanager sbctl refind
 # NOTE: amd CPU, install deps
 pacstrap /mnt amd-ucode
 # NOTE: nvidia GPU, install deps
@@ -68,17 +68,36 @@ mkdir -p /etc/pacman.d/hooks
 vim /etc/pacman.d/hooks/nvidia.hook
 # find hook here: https://wiki.archlinux.org/title/NVIDIA
 
-# set grub defaults (/etc/default/grub)
-# NOTE: arm64, ensure grub can find initramfs GRUB_EARLY_INITRD_LINUX_CUSTOM=initramfs-linux.img
-# uncomment GRUB_TERMINAL_OUTPUT=console
-# add GRUB_CMDLINE_LINUX=... resume=<swap partition>
-# NOTE: nvidia, add GRUB_CMDLINE_LINUX=... nvidia_drm.modeset=1
+# install refind
+refind-install
 
-# install bootloader
-# NOTE: x86_64, use x86_64-efi target
-# NOTE: arm, use arm64-efi target
-grub-install --target=x86_64-efi --efi-directory=/boot
-grub-mkconfig -o /boot/grub/grub.cfg
+# configure /boot/EFI/refind/refind.conf
+#
+# disable autodiscovery of linux kernels for this installation
+# get PARTUUID (run `blkid` with boot partition)
+# then, set (no quotes): dont_scan_volumes [partuuid]
+#
+# add manual entry for this installation
+# menuentry "Arch Linux" {
+#     icon     /EFI/refind/icons/os_arch.png
+#     volume   "Arch Linux"
+#     loader   /vmlinuz-linux
+#     initrd   /initramfs-linux.img
+#     options  "root=/dev/mapper/vg--os-os rw loglevel=3 quiet"
+#     submenuentry "Boot using fallback initramfs" {
+#         initrd /boot/initramfs-linux-fallback.img
+#     }
+# }
+# for hibernation, get UUID (run `blkid` with swap partition)
+# then, add to options (no quotes): resume=UUID=[uuid]
+# NOTE: nvidia GPU, add to options: nvidia_drm.modeset=1
+
+# set up secure boot
+sbctl create-keys
+sbctl enroll-keys -m
+sbctl sign -s /boot/vmlinuz-linux
+sbctl sign -s /boot/EFI/refind/refind_x64.efi
+sbctl verify
 
 # enable services
 systemctl enable NetworkManager
