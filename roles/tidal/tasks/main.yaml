@@ -1,0 +1,21 @@
+---
+- tags: [optional, tidal]
+  block:
+    - when: not (linux or darwin)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+
+    - when: linux
+      block:
+        - name: flatpak install tidal
+          become: true
+          community.general.flatpak:
+            name: com.mastermindzh.tidal-hifi
+
+    - when: darwin
+      block:
+        - name: brew install homebrew/cask/tidal
+          community.general.homebrew_cask:
+            name: homebrew/cask/tidal
+            path: "{{brew_path}}"
