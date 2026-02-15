@@ -11,7 +11,7 @@
         - name: find fonts
           ansible.builtin.find:
             paths: "{{dotfiles_path}}/roles/fonts/files"
-            patterns: "*.ttf"
+            patterns: "*.[ot]tf"
           register: fonts
 
         - name: install fonts
