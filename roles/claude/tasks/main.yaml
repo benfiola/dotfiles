@@ -1,12 +1,12 @@
 ---
 - tags: [graphical, claude]
   block:
-    - when: not (darwin or linux)
+    - when: not true
       block:
         - name: unimplemented
           benfiola.dotfiles.empty: {}
 
-    - when: darwin or linux
+    - when: true
       block:
         - name: create .claude folder
           ansible.builtin.file:
