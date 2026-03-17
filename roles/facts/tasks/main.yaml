@@ -9,11 +9,11 @@
     - name: set system facts
       ansible.builtin.set_fact:
         os_family: "{{ansible_facts['os_family'] | lower}}"
-        system: "{{ansible_system | lower}}"
-        architecture: "{{ansible_architecture | lower}}"
-        distribution: "{{ansible_distribution | lower}}"
-        release: "{{ansible_distribution_release | lower}}"
-        username: "{{ansible_user_id}}"
+        system: "{{ansible_facts['system'] | lower}}"
+        architecture: "{{ansible_facts['architecture'] | lower}}"
+        distribution: "{{ansible_facts['distribution'] | lower}}"
+        release: "{{ansible_facts['distribution_release'] | lower}}"
+        username: "{{ansible_facts['user_id']}}"
         vm: false
         wsl: false
 

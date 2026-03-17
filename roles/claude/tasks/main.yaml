@@ -1,0 +1,22 @@
+---
+- tags: [graphical, claude]
+  block:
+    - when: not (darwin or linux)
+      block:
+        - name: unimplemented
+          benfiola.dotfiles.empty: {}
+
+    - when: darwin or linux
+      block:
+        - name: create .claude folder
+          ansible.builtin.file:
+            path: "{{user.home}}/.claude"
+            recurse: true
+            state: directory
+
+        - name: symlink CLAUDE.md
+          ansible.builtin.file:
+            src: "{{dotfiles_path}}/roles/claude/files/CLAUDE.md"
+            path: "{{user.home}}/.claude/CLAUDE.md"
+            state: link
+            force: true
