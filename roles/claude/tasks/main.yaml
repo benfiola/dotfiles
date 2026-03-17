@@ -8,15 +8,24 @@
 
     - when: true
       block:
+        - when: "{{ install_claude | default(default_install_claude) }}"
+          name: brew install homebrew/cask/claude-code
+          community.general.homebrew_cask:
+            name: homebrew/cask/claude-code
+            path: "{{brew_path}}"
+
         - name: create .claude folder
           ansible.builtin.file:
-            path: "{{user.home}}/.claude"
+            path: "{{claude_path | default(default_claude_path)}}"
             recurse: true
             state: directory
 
         - name: symlink CLAUDE.md
           ansible.builtin.file:
             src: "{{dotfiles_path}}/roles/claude/files/CLAUDE.md"
-            path: "{{user.home}}/.claude/CLAUDE.md"
+            path: "{{claude_path | default(default_claude_path)}}/CLAUDE.md"
             state: link
             force: true
+      vars:
+        default_claude_path: "{{user.home}}/.claude"
+        default_install_claude: true
