@@ -2,6 +2,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "anthropic.claude-code",
         "esbenp.prettier-vscode",
         "ms-python.black-formatter",
         "ms-python.python",
@@ -28,5 +29,8 @@
       "version": "3.13.7"
     }
   },
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.claude,target=/root/.claude,type=bind,consistency=cached"
+  ],
   "postCreateCommand": ".devcontainer/post-create.sh"
 }
