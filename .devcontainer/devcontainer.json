@@ -6,24 +6,7 @@
         "esbenp.prettier-vscode",
         "jnoortheen.nix-ide",
         "rohit-gohri.format-code-action"
-      ],
-      "settings": {
-        "[nix]": {
-          "editor.defaultFormatter": "jnoortheen.nix-ide",
-        },
-        "editor.codeActionsOnSave": [
-          "source.organizeImports",
-          "source.unusedImports",
-          "source.formatDocument"
-        ],
-        "editor.defaultFormatter": "esbenp.prettier-vscode",
-        "nix.formatterPath": "nixfmt",
-        "nix.enableLanguageServer": true,
-        "nix.serverPath": "nixd",
-        "nix.serverSettings": {
-          "nixd": {}
-        }
-      }
+      ]
     }
   },
   "features": {
