@@ -8,9 +8,10 @@
   outputs =
     { nixpkgs, ... }:
     let
+      lib = (import <nixpkgs> { }).lib;
     in
     {
-      nixosConfiguration = nixpkgs.lib.nixosSystem {
+      nixosConfiguration = lib.nixosSystem {
         system = "aarch64-linux";
         modules = [ ];
       };
