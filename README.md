@@ -1,150 +1,228 @@
-# dotfiles
+# Dotfiles
 
-This is my personal dotfiles project and supports macOS, Ubuntu, Archlinux operating systems on arm64 and amd64 architectures (to varying degrees).
+Dotfiles expressed as a nix flake.
 
-# Requirements
-
-* `ansible`
-* `git`
-
-If running on MacOS, additionally:
-
-* 'Full-disk access' Terminal permissions
-
-# Basic usage
-
-Running the following command will fully personalize your local machine.  
-
-```shell
-# clone dotfiles repo to target location
-git clone git@github.com:benfiola/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-
-# install ansible galaxy dependencies
-ansible-galaxy install -r requirements.yaml
-
-# symlink collection into ansible galaxy install location
-mkdir -p ~/.ansible/collections/ansible_collections/benfiola
-ln -s "$(pwd)" ~/.ansible/collections/ansible_collections/benfiola/dotfiles
-
-# run collection
-LOCAL=1 ansible-playbook benfiola.dotfiles.main
-```
-
-# Ansible?
-
-Generally, dotfiles projects provide a mix of static configuration and bootstrapping scripts to provision a local computing environment.  However, the effort to provide bootstrapping scripts that comprehensively provision an arbirary machine (architecture, os, package manager)  eventually becomes significant - ansible is more capable of accomplishing this goal.
-
-# Expected outcome and conventions
-
-When this ansible playbook is run, the following outcomes are expected:
-
-* Files at _$HOME/.profile.d_ are sourced when terminal sessions are created
-* Helper shell scripts are implemented as functions/aliases provided via sourced files in _$HOME/.profile.d_
-* Helper scripts that exist beyond the terminal session are installed to _/usr/local/bin_
-* File-based configuration is symlinked/hardlinked from the project's clone path to their expected location (such that local configuration change leaves the cloned repo in a dirty state)
-* Script-based configuration is applied on every playbook execution (e.g., _gsettings_ settings)
-* All necessary, supported applications are installed
-* OS, desktop environments, and applications are all configured and themed appropriately
-
-# Inventory
-
-Inventory is defined from the environment via the [benfiola.dotfiles.environmnent](./plugins/inventory/environment.py) inventory plugin.
-
-| Envioronment Variable | Description |
-| - | - |
-| _LOCAL_ | When set to a truthy value, playbook will be applied to the local machine.  One of _LOCAL_ or _REMOTE_IP_ must be provided. |
-| _REMOTE_IP_ | When set to a truthy value, playbook will be applied to the provided IP address. One of _LOCAL_ or _REMOTE_IP_ must be provided. |
-
-# Playbook
-
-The [benfiola.dotfiles.main](./playbooks/main.yaml) playbook lists all available roles in vague dependency order to ensure that downstream roles are fulfilled
- by upstream roles
-
-[Tags](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html) ultimately filter down the roles that are executed.
-
-# Roles
-
-[Roles](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html) are intended to be analogous to software libraries and often represent the installation and configuration of core functionality.  Ideally, any role should be able to be isolated and deployed to ansible-galaxy without any modification.  All roles can be found [here](./roles).
-
-As an example of a role's functionality, the [zsh role](./roles/zsh/tasks/main.yaml) will:
-
-* Install zsh
-* Set zsh as the shell for the current user
-* Install a _zshrc_ file.
-
-The decision to create a role (versus adding to an existing role's task list) is arbitrary - but is generally a decision made on a mix of complexity (e.g., [wine](./roles/wine/tasks/main.yaml) has a lot of explicit package dependencies) or replaceability (e.g., [konsole](./roles/konsole/tasks/main.yaml) could get swapped out for another terminal emulator).
-
-Dependencies on other roles are manually enforced at the playbook level - care should be taken to ensure that facts used by the role are fulfilled by an upstream role.
-
-# Tags
-
-Tags are utilized to apply various levels of personalization to the target machine.  
-
-Tags need to be composed - personalizing a machine with a graphical environment requires `minimal,graphical` tags.
-
-| Tag Name | Description |
-| - | - |
-| `minimal` | installs programs and configuration required for command line interactivity |
-| `graphical` | installs programs and configuration required for graphical interactivity |
-| `optional` | installs programs and configuration unrelated to development |
-
-By default, all tags (`minimal,graphical,optional`) are applied.
-
-Additionally, each role is tagged with its name - allowing you to target specific roles by name.
-
-# Task lists
-
-Role task lists are structured to:
-
-* Have a common set of tags applied to all tasks within the role
-* Inform the end-user when a task might be incompletely implemented
-* Guarding all subsequent tasks against fall-through when incompletely implemented
-
-As a result, role task lists often look like the following:
-
-```yaml
 ---
-# apply common tags
-- tags: [<tag>, <role_name>]
-  block:
-    # this block only gets executed in the fall-through case
-    - when: not (darwin or (linux and amd64))
-      block:
-        - name: unimplemented
-          empty: {}
-    
-    # guards for one os
-    - when: darwin
-      block:
-        - debug:
-            msg: darwin
-    
-    # guard for an os + architecture combination
-    - when: linux and amd64
-      block:
-        - debug:
-            msg: linux + amd64 task
 
-    # guard common tasks
-    - when: darwin or (linux and amd64)
-      block:
-        - debug:
-            msg: common task
-...
+## macOS Setup (nix-darwin)
+
+1. Create user account.
+2. Install Xcode CLI Tools: `xcode-select --install`.
+3. Sign in to the App Store.
+4. Grant 'Full Disk Access' permissions to Terminal
+5. Install Nix: `curl -fsSL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes`.
+6. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
+7. Install age key to `/etc/age/dotfiles.key`.
+8. From dotfiles directory, build derivation: `nix build '.#darwinConfigurations.bfiola-home-laptop.system'`.
+9. From dotfiles directory, activate derivation: `sudo ./result/sw/bin/darwin-rebuild switch --flake '.#[hostname]'`.
+10. Remove 'Full Disk Access' from Terminal, set 'Full Disk Access' for desired terminal emulator.
+
+Subsequent rebuilds use: `sudo darwin-rebuild switch --flake [path]#[hostname]`
+
+---
+
+## Windows Setup (NixOS-WSL)
+
+1. Ensure WSL2 is enabled.
+2. Download the [NixOS WSL image](https://github.com/nix-community/NixOS-WSL/releases).
+3. Create a NixOS WSL distribution: `wsl --install --from-file nixos.wsl --name [name]`
+4. Launch the distribution.
+5. Update the distribution: `sudo nix-channel --update && sudo nixos-rebuild switch`.
+6. Modify the default user: set `wsl.defaultUser` to the desired username via `sudo nixos-rebuild edit`.
+7. Apply changes: `sudo nixos-rebuild boot`
+8. Exit then terminate distribution.
+9. Restart distribution (as root) and immediately exit to apply derivation: `wsl -d [name] --user root exit`
+10. Terminate distribution again.
+11. Start distribution
+12. Start nix shell for bootstrap commands: `nix shell nixpkgs#vim nixpkgs#git --extra-experimental-features 'nix-command flakes'`
+13. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
+14. Install age key to `/etc/age/dotfiles.key`.
+15. From the dotfiles directory, activate derivation: `sudo nixos-rebuild switch --flake .#[hostname]`.
+
+Subsequent rebuilds use: `sudo nixos-rebuild switch --flake [path]#[hostname]`
+
+---
+
+## Linux Setup (NixOS)
+
+<!-- prettier-ignore -->
+1. Create install media via the [NixOS minimal ISO](https://nixos.org/download/#nixos-iso).
+2. Boot into install media.
+3. Enable experimental features for the session: `export NIX_CONFIG="experimental-features = nix-command flakes"`.
+4. Start nix shell for bootstrap commands: `sudo nix shell nixpkgs#vim nixpkgs#git nixpkgs#sbctl`
+5. Create and mount partitions
+   ```
+   parted [device]
+   > mktable gpt
+   > mkpart ESP fat32 0% 1024MiB
+   > set 1 esp on
+   > mkpart primary 1024MiB -[ram-size]GiB
+   > set 2 lvm on
+   > mkpart primary linux-swap -[ram-size]GiB 100%
+   > quit
+
+   pvcreate [part-lvm]
+   vgcreate vg-os [part-lvm]
+   lvcreate -l 100%FREE -n os vg-os
+
+   mkfs.fat -F 32 -n BOOT [part-esp]
+   mkfs.ext4 -L nixos /dev/vg-os/os
+   mkswap -L swap [part-swap]
+
+   swapon [part-swap]
+   mount /dev/vg-os/os /mnt
+   mount --mkdir [part-esp] /mnt/boot
+   ```
+6. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles /mnt/etc/dotfiles`
+7. Install age key to `/mnt/etc/age/dotfiles.key`.
+8. Generate hardware configuration:
+   ```
+   nixos-generate-config --root /mnt
+   cp /mnt/etc/nixos/hardware-configuration.nix /mnt/etc/dotfiles/hosts/[hostname]/hardware.nix
+   ```
+9. Generate the secure boot keys:
+   ```
+   mkdir -p /mnt/var/lib/sbctl /var/lib/sbctl
+   mount --bind /mnt/var/lib/sbctl /var/lib/sbctl
+   sbctl create-keys
+   umount /var/lib/sbctl
+   ```
+10. From the dotfiles directory, stage the hardware configuration: `git add -A`
+11. From the dotfiles directory, install NixOS: `nixos-install --flake .#[hostname] --no-root-passwd`
+12. Set the user password: `nixos-enter --root /mnt -c 'passwd [user]'`
+13. Boot into UEFI, disable secure boot and clear existing secure boot keys
+14. Reboot into new installation
+15. Enroll secure boot keys: `nix shell nixpkgs#sbctl -c sudo sbctl enroll-keys --microsoft`.
+16. Relocate dotfiles directory, and ensure its owned by the desired user/group.
+17. Commit host hardware configuration.
+18. Reboot into UEFI, enable secure boot
+19. Boot into new installation.
+
+---
+
+## Debugging & Diagnostics
+
+### nix flake check
+
+Validate flake syntax and evaluate all outputs for errors.
+
+**Arguments:**
+
+- (none) — checks all outputs in the flake
+
+**Example:**
+
+```bash
+nix flake check
 ```
 
-# Custom modules
+**Why:** Catch parse errors, missing dependencies, and evaluation failures before building.
 
-Generally, tasks that require a bit of processing or state aren't a great fit for ansible task lists.  To avoid needlessly complex common tasks within ansible, some functionality is instead implemented as [custom ansible modules](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html).
+---
 
-| Task | Description |
-| - | - |
-| [benfiola.dotfiles.asdf_plugin](./plugins/modules/asdf_plugin.py) | Helps manage (un)installation of [asdf plugins](https://github.com/asdf-vm/asdf-plugins) |
-| [benfiola.dotfiles.empty](./plugins/modules/empty.py) | No-op task - used primarily to identify 'unimplemented' paths within role implementations |
-| [benfiola.dotfiles.temp_file](./plugins/modules/temp_file.py) | Creates a temp file on the target machine |
-| [benfiola.dotfiles.temp_file_cleanup](./plugins/modules/temp_file_cleanup.py) | Cleans up created temp files on the target machine - _must_ be manually run before the end of the playbook run |
+### nix flake metadata
 
-# Notes
+Display flake metadata including input references and their resolved revisions.
 
-* [This](./archlinux-instructions.sh) is the rough sequence of steps I go through to install arch linux from scratch.  You'll need to substitute details where necessary (i.e., device paths).  
+**Arguments:**
+
+- (none) — shows metadata for the current flake
+- `--json` — machine-readable output
+
+**Example:**
+
+```bash
+nix flake metadata
+nix flake metadata --json | jq '.locks.nodes'
+```
+
+**Why:** Inspect pinned versions and ensure inputs resolved as expected.
+
+---
+
+### nix flake update
+
+Update inputs to their latest versions (or create a fresh flake.lock).
+
+**Arguments:**
+
+- (none) — updates all inputs
+- `<input-name>` — update only a specific input
+
+**Example:**
+
+```bash
+nix flake update                    # Update everything
+nix flake update nixpkgs            # Update only nixpkgs
+```
+
+**Why:** Pull latest packages, fixes, and security patches; or refresh a single input without full rebuild.
+
+---
+
+### nix build
+
+Evaluate and build a flake output.
+
+**Arguments:**
+
+- `.#<output-path>` — output to build
+- `--dry-run` — evaluate without actually building
+- `--verbose` — show detailed build logs
+- `--print-build-logs` — stream build output
+
+**Example:**
+
+```bash
+# NixOS
+nix build --dry-run '.#nixosConfigurations.bfiola-desktop-linux.config.system.build.toplevel'
+
+# macOS (nix-darwin)
+nix build --dry-run '.#darwinConfigurations.bfiola-home-laptop.system'
+
+# Home Manager
+nix build --dry-run '.#homeConfigurations.<user>.activationPackage'
+
+# With verbose output
+nix build --verbose --print-build-logs '.#nixosConfigurations.bfiola-desktop-linux.config.system.build.toplevel'
+```
+
+**Why:** Test that your configuration builds; `--dry-run` catches evaluation errors without the build cost.
+
+---
+
+### nix repl
+
+Interactive REPL for evaluating and debugging flake expressions.
+
+**Arguments:**
+
+- (none) — starts REPL
+- `:lf .` — load the local flake
+- `:lf <flake-url>` — load a remote flake
+
+**Example:**
+
+```bash
+nix repl
+> :lf .
+> nixosConfigurations     # or darwinConfigurations, homeConfigurations, etc
+> <config>.config.system.stateVersion
+```
+
+**Why:** Interactively test expressions, inspect configuration values, and debug evaluation issues.
+
+---
+
+### NIX_SHOW_STATS=1
+
+Enable statistics and detailed error messages during evaluation.
+
+**Example:**
+
+```bash
+NIX_SHOW_STATS=1 nix flake check
+NIX_SHOW_STATS=1 nix build '.#<your-config>'
+```
+
+**Why:** Identify performance bottlenecks and get clearer error messages on evaluation failures.
