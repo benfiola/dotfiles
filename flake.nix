@@ -2,19 +2,17 @@
   description = "dotfiles";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=26.05";
 
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin";
+      url = "github:nix-darwin/nix-darwin?ref=nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs =
-    { nixpkgs, ... }:
+    { nixpkgs, nix-darwin, ... }@inputs:
     let
-      lib = nixpkgs.lib;
-
       hostNames = builtins.attrNames (builtins.readDir ./hosts);
 
       parseHost =
@@ -28,17 +26,29 @@
           hardware = if builtins.pathExists hardwarePath then import hardwarePath else { };
         };
 
-      hosts = lib.genAttrs hostNames parseHost;
+      hosts = nixpkgs.lib.genAttrs hostNames parseHost;
 
-      hostsByPlatform = platform: lib.filterAttrs (_: host: host.config.platform == platform) hosts;
+      hostsByPlatform =
+        platform: nixpkgs.lib.filterAttrs (_: host: host.config.platform == platform) hosts;
     in
     {
+      config = import ./config;
 
-      nixosConfigurations = lib.mapAttrs (
+      darwinConfigurations = nixpkgs.lib.mapAttrs (
         hostName: host:
-        lib.nixosSystem {
+        nix-darwin.lib.darwinSystem {
+          specialArgs = { inherit host inputs; };
           system = host.config.system;
-          modules = [ { system.stateVersion = "26.11"; } ];
+          modules = [ { system.stateVersion = 7; } ];
+        }
+      ) (hostsByPlatform "darwin");
+
+      nixosConfigurations = nixpkgs.lib.mapAttrs (
+        hostName: host:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit host inputs; };
+          system = host.config.system;
+          modules = [ { system.stateVersion = "26.05"; } ];
         }
       ) (hostsByPlatform "nixos");
     };
