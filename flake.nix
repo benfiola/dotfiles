@@ -48,7 +48,10 @@
         nixpkgs.lib.nixosSystem {
           specialArgs = { inherit host inputs; };
           system = host.config.system;
-          modules = [ { system.stateVersion = "26.05"; } ];
+          modules = [
+            { system.stateVersion = "26.05"; }
+            host.hardware
+          ];
         }
       ) (hostsByPlatform "nixos");
     };
