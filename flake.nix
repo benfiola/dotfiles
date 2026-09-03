@@ -32,7 +32,7 @@
         platform: nixpkgs.lib.filterAttrs (_: host: host.config.platform == platform) hosts;
     in
     {
-      config = import ./config;
+      config = import ./config.nix;
 
       darwinConfigurations = nixpkgs.lib.mapAttrs (
         hostName: host:
