@@ -1,3 +1,3 @@
 {
-  home-manager = inputs: { };
+  home = inputs: { };
 }

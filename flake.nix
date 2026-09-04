@@ -47,7 +47,7 @@
           empty = _: { };
         in
         {
-          home-manager = module.home-manager or empty;
+          home = module.home or empty;
           nixos = module.nixos or empty;
           darwin = module.darwin or empty;
         };
