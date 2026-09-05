@@ -18,67 +18,14 @@
   outputs =
     { nixpkgs, nix-darwin, ... }@inputs:
     let
-      # hosts
-      hostNames = builtins.attrNames (builtins.readDir ./hosts);
+      lib = import ./lib.nix { inherit nixpkgs nix-darwin; };
 
-      getHost =
-        hostName:
-        let
-          configPath = ./hosts/${hostName}/config.nix;
-          hardwarePath = ./hosts/${hostName}/hardware.nix;
-        in
-        {
-          config = import configPath;
-          hardware = if builtins.pathExists hardwarePath then import hardwarePath else { };
-        };
-
-      hosts = nixpkgs.lib.genAttrs hostNames getHost;
-
-      hostsByPlatform =
-        platform: nixpkgs.lib.filterAttrs (_: host: host.config.platform == platform) hosts;
-
-      # modules
-      moduleNames = builtins.attrNames (builtins.readDir ./modules);
-
-      getModule =
-        moduleName:
-        let
-          module = import ./modules/${moduleName};
-          empty = _: { };
-        in
-        {
-          home = module.home or empty;
-          nixos = module.nixos or empty;
-          darwin = module.darwin or empty;
-        };
-
-      modules = builtins.map getModule moduleNames;
-
-      modulesByInput = inputName: builtins.map (module: module.${inputName}) modules;
+      systems = lib.mkSystems {
+        mkConfig = lib.mkConfig;
+        hostsDirs = [ ./hosts ];
+        modulesDirs = [ ./modules ];
+        inherit inputs;
+      };
     in
-    {
-      config = import ./config.nix;
-
-      darwinConfigurations = nixpkgs.lib.mapAttrs (
-        hostName: host:
-        nix-darwin.lib.darwinSystem {
-          specialArgs = { inherit host inputs; };
-          system = host.config.system;
-          modules = [ { system.stateVersion = 7; } ] ++ (modulesByInput "darwin");
-        }
-      ) (hostsByPlatform "darwin");
-
-      nixosConfigurations = nixpkgs.lib.mapAttrs (
-        hostName: host:
-        nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit host inputs; };
-          system = host.config.system;
-          modules = [
-            { system.stateVersion = "26.05"; }
-            host.hardware
-          ]
-          ++ (modulesByInput "nixos");
-        }
-      ) (hostsByPlatform "nixos");
-    };
+    systems // { inherit lib; };
 }
