@@ -7,6 +7,7 @@ let
     gitSshKeys = [ ./modules/ssh/github.com ];
     ssh = true;
     sshKeys = [ ./modules/ssh/github.com ];
+    user = "bfiola";
     wsl = false;
   };
   os =

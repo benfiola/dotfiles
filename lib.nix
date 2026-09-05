@@ -51,8 +51,27 @@
         };
 
       modulePaths = map (entry: entry.path) (builtins.concatMap fileEntries modulesDirs);
+
       modules = map getModule modulePaths;
+
       modulesByInput = inputName: map (module: module.${inputName}) modules;
+
+      mkHomeManagerModule = host: {
+        config = nixpkgs.lib.mkMerge [
+          (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
+            users.users.${host.config.user}.isNormalUser = nixpkgs.lib.mkDefault true;
+          })
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = { inherit host inputs; };
+            home-manager.users.${host.config.user} = {
+              home.stateVersion = "26.05";
+              imports = modulesByInput "home";
+            };
+          }
+        ];
+      };
     in
     {
       darwinConfigurations = nixpkgs.lib.mapAttrs (
@@ -60,7 +79,12 @@
         nix-darwin.lib.darwinSystem {
           specialArgs = { inherit host inputs; };
           system = host.config.system;
-          modules = [ { system.stateVersion = 7; } ] ++ (modulesByInput "darwin");
+          modules = [
+            { system.stateVersion = 7; }
+            inputs.home-manager.darwinModules.home-manager
+            (mkHomeManagerModule host)
+          ]
+          ++ (modulesByInput "darwin");
         }
       ) (hostsByPlatform "darwin");
 
@@ -72,6 +96,8 @@
           modules = [
             { system.stateVersion = "26.05"; }
             inputs.nixos-wsl.nixosModules.default
+            inputs.home-manager.nixosModules.home-manager
+            (mkHomeManagerModule host)
             host.hardware
           ]
           ++ (modulesByInput "nixos");
