@@ -71,6 +71,7 @@
           system = host.config.system;
           modules = [
             { system.stateVersion = "26.05"; }
+            inputs.nixos-wsl.nixosModules.default
             host.hardware
           ]
           ++ (modulesByInput "nixos");
