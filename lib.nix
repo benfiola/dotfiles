@@ -1,6 +1,6 @@
 { nixpkgs, nix-darwin }:
 {
-  mkConfig = import ./config.nix;
+  mkConfig = import ./config.nix { inherit (nixpkgs) lib; };
 
   mkSystems =
     {

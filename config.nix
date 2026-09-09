@@ -1,15 +1,29 @@
+{ lib }:
 host:
 let
   profile = host.profile or "";
 
+  githubKey = ./modules/ssh/github.com;
+
   common = {
-    git = true;
-    gitSshKeys = [ ./modules/ssh/github.com ];
-    ssh = true;
-    sshKeys = [ ./modules/ssh/github.com ];
+    git = {
+      enable = true;
+      identities."github.com" = {
+        name = "Ben Fiola";
+        email = "me@benfiola.com";
+        signingKey = githubKey;
+      };
+    };
+
+    ssh = {
+      enable = true;
+      hosts."github.com".key = githubKey;
+    };
+
     user = "bfiola";
     wsl = false;
   };
+
   os =
     if host.platform == "nixos" then
       { } // (if profile == "graphical" then { } else { })
@@ -18,4 +32,8 @@ let
     else
       { };
 in
-common // os // host
+lib.foldl' lib.recursiveUpdate { } [
+  common
+  os
+  host
+]
