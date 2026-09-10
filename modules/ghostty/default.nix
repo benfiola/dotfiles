@@ -1,6 +1,4 @@
 {
-  # nixpkgs ghostty doesn't build cleanly on darwin: install the app via cask
-  # there, and let home-manager own only the config file.
   darwin =
     { host, lib, ... }:
     let

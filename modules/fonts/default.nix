@@ -1,6 +1,11 @@
 let
   fonts =
-    { host, lib, pkgs, ... }:
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       config = host.config;
       resolve = name: lib.getAttrFromPath (lib.splitString "." name) pkgs;

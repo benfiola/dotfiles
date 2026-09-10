@@ -1,6 +1,11 @@
 {
   home =
-    { host, lib, pkgs, ... }:
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       config = host.config;
     in

@@ -1,6 +1,4 @@
 let
-  # System-level: register zsh as a login shell. macOS already defaults to zsh,
-  # but NixOS needs it in /etc/shells before the user's shell can be set to it.
   system =
     { host, lib, ... }:
     let
@@ -20,8 +18,6 @@ in
       programs.zsh = {
         enable = true;
 
-        # General-purpose interactive-shell helpers that belong to no single
-        # tool. Tool-specific integration lives in that tool's module.
         initContent = ''
           src() {
             mkdir -p "$HOME/source"
@@ -32,7 +28,12 @@ in
     };
 
   nixos =
-    { host, lib, pkgs, ... }:
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       config = host.config;
     in
