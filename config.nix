@@ -43,7 +43,11 @@ let
     claude.enable = true;
     ghostty.enable = true;
     docker.enable = true;
-    homebrew.enable = true;
+
+    homebrew = {
+      enable = true;
+      repoUrl = null;
+    };
 
     # unfree package names permitted for this config (nixpkgs allowUnfreePredicate)
     unfree = [ "claude-code" ];
