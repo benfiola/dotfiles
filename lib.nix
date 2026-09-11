@@ -90,10 +90,7 @@
               # nix-darwin routes user-scoped options (homebrew, etc.) through this.
               system.primaryUser = host.config.user;
             }
-            {
-              nixpkgs.config.allowUnfreePredicate =
-                pkg: builtins.elem (nixpkgs.lib.getName pkg) host.config.unfree;
-            }
+            { nixpkgs.config.allowUnfree = true; }
             inputs.home-manager.darwinModules.home-manager
             inputs.nix-homebrew.darwinModules.nix-homebrew
             (mkHomeManagerModule host)
@@ -109,10 +106,7 @@
           system = host.config.system;
           modules = [
             { system.stateVersion = "26.05"; }
-            {
-              nixpkgs.config.allowUnfreePredicate =
-                pkg: builtins.elem (nixpkgs.lib.getName pkg) host.config.unfree;
-            }
+            { nixpkgs.config.allowUnfree = true; }
             inputs.nixos-wsl.nixosModules.default
             inputs.home-manager.nixosModules.home-manager
             (mkHomeManagerModule host)

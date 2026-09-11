@@ -56,11 +56,11 @@ Each is "install one package" with a per-OS branch. Plan:
 
 ## Supporting work
 
-- **`graphical` profile** — `config.nix` has a `profile` hook (`host.profile`),
-  currently unused. Wire it so desktop-only modules (kde, ghostty, fonts, GUI
-  apps) default `enable` from it instead of blanket `true`.
-- **`config.nix` `os` block** — currently `{ } // (if … then { } else { })`
-  placeholders. If populated, use `lib.optionalAttrs`, not `mkIf`.
+- ~~**`graphical` profile**~~ — done. `bfiola-desktop-linux` sets
+  `profile = "graphical"`; the `os` block in `config.nix` enables
+  `ghostty`/`fonts` only for graphical NixOS hosts (not `bfiola-desktop-wsl`).
+  darwin ignores `profile` (always graphical). Wire `kde` and the GUI apps
+  module the same way once they exist.
 - **`c` role** — dropped for now; revisit if a global C toolchain is wanted vs
   per-project `nix develop`.
 

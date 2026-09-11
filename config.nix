@@ -6,6 +6,17 @@ let
   githubKey = ./modules/ssh/github.com;
 
   common = {
+    claude.enable = true;
+    docker.enable = true;
+    fonts = {
+      enable = false;
+      packages = [
+        "nerd-fonts.jetbrains-mono"
+        "noto-fonts-color-emoji"
+        "noto-fonts-cjk-sans"
+      ];
+    };
+    ghostty.enable = false;
     git = {
       enable = true;
       identities."github.com" = {
@@ -14,55 +25,39 @@ let
         signingKey = githubKey;
       };
     };
-
-    ssh = {
+    homebrew = {
       enable = true;
-      hosts."github.com".key = githubKey;
+      repoUrl = null;
     };
-
-    fonts = {
-      enable = true;
-      packages = [
-        "nerd-fonts.jetbrains-mono"
-        "noto-fonts-color-emoji"
-        "noto-fonts-cjk-sans"
-      ];
-    };
-
     locale = {
       enable = true;
       timeZone = "America/Los_Angeles";
       defaultLocale = "en_US.UTF-8";
     };
-
-    starship.enable = true;
-    zsh.enable = true;
-    vim.enable = true;
     ls.enable = true;
-    yubikey.enable = true;
-    claude.enable = true;
-    ghostty.enable = true;
-    docker.enable = true;
-
-    homebrew = {
+    ssh = {
       enable = true;
-      repoUrl = null;
+      hosts."github.com".key = githubKey;
     };
-
-    # unfree package names permitted for this config (nixpkgs allowUnfreePredicate)
-    unfree = [ "claude-code" ];
-
+    starship.enable = true;
     user = "bfiola";
+    vim.enable = true;
     wsl = false;
+    yubikey.enable = true;
+    zsh.enable = true;
+  };
+
+  graphical = {
+    fonts.enable = true;
+    ghostty.enable = true;
   };
 
   os =
     if host.platform == "nixos" then
-      { } // (if profile == "graphical" then { } else { })
-    else if host.platform == "darwin" then
-      { }
+      lib.optionalAttrs (profile == "graphical") graphical
     else
-      { };
+      # darwin is always graphical, so it doesn't consult `profile`.
+      graphical;
 in
 lib.foldl' lib.recursiveUpdate { } [
   common
