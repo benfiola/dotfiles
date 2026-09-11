@@ -4,15 +4,6 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
 `modules/<name>/default.nix` returning `{ home, nixos, darwin }`, toggled from
 `config.nix`.
 
-## Port later — needs real translation work
-
-### vscode — `dotfiles-old/roles/vscode`
-
-- Current role is just a `vscode-init` shell helper that scaffolds
-  `.vscode/settings.json` per project — not editor config.
-- Decision: keep it as a zsh function, or replace with `programs.vscode`
-  (real settings + extensions sync).
-
 ## GUI apps with a real NixOS knob
 
 steam, wine, xbox — unlike the rest of the GUI apps (now `modules/apps`, see
@@ -75,6 +66,21 @@ one package", so split each into its own module when a host needs it:
   quietly skip unsupported combinations.
 - **`c` role** — dropped for now; revisit if a global C toolchain is wanted vs
   per-project `nix develop`.
+- ~~**`vscode`**~~ — done (`modules/vscode`). Old role's `vscode-init` shell
+  helper (scaffolded per-project `.vscode/settings.json`) dropped entirely,
+  not ported — never used. Replaced with `programs.vscode`: `pkgs.vscode`
+  (not vscodium — needed for the Dev Containers extension, which Microsoft
+  restricts to official builds/marketplace), extensions declared via the
+  `nix-vscode-extensions` flake input's marketplace mirror
+  (`mutableExtensionsDir = false`, fully declarative), user settings ported
+  from the real
+  `settings.json`/`extensions.txt` with `settingsSync.ignoredExtensions`,
+  the dead `go.*` setting (no Go extension installed), and the `[nix]`
+  formatter setting (nix-ide is repo-local, not global — see
+  `.vscode/settings.template.json`) dropped; `anthropic.claude-code` added
+  to the extension list since settings already referenced it but it was
+  missing from the source extension list. Gated the same as
+  `firefox`/`ghostty` (`graphicalNixos` + `darwin`).
 
 ## Intentionally not ported (Nix replaces the mechanism)
 

@@ -42,6 +42,7 @@ let
     tidal.enable = false;
     user = "bfiola";
     vim.enable = true;
+    vscode.enable = false;
     whatsapp.enable = false;
     wsl = false;
     yubikey.enable = true;
@@ -58,6 +59,7 @@ let
     kde.enable = true;
     proton.enable = true;
     tidal.enable = true;
+    vscode.enable = true;
   };
 
   darwin = {
@@ -72,6 +74,7 @@ let
     macos.enable = true;
     magnet.enable = true;
     tidal.enable = true;
+    vscode.enable = true;
     whatsapp.enable = true;
   };
 
