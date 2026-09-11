@@ -1,3 +1,7 @@
+let
+  timeZone = "America/Los_Angeles";
+  defaultLocale = "en_US.UTF-8";
+in
 {
   nixos =
     { host, lib, ... }:
@@ -5,8 +9,8 @@
       config = host.config;
     in
     lib.mkIf config.locale.enable {
-      i18n.defaultLocale = config.locale.defaultLocale;
-      time.timeZone = config.locale.timeZone;
+      i18n.defaultLocale = defaultLocale;
+      time.timeZone = timeZone;
     };
 
   darwin =
@@ -15,6 +19,6 @@
       config = host.config;
     in
     lib.mkIf config.locale.enable {
-      time.timeZone = config.locale.timeZone;
+      time.timeZone = timeZone;
     };
 }

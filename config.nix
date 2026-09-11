@@ -12,14 +12,7 @@ let
     contexts.enable = false;
     discord.enable = false;
     docker.enable = true;
-    fonts = {
-      enable = false;
-      packages = [
-        "nerd-fonts.jetbrains-mono"
-        "noto-fonts-color-emoji"
-        "noto-fonts-cjk-sans"
-      ];
-    };
+    fonts.enable = false;
     ghostty.enable = false;
     gimp.enable = false;
     git = {
@@ -35,11 +28,7 @@ let
       repoUrl = null;
     };
     kde.enable = false;
-    locale = {
-      enable = true;
-      timeZone = "America/Los_Angeles";
-      defaultLocale = "en_US.UTF-8";
-    };
+    locale.enable = true;
     ls.enable = true;
     magnet.enable = false;
     proton.enable = false;

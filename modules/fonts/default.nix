@@ -1,4 +1,10 @@
 let
+  packages = [
+    "nerd-fonts.jetbrains-mono"
+    "noto-fonts-color-emoji"
+    "noto-fonts-cjk-sans"
+  ];
+
   fonts =
     {
       host,
@@ -11,7 +17,7 @@ let
       resolve = name: lib.getAttrFromPath (lib.splitString "." name) pkgs;
     in
     lib.mkIf config.fonts.enable {
-      fonts.packages = map resolve config.fonts.packages;
+      fonts.packages = map resolve packages;
     };
 in
 {

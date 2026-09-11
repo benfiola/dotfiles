@@ -16,6 +16,7 @@ let
     discord = {
       package = "vesktop";
       cask = "vesktop";
+      insecurePackages = [ "electron-39.8.10" ];
     };
     gimp = {
       package = "gimp";
@@ -33,6 +34,7 @@ let
     tidal = {
       package = "tidal-hifi";
       cask = "tidal";
+      unfreePackages = [ "castlabs-electron" ];
     };
     whatsapp = {
       cask = "whatsapp";
@@ -40,6 +42,23 @@ let
   };
 in
 {
+  nixos =
+    { host, lib, ... }:
+    let
+      config = host.config;
+      enabled = lib.filterAttrs (name: _: config.${name}.enable) apps;
+    in
+    lib.mkIf (config.platform == "nixos") {
+      dotfiles.insecurePackages = lib.pipe enabled [
+        (lib.mapAttrsToList (_: app: app.insecurePackages or [ ]))
+        lib.flatten
+      ];
+      nixpkgs.config.allowUnfreePackages = lib.pipe enabled [
+        (lib.mapAttrsToList (_: app: app.unfreePackages or [ ]))
+        lib.flatten
+      ];
+    };
+
   home =
     {
       host,

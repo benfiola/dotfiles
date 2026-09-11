@@ -56,14 +56,24 @@
 
       modulesByInput = inputName: map (module: module.${inputName}) modules;
 
+      insecurePackagesModule =
+        { lib, config, ... }:
+        {
+          options.dotfiles.insecurePackages = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+            description = "Package name+version strings to allow despite being marked insecure.";
+          };
+
+          config.nixpkgs.config.permittedInsecurePackages = config.dotfiles.insecurePackages;
+        };
+
       mkHomeManagerModule = host: {
         config = nixpkgs.lib.mkMerge [
           (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
             users.users.${host.config.user}.isNormalUser = nixpkgs.lib.mkDefault true;
           })
           (nixpkgs.lib.mkIf (host.config.platform == "darwin") {
-            # home-manager on nix-darwin reads homeDirectory from here; unlike
-            # NixOS, nix-darwin doesn't populate it from the user account.
             users.users.${host.config.user}.home = "/Users/${host.config.user}";
           })
           {
@@ -90,10 +100,9 @@
           modules = [
             {
               system.stateVersion = 7;
-              # nix-darwin routes user-scoped options (homebrew, etc.) through this.
               system.primaryUser = host.config.user;
             }
-            { nixpkgs.config.allowUnfree = true; }
+            insecurePackagesModule
             inputs.home-manager.darwinModules.home-manager
             inputs.nix-homebrew.darwinModules.nix-homebrew
             (mkHomeManagerModule host)
@@ -109,7 +118,7 @@
           system = host.config.system;
           modules = [
             { system.stateVersion = "26.05"; }
-            { nixpkgs.config.allowUnfree = true; }
+            insecurePackagesModule
             inputs.nixos-wsl.nixosModules.default
             inputs.home-manager.nixosModules.home-manager
             (mkHomeManagerModule host)

@@ -1,4 +1,17 @@
+let
+  system =
+    { host, lib, ... }:
+    let
+      config = host.config;
+    in
+    lib.mkIf config.claude.enable {
+      nixpkgs.config.allowUnfreePackages = [ "claude-code" ];
+    };
+in
 {
+  nixos = system;
+  darwin = system;
+
   home =
     {
       host,
