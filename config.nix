@@ -6,7 +6,11 @@ let
   githubKey = ./modules/ssh/github.com;
 
   common = {
+    alfred.enable = false;
+    bitwarden.enable = false;
     claude.enable = true;
+    contexts.enable = false;
+    discord.enable = false;
     docker.enable = true;
     fonts = {
       enable = false;
@@ -17,6 +21,7 @@ let
       ];
     };
     ghostty.enable = false;
+    gimp.enable = false;
     git = {
       enable = true;
       identities."github.com" = {
@@ -35,13 +40,17 @@ let
       defaultLocale = "en_US.UTF-8";
     };
     ls.enable = true;
+    magnet.enable = false;
+    proton.enable = false;
     ssh = {
       enable = true;
       hosts."github.com".key = githubKey;
     };
     starship.enable = true;
+    tidal.enable = false;
     user = "bfiola";
     vim.enable = true;
+    whatsapp.enable = false;
     wsl = false;
     yubikey.enable = true;
     zsh.enable = true;

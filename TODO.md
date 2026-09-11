@@ -37,30 +37,34 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
 - Decision: keep it as a zsh function, or replace with `programs.vscode`
   (real settings + extensions sync).
 
-## GUI apps — one list, not a module each
+## GUI apps with a real NixOS knob
 
-alfred, bitwarden, contexts, discord, gimp, magnet, spotify, steam, tidal,
-whatsapp, wireguard, lutris, wine, xbox, proton.
+steam, wine, xbox — unlike the rest of the GUI apps (now `modules/apps`, see
+`config.nix` for the per-app `enable` flags), these need more than "install
+one package", so split each into its own module when a host needs it:
 
-Each is "install one package" with a per-OS branch. Plan:
+- steam → `programs.steam.enable`
+- wine → `wineWowPackages.staging` + `winetricks`
+- xbox → `hardware.xone` (nixos-hardware input)
 
-- one `modules/apps` (or the `graphical` profile) reading lists from `config.nix`:
-  - `packages` — nixpkgs, Linux (`discord`, `gimp`, `spotify`, …)
-  - `casks` — homebrew, darwin; contribute via each app's `darwin` output, same
-    as `modules/ghostty` does `homebrew.casks = [ "ghostty" ]`
-  - `mas` — `homebrew.masApps = { Magnet = 441258766; … }`
-- Split out the ones with a real NixOS knob when a host needs them:
-  - steam → `programs.steam.enable`
-  - wine → `wineWowPackages.staging` + `winetricks`
-  - xbox → `hardware.xone` (nixos-hardware input)
+### wireguard — own module, not `modules/apps`
+
+- darwin: mas app (id `1451685025`) — the GUI client only, same as before.
+- NixOS: no nixpkgs package for a GTK client (`wireguird` isn't packaged —
+  checked 26.05 and unstable); would need a custom `buildGoModule`
+  derivation for `UnnoTed/wireguird` if a GUI is wanted there.
+- Either way this module needs to go beyond the client app: actual
+  `wg-quick`/`networking.wireguard.interfaces` config, and private keys
+  need a secrets story — pull in `agenix` (new flake input) rather than
+  committing keys in plaintext.
 
 ## Supporting work
 
 - ~~**`graphical` profile**~~ — done. `bfiola-desktop-linux` sets
   `profile = "graphical"`; the `os` block in `config.nix` enables
   `ghostty`/`fonts` only for graphical NixOS hosts (not `bfiola-desktop-wsl`).
-  darwin ignores `profile` (always graphical). Wire `kde` and the GUI apps
-  module the same way once they exist.
+  darwin ignores `profile` (always graphical). Wire `kde` the same way once
+  it exists.
 - **`c` role** — dropped for now; revisit if a global C toolchain is wanted vs
   per-project `nix develop`.
 
