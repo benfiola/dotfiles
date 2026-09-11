@@ -6,14 +6,6 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
 
 ## Port later — needs real translation work
 
-### firefox / chromium policies — `dotfiles-old/roles/{firefox,chromium}`
-
-- Enterprise policy JSON installed to system paths.
-- NixOS: `programs.firefox.policies = { ... }` (native); chromium via
-  `environment.etc."chromium/policies/managed/policy.json"`.
-- darwin: `.mobileconfig` / `defaults` — lower priority.
-- Only worth it if managed browser policy is actually wanted.
-
 ### vscode — `dotfiles-old/roles/vscode`
 
 - Current role is just a `vscode-init` shell helper that scaffolds
@@ -44,6 +36,18 @@ one package", so split each into its own module when a host needs it:
 
 ## Supporting work
 
+- ~~**`firefox` / `chromium`**~~ — replaced, not ported. `dotfiles-old`'s
+  `firefox.cfg`/`autoconfig.js` was ~100 privacy-hardening prefs plus a
+  `policies.json` force-installing uBlock Origin, Bitwarden, and the Nord
+  theme. `modules/firefox` uses LibreWolf instead (`programs.firefox.package =
+  pkgs.librewolf`, a real nixpkgs package on both nixos and darwin, no
+  homebrew cask needed — same "this slot installs a specific app, not
+  necessarily the eponymous one" precedent as the old chromium role installing
+  actual Google Chrome) — its upstream `librewolf.cfg`/`policies.json` already
+  bake in the same hardening (that's the point of the fork) and it ships
+  uBlock Origin by default, so the module only force-installs Bitwarden and
+  Nord theme via `policies.ExtensionSettings`. chromium dropped entirely,
+  not just deferred.
 - ~~**`macos`**~~ — done (`modules/macos`). `config.sh`'s `defaults write`
   calls ported to `system.defaults.{dock,finder,NSGlobalDomain}` where a
   native nix-darwin option exists (dock autohide, Finder desktop icons,

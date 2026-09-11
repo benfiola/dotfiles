@@ -12,6 +12,7 @@ let
     contexts.enable = false;
     discord.enable = false;
     docker.enable = true;
+    firefox.enable = false;
     fonts.enable = false;
     ghostty.enable = false;
     gimp.enable = false;
@@ -50,6 +51,7 @@ let
   graphicalNixos = {
     bitwarden.enable = true;
     discord.enable = true;
+    firefox.enable = true;
     fonts.enable = true;
     ghostty.enable = true;
     gimp.enable = true;
@@ -63,6 +65,7 @@ let
     bitwarden.enable = true;
     contexts.enable = true;
     discord.enable = true;
+    firefox.enable = true;
     fonts.enable = true;
     ghostty.enable = true;
     gimp.enable = true;
