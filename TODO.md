@@ -6,12 +6,6 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
 
 ## Port later — needs real translation work
 
-### macos — `dotfiles-old/roles/macos`
-
-- nix-darwin only.
-- Role runs `config.sh`, a pile of `defaults write`. Map each to
-  `system.defaults.*` (dock, finder, NSGlobalDomain, trackpad, …).
-
 ### firefox / chromium policies — `dotfiles-old/roles/{firefox,chromium}`
 
 - Enterprise policy JSON installed to system paths.
@@ -50,6 +44,14 @@ one package", so split each into its own module when a host needs it:
 
 ## Supporting work
 
+- ~~**`macos`**~~ — done (`modules/macos`). `config.sh`'s `defaults write`
+  calls ported to `system.defaults.{dock,finder,NSGlobalDomain}` where a
+  native nix-darwin option exists (dock autohide, Finder desktop icons,
+  keyboard/spelling behavior, …); the handful without one (Safari dev menu,
+  `NSQuitAlwaysKeepsWindows`, Finder's `WarnOnEmptyTrash`) go through
+  `system.defaults.CustomUserPreferences`. `macos.enable` defaults to `true`
+  for darwin hosts in `config.nix`; asserts (in the `home` block, like
+  `kde`/`docker`) if enabled elsewhere.
 - ~~**`graphical` profile**~~ — done. `bfiola-desktop-linux` sets
   `profile = "graphical"`; the `os` block in `config.nix` enables
   `ghostty`/`fonts` for graphical hosts on every platform, plus

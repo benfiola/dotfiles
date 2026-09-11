@@ -120,6 +120,7 @@
             { system.stateVersion = "26.05"; }
             insecurePackagesModule
             inputs.nixos-wsl.nixosModules.default
+            { wsl.enable = host.config.wsl; }
             inputs.home-manager.nixosModules.home-manager
             (mkHomeManagerModule host)
             host.hardware

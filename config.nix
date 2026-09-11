@@ -30,6 +30,7 @@ let
     kde.enable = false;
     locale.enable = true;
     ls.enable = true;
+    macos.enable = false;
     magnet.enable = false;
     proton.enable = false;
     ssh = {
@@ -65,6 +66,7 @@ let
     fonts.enable = true;
     ghostty.enable = true;
     gimp.enable = true;
+    macos.enable = true;
     magnet.enable = true;
     tidal.enable = true;
     whatsapp.enable = true;
