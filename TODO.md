@@ -6,16 +6,6 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
 
 ## Port later — needs real translation work
 
-### kde — `dotfiles-old/roles/kde`
-
-- NixOS only, graphical hosts.
-- `services.displayManager.sddm.enable`, `services.desktopManager.plasma6.enable`,
-  pipewire (`services.pipewire.{enable,pulse.enable}`).
-- The role's `config.sh` / `root_config.sh` KDE tweaks need translating — either
-  `programs.plasma` (plasma-manager, add as a flake input) or a home-manager
-  activation script.
-- Gate on the `graphical` profile (see Supporting work).
-
 ### macos — `dotfiles-old/roles/macos`
 
 - nix-darwin only.
@@ -62,9 +52,21 @@ one package", so split each into its own module when a host needs it:
 
 - ~~**`graphical` profile**~~ — done. `bfiola-desktop-linux` sets
   `profile = "graphical"`; the `os` block in `config.nix` enables
-  `ghostty`/`fonts` only for graphical NixOS hosts (not `bfiola-desktop-wsl`).
-  darwin ignores `profile` (always graphical). Wire `kde` the same way once
-  it exists.
+  `ghostty`/`fonts` for graphical hosts on every platform, plus
+  `graphicalNixos`/`graphicalDarwin` splits for apps and `kde` that only
+  exist on one platform (`bfiola-desktop-wsl` gets neither since it has no
+  `profile`). darwin ignores `profile` (always graphical).
+- ~~**`kde`**~~ — done (`modules/kde`). `services.displayManager.sddm` +
+  `services.desktopManager.plasma6` on the NixOS side; the `config.sh` /
+  `root_config.sh` tweaks ported to `programs.plasma` via plasma-manager
+  (workspace theme, fonts, krunner, shortcuts, krunner plugin disables) on
+  the home-manager side.
+- **fail-fast on unsupported `*.enable`** — done. `modules/apps`, `docker`,
+  and `kde` now assert instead of silently no-op-ing when a host enables
+  something its platform can't provide (e.g. `magnet.enable` on NixOS,
+  `docker.enable` on WSL, `kde.enable` on darwin), so `config.nix` needs
+  platform-correct enables up front rather than relying on modules to
+  quietly skip unsupported combinations.
 - **`c` role** — dropped for now; revisit if a global C toolchain is wanted vs
   per-project `nix develop`.
 

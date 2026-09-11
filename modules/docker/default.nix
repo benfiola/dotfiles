@@ -23,8 +23,18 @@
     let
       config = host.config;
     in
-    lib.mkIf (config.docker.enable && !config.wsl) {
-      virtualisation.docker.enable = true;
-      users.users.${config.user}.extraGroups = [ "docker" ];
-    };
+    lib.mkMerge [
+      {
+        assertions = [
+          {
+            assertion = !(config.docker.enable && config.wsl);
+            message = "docker.enable is not supported on WSL hosts (wsl = true in config.nix)";
+          }
+        ];
+      }
+      (lib.mkIf (config.docker.enable && !config.wsl) {
+        virtualisation.docker.enable = true;
+        users.users.${config.user}.extraGroups = [ "docker" ];
+      })
+    ];
 }

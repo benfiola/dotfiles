@@ -52,6 +52,10 @@ in
       enabled = lib.filterAttrs (name: _: config.${name}.enable) apps;
     in
     lib.mkIf (config.platform == "nixos") {
+      assertions = lib.mapAttrsToList (name: app: {
+        assertion = app ? package;
+        message = "${name}.enable is set, but modules/apps has no NixOS package for ${name}";
+      }) enabled;
       home.packages = lib.pipe enabled [
         (lib.filterAttrs (_: app: app ? package))
         (lib.mapAttrsToList (_: app: pkgs.${app.package}))
@@ -65,6 +69,10 @@ in
       enabled = lib.filterAttrs (name: _: config.${name}.enable) apps;
     in
     {
+      assertions = lib.mapAttrsToList (name: app: {
+        assertion = app ? cask || app ? mas;
+        message = "${name}.enable is set, but modules/apps has no darwin cask/mas entry for ${name}";
+      }) enabled;
       homebrew.casks = lib.pipe enabled [
         (lib.filterAttrs (_: app: app ? cask))
         (lib.mapAttrsToList (_: app: app.cask))

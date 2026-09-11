@@ -34,6 +34,7 @@ let
       enable = true;
       repoUrl = null;
     };
+    kde.enable = false;
     locale = {
       enable = true;
       timeZone = "America/Los_Angeles";
@@ -56,17 +57,35 @@ let
     zsh.enable = true;
   };
 
-  graphical = {
+  graphicalNixos = {
+    bitwarden.enable = true;
+    discord.enable = true;
     fonts.enable = true;
     ghostty.enable = true;
+    gimp.enable = true;
+    kde.enable = true;
+    proton.enable = true;
+    tidal.enable = true;
+  };
+
+  darwin = {
+    alfred.enable = true;
+    bitwarden.enable = true;
+    contexts.enable = true;
+    discord.enable = true;
+    fonts.enable = true;
+    ghostty.enable = true;
+    gimp.enable = true;
+    magnet.enable = true;
+    tidal.enable = true;
+    whatsapp.enable = true;
   };
 
   os =
     if host.platform == "nixos" then
-      lib.optionalAttrs (profile == "graphical") graphical
+      lib.optionalAttrs (profile == "graphical") graphicalNixos
     else
-      # darwin is always graphical, so it doesn't consult `profile`.
-      graphical;
+      darwin;
 in
 lib.foldl' lib.recursiveUpdate { } [
   common
