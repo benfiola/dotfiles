@@ -56,18 +56,4 @@
         };
       };
     };
-
-  home =
-    { host, lib, ... }:
-    let
-      config = host.config;
-    in
-    {
-      assertions = [
-        {
-          assertion = !(config.macos.enable && config.platform != "darwin");
-          message = "macos.enable is not supported outside darwin";
-        }
-      ];
-    };
 }

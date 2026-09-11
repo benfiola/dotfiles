@@ -2,6 +2,12 @@
   description = "dotfiles";
 
   inputs = {
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.home-manager.follows = "home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager?ref=release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -16,6 +22,11 @@
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
+    padctl = {
+      url = "github:BANANASJIM/padctl";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -28,6 +39,7 @@
 
     plasma-manager = {
       url = "github:nix-community/plasma-manager?ref=trunk";
+      inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -43,6 +55,12 @@
         modulesDirs = [ ./modules ];
         inherit inputs;
       };
+
+      devShells = lib.mkDevShells {
+        mkConfig = lib.mkConfig;
+        hostsDirs = [ ./hosts ];
+        inherit inputs;
+      };
     in
-    systems // { inherit lib; };
+    systems // { inherit lib devShells; };
 }

@@ -1,0 +1,38 @@
+{
+  nixos =
+    { host, lib, ... }:
+    let
+      config = host.config;
+    in
+    lib.mkIf config.steam.enable {
+      programs.steam.enable = true;
+      nixpkgs.config.allowUnfreePackages = [ "steam" ];
+    };
+
+  darwin =
+    { host, lib, ... }:
+    let
+      config = host.config;
+    in
+    lib.mkIf config.steam.enable {
+      homebrew.casks = [ "steam" ];
+    };
+
+  home =
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      config = host.config;
+    in
+    lib.mkIf (config.steam.enable && config.platform == "nixos") {
+      home.packages = with pkgs; [
+        wineWow64Packages.staging
+        winetricks
+        protonup-qt
+      ];
+    };
+}

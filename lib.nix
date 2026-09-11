@@ -1,4 +1,33 @@
 { nixpkgs, nix-darwin }:
+let
+  fileEntries =
+    dir:
+    map (name: {
+      inherit name;
+      path = dir + "/${name}";
+    }) (builtins.attrNames (builtins.readDir dir));
+
+  mkHosts =
+    { mkConfig, hostsDirs }:
+    let
+      getHost =
+        hostPath:
+        let
+          configPath = hostPath + "/config.nix";
+          hardwarePath = hostPath + "/hardware.nix";
+        in
+        {
+          config = (import configPath) mkConfig;
+          hardware = if builtins.pathExists hardwarePath then import hardwarePath else { };
+        };
+    in
+    builtins.listToAttrs (
+      map (entry: {
+        inherit (entry) name;
+        value = getHost entry.path;
+      }) (builtins.concatMap fileEntries hostsDirs)
+    );
+in
 {
   mkConfig = import ./config.nix { inherit (nixpkgs) lib; };
 
@@ -10,30 +39,7 @@
       inputs,
     }:
     let
-      fileEntries =
-        dir:
-        map (name: {
-          inherit name;
-          path = dir + "/${name}";
-        }) (builtins.attrNames (builtins.readDir dir));
-
-      getHost =
-        hostPath:
-        let
-          configPath = hostPath + "/config.nix";
-          hardwarePath = hostPath + "/hardware.nix";
-        in
-        {
-          config = (import configPath) mkConfig;
-          hardware = if builtins.pathExists hardwarePath then import hardwarePath else { };
-        };
-
-      hosts = builtins.listToAttrs (
-        map (entry: {
-          inherit (entry) name;
-          value = getHost entry.path;
-        }) (builtins.concatMap fileEntries hostsDirs)
-      );
+      hosts = mkHosts { inherit mkConfig hostsDirs; };
 
       hostsByPlatform =
         platform: nixpkgs.lib.filterAttrs (_: host: host.config.platform == platform) hosts;
@@ -119,6 +125,7 @@
           modules = [
             { system.stateVersion = "26.05"; }
             insecurePackagesModule
+            inputs.agenix.nixosModules.default
             inputs.nixos-wsl.nixosModules.default
             { wsl.enable = host.config.wsl; }
             inputs.home-manager.nixosModules.home-manager
@@ -129,4 +136,27 @@
         }
       ) (hostsByPlatform "nixos");
     };
+
+  mkDevShells =
+    {
+      mkConfig,
+      hostsDirs,
+      inputs,
+      packages ? (_: [ ]),
+    }:
+    let
+      hosts = mkHosts { inherit mkConfig hostsDirs; };
+      systems = nixpkgs.lib.unique (map (host: host.config.system) (builtins.attrValues hosts));
+    in
+    nixpkgs.lib.genAttrs systems (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        default = pkgs.mkShell {
+          packages = [ inputs.agenix.packages.${system}.default ] ++ packages system;
+        };
+      }
+    );
 }

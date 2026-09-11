@@ -25,7 +25,7 @@ let
       };
     };
     homebrew = {
-      enable = true;
+      enable = false;
       repoUrl = null;
     };
     kde.enable = false;
@@ -33,17 +33,19 @@ let
     ls.enable = true;
     macos.enable = false;
     magnet.enable = false;
-    proton.enable = false;
+    padctl.enable = false;
     ssh = {
       enable = true;
       hosts."github.com".key = githubKey;
     };
     starship.enable = true;
+    steam.enable = false;
     tidal.enable = false;
     user = "bfiola";
     vim.enable = true;
     vscode.enable = false;
     whatsapp.enable = false;
+    wireguard.enable = false;
     wsl = false;
     yubikey.enable = true;
     zsh.enable = true;
@@ -57,7 +59,8 @@ let
     ghostty.enable = true;
     gimp.enable = true;
     kde.enable = true;
-    proton.enable = true;
+    padctl.enable = true;
+    steam.enable = true;
     tidal.enable = true;
     vscode.enable = true;
   };
@@ -71,11 +74,13 @@ let
     fonts.enable = true;
     ghostty.enable = true;
     gimp.enable = true;
+    homebrew.enable = true;
     macos.enable = true;
     magnet.enable = true;
     tidal.enable = true;
     vscode.enable = true;
     whatsapp.enable = true;
+    wireguard.enable = true;
   };
 
   os =
