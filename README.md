@@ -1,12 +1,27 @@
 # Dotfiles
 
-Flake configuration for system management with support for NixOS (nixosSystem), macOS (nix-darwin), WSL (nix-wsl), and home-manager.
+Dotfiles expressed as a nix flake.
+
+---
+
+## macOS Setup (nix-darwin)
+
+1. Create user account.
+2. Install Xcode CLI Tools: `xcode-select --install`.
+3. Sign in to the App Store.
+4. Install Nix: `curl -fsSL https://install.determinate.systems/nix | sh -s -- install`.
+5. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
+6. Install age key to `/etc/age/age.key`.
+7. From dotfiles directory, build derivation: `nix build '.#darwinConfigurations.bfiola-home-laptop.system'`.
+8. From dotfiles directory, activate derivation: `sudo ./result/sw/bin/darwin-rebuild switch --flake '.#bfiola-home-laptop'`.
+
+Subsequent rebuilds use: `sudo darwin-rebuild switch --flake ~/dotfiles#bfiola-home-laptop`.
 
 ---
 
 ## Hardware Configuration (NixOS)
 
-Each NixOS host requires a `hardware.nix` file (e.g., `hosts/bfiola-desktop-linux/hardware.nix`) that describes filesystems, bootloader, and hardware-specific settings.
+Each NixOS host requires a `hardware.nix` file (e.g., `hosts/[hostname]/hardware.nix`).
 
 ### Generating hardware-configuration.nix
 
@@ -17,7 +32,7 @@ sudo nixos-generate-config --root /mnt
 This generates two files: `hardware-configuration.nix` and `configuration.nix`. Copy `hardware.nix` to your flake:
 
 ```bash
-cp /mnt/etc/nixos/hardware-configuration.nix hosts/your-hostname/hardware.nix
+cp /mnt/etc/nixos/hardware-configuration.nix hosts/[hostname]/hardware.nix
 ```
 
 ---

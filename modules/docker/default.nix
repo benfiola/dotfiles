@@ -16,6 +16,10 @@
         pkgs.docker-buildx
         pkgs.docker-compose
       ];
+
+      home.file.".colima/_templates/default.yaml" = lib.mkIf (config.docker.colima != { }) {
+        text = lib.generators.toYAML { } config.docker.colima;
+      };
     };
 
   nixos =

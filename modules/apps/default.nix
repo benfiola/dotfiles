@@ -28,6 +28,10 @@ let
         id = 441258766;
       };
     };
+    orcaslicer = {
+      package = "orca-slicer";
+      cask = "orcaslicer";
+    };
     tidal = {
       package = "tidal-hifi";
       cask = "tidal";

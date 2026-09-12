@@ -12,7 +12,15 @@ let
     claude.enable = true;
     contexts.enable = false;
     discord.enable = false;
-    docker.enable = true;
+    docker = {
+      enable = true;
+      colima = {
+        arch = "aarch64";
+        vmType = "vz";
+        rosetta = true;
+        nestedVirtualization = true;
+      };
+    };
     firefox.enable = false;
     fonts.enable = false;
     ghostty.enable = false;
@@ -32,8 +40,12 @@ let
     kde.enable = false;
     locale.enable = true;
     ls.enable = true;
-    macos.enable = false;
+    macos = {
+      enable = false;
+      computerName = host.hostName;
+    };
     magnet.enable = false;
+    orcaslicer.enable = false;
     padctl.enable = false;
     ssh = {
       enable = true;
@@ -63,6 +75,7 @@ let
     ghostty.enable = true;
     gimp.enable = true;
     kde.enable = true;
+    orcaslicer.enable = true;
     padctl.enable = true;
     steam.enable = true;
     tidal.enable = true;
@@ -86,6 +99,7 @@ let
     homebrew.enable = true;
     macos.enable = true;
     magnet.enable = true;
+    orcaslicer.enable = true;
     tidal.enable = true;
     vscode.enable = true;
     whatsapp.enable = true;

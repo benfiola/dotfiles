@@ -5,6 +5,12 @@
       config = host.config;
     in
     lib.mkIf config.macos.enable {
+      networking = {
+        computerName = config.macos.computerName;
+        hostName = config.macos.computerName;
+        localHostName = config.macos.computerName;
+      };
+
       system.defaults = {
         dock = {
           autohide = true;

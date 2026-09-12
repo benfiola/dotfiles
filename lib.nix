@@ -14,20 +14,21 @@ let
     { mkConfig, hostsDirs }:
     let
       getHost =
-        hostPath:
+        name: hostPath:
         let
           configPath = hostPath + "/config.nix";
           hardwarePath = hostPath + "/hardware.nix";
+          mkConfigForHost = args: mkConfig (nixpkgs.lib.recursiveUpdate { hostName = name; } args);
         in
         {
-          config = (import configPath) mkConfig;
+          config = (import configPath) mkConfigForHost;
           hardware = if builtins.pathExists hardwarePath then import hardwarePath else { };
         };
     in
     builtins.listToAttrs (
       map (entry: {
         inherit (entry) name;
-        value = getHost entry.path;
+        value = getHost entry.name entry.path;
       }) (builtins.concatMap fileEntries hostsDirs)
     );
 in
