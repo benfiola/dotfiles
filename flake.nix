@@ -59,7 +59,6 @@
       devShells = lib.mkDevShells {
         mkConfig = lib.mkConfig;
         hostsDirs = [ ./hosts ];
-        inherit inputs;
       };
     in
     systems // { inherit lib devShells; };

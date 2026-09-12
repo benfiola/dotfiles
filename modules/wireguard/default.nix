@@ -1,53 +1,57 @@
 {
   darwin =
-    { host, lib, ... }:
+    {
+      host,
+      lib,
+      ...
+    }:
     let
-      config = host.config;
+      hostConfig = host.config;
+      tunnels = hostConfig.wireguard.tunnels;
+      nameOf = path: lib.removeSuffix ".conf.age" (builtins.baseNameOf path);
     in
-    lib.mkIf config.wireguard.enable {
-      homebrew.masApps.WireGuard = 1451685025;
-    };
+    lib.mkMerge [
+      (lib.mkIf hostConfig.wireguard.enable {
+        homebrew.masApps.WireGuard = 1451685025;
+      })
+      (lib.mkIf (hostConfig.wireguard.enable && tunnels != [ ]) {
+        age.secrets = lib.listToAttrs (
+          map (path: {
+            name = nameOf path;
+            value = {
+              file = path;
+              path = "/Users/${hostConfig.user}/.wireguard/${nameOf path}.conf";
+              owner = hostConfig.user;
+            };
+          }) tunnels
+        );
+      })
+    ];
 
   nixos =
     {
       host,
       lib,
-      config,
+      pkgs,
       ...
     }:
     let
       hostConfig = host.config;
-      tunnel = hostConfig.wireguard.tunnel or null;
+      tunnels = hostConfig.wireguard.tunnels;
+      nameOf = path: lib.removeSuffix ".conf.age" (builtins.baseNameOf path);
     in
-    lib.mkIf hostConfig.wireguard.enable (
-      let
-        secretName = "${tunnel.name}-env";
-      in
-      {
-        age.identityPaths = [ "/etc/age/host.key" ];
-        age.secrets.${secretName}.file = ../../secrets + "/${tunnel.name}.env.age";
+    lib.mkIf (hostConfig.wireguard.enable && tunnels != [ ]) {
+      environment.systemPackages = [ pkgs.wireguard-tools ];
 
-        networking.networkmanager.ensureProfiles = {
-          environmentFiles = [ config.age.secrets.${secretName}.path ];
-          profiles.${tunnel.name} = {
-            connection = {
-              id = tunnel.name;
-              type = "wireguard";
-              interface-name = tunnel.name;
-            };
-            wireguard.private-key = "$WG_PRIVATE_KEY";
-            "wireguard-peer.${tunnel.peerPublicKey}" = {
-              endpoint = tunnel.endpoint;
-              allowed-ips = tunnel.allowedIPs;
-              persistent-keepalive = 25;
-            };
-            ipv4 = {
-              method = "manual";
-              address1 = tunnel.address;
-            };
-            ipv6.method = "disabled";
+      age.secrets = lib.listToAttrs (
+        map (path: {
+          name = nameOf path;
+          value = {
+            file = path;
+            path = "/etc/wireguard/${nameOf path}.conf";
+            mode = "0400";
           };
-        };
-      }
-    );
+        }) tunnels
+      );
+    };
 }

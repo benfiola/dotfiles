@@ -46,7 +46,10 @@ let
     vim.enable = true;
     vscode.enable = false;
     whatsapp.enable = false;
-    wireguard.enable = false;
+    wireguard = {
+      enable = false;
+      tunnels = [ ];
+    };
     wsl = false;
     yubikey.enable = true;
     zsh.enable = true;

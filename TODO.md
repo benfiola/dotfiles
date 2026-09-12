@@ -6,42 +6,60 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
 
 ## wireguard — own module, not `modules/apps`
 
-- darwin: mas app (id `1451685025`) — the GUI client only, same as before.
-- NixOS: skips the `wireguird` GTK client entirely (unpackaged, Go+GTK3 with
-  a `fileb0x`-generated asset step and no real maintenance signal — not
-  worth vendoring a `buildGoModule` derivation for). Instead the tunnel is a
-  declarative NetworkManager connection profile
-  (`networking.networkmanager.ensureProfiles`), which gets `plasma-nm`'s tray
-  applet for free on KDE hosts (`plasma6.nix` adds it automatically whenever
-  `networking.networkmanager.enable` is on) — no custom package needed.
-  `networking.networkmanager.enable` itself lives in `modules/kde` right next
-  to `services.pipewire`, not its own module — same "bundle infra the
-  desktop session wants" precedent, and there's no nixos host in this fleet
-  that wants NM without KDE (or KDE without NM) to justify splitting it out.
-  `modules/wireguard` doesn't check for this — enabling wireguard on a nixos
-  host without kde just silently produces a NetworkManager connection
-  profile that never applies (no NM running to apply it), no error. Same
-  tradeoff as everywhere else post-unwind (see "fail-fast on unsupported
-  `*.enable`" below); worth remembering if this fleet ever grows a
-  non-KDE nixos host that wants the tunnel.
-- `modules/wireguard` is done (mechanism only). `agenix` is wired in as a
-  flake input + nixos module, with a
-  `nix develop` devShell exposing the `agenix` CLI. Secrets use a single
-  shared operator age key (not per-host, not ssh-host-key-based) delivered
-  onto each machine out-of-band (USB) as `/etc/age/host.key` during
-  install — one identity file has to exist before a host can decrypt
-  anything at all, and a shared operator key means that file is identical
-  across hosts (provisioned once, copied everywhere) instead of needing a
-  distinct one minted and distributed per host.
+- Both platforms are aligned on plain wg-quick `.conf` files now — no
+  NetworkManager, no `ensureProfiles`, no per-field Nix templating on either
+  side. `wireguard.tunnels` on a host's `config.nix` is a list of tunnel
+  *names* (e.g. `[ "home" ]`), each with a colocated
+  `modules/wireguard/<name>.conf.age` — the entire wg-quick config encrypted
+  as one file, not just the private key. Nix's job per platform is just
+  "decrypt this file to the right path with the right ownership":
+  - darwin: `age.secrets.<name>.path` → `~/.wireguard/<name>.conf`, owned by
+    the host user. `homebrew.masApps.WireGuard` (id `1451685025`) is still
+    the actual on/off control — its menu bar toggle is the ad-hoc UX wanted,
+    and WireGuard.app already expects exactly this wg-quick `.conf` format
+    for its manual "Import tunnel(s) from file..." (no watched folder, no
+    live reload, so this is still a one-time-or-per-rotation manual import).
+  - nixos: `age.secrets.<name>.path` → `/etc/wireguard/<name>.conf`
+    (`wg-quick`'s own bare-name lookup convention), mode `0400`.
+    `pkgs.wireguard-tools` is installed, but nothing runs `wg-quick up` yet —
+    the original plan (NetworkManager + `plasma-nm`'s tray applet for an
+    ad-hoc GUI toggle) doesn't apply once NM is out of the picture, and no
+    replacement toggle mechanism has been chosen (a KRunner/shortcut running
+    `wg-quick up/down` with a scoped sudoers rule, a systemd service started
+    via a desktop launcher, or just plain CLI — undecided, deliberately
+    deferred). `networking.networkmanager.enable` still lives in
+    `modules/kde` for unrelated reasons (general desktop networking, Arch
+    parity) — no longer anything to do with wireguard.
+- Secrets: `agenix`'s nixos/darwin modules (`inputs.agenix.{nixos,darwin}
+  Modules.default` in `lib.nix`) provide the actual runtime mechanism —
+  `age.secrets.<name>.file`/`.path`, decrypted at activation using
+  `age.identityPaths` (hardcoded in `lib.nix`, alongside the shared operator
+  pubkey, as `ageIdentityPath`/`ageRecipient` — every host shares one
+  operator key rather than a distinct per-host identity, and both values
+  live in exactly one place, referenced by `agenixIdentityModule` and the
+  devShell's `age-edit` script). The `agenix` *CLI* and its `secrets.nix`
+  convention were dropped after standing it up once and finding it just
+  duplicated what `age.secrets.<name>.file = ./<name>.conf.age;` already
+  declares — recipients only matter at encrypt time, decrypt-side options
+  don't read `secrets.nix` at all. `age-edit <file>` (in the `nix develop`
+  devShell) does decrypt-into-`vim`-reencrypt against the same hardcoded
+  identity/recipient, with a `trap`-guaranteed temp-file cleanup — no
+  separate rules file, no per-secret ceremony.
+- The private key has to be decryptable at activation, so the identity
+  (`/etc/age/host.key`) has to exist on a host *before* Nix does anything —
+  an unavoidable one-time bootstrap step, same as `passwd`/`useradd` in
+  `archlinux-instructions.sh`. Resolved as: one shared operator age key
+  (not per-host), generated once, carried on a USB stick (or similar
+  physical medium — no network/CLI dependency needed on a bare install
+  environment), copied to `/etc/age/host.key` during every host's install.
 - Still needed before this actually works on a host:
-  1. `age-keygen` the real operator key once, replace the placeholder
-     pubkey in `secrets/secrets.nix`.
-  2. Set `wireguard.tunnel = { name; address; peerPublicKey; endpoint;
-     allowedIPs; }` on `bfiola-desktop-linux`'s `config.nix` (the actual
-     tunnel/peer values aren't decided yet).
-  3. `agenix -e secrets/<tunnel.name>.env.age` (from `nix develop`) with a
-     `WG_PRIVATE_KEY=...` line.
-  4. Copy `/etc/age/host.key` onto the host from the USB during install.
+  1. Decide on a nixos toggle mechanism (see above).
+  2. Set `wireguard.tunnels = [ "home" ];` (or whatever it ends up being
+     named) on `bfiola-desktop-linux`'s `config.nix`.
+  3. `age-edit modules/wireguard/home.conf.age` (from `nix develop`) with
+     the real wg-quick config content.
+  4. Copy the operator's `/etc/age/host.key` onto the host from the USB
+     during install.
 
 ## Supporting work
 

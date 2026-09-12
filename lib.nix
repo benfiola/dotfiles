@@ -1,5 +1,8 @@
 { nixpkgs, nix-darwin }:
 let
+  ageIdentityPath = "/etc/age/host.key";
+  ageRecipient = "age1qlrgcllugyaa9dadhjtyylldq0hpjsdxw7qu38v42j3s6ywzmuyqddqxrv";
+
   fileEntries =
     dir:
     map (name: {
@@ -74,6 +77,10 @@ in
           config.nixpkgs.config.permittedInsecurePackages = config.dotfiles.insecurePackages;
         };
 
+      agenixIdentityModule = {
+        age.identityPaths = [ ageIdentityPath ];
+      };
+
       mkHomeManagerModule = host: {
         config = nixpkgs.lib.mkMerge [
           (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
@@ -109,6 +116,8 @@ in
               system.primaryUser = host.config.user;
             }
             insecurePackagesModule
+            inputs.agenix.darwinModules.default
+            agenixIdentityModule
             inputs.home-manager.darwinModules.home-manager
             inputs.nix-homebrew.darwinModules.nix-homebrew
             (mkHomeManagerModule host)
@@ -126,6 +135,7 @@ in
             { system.stateVersion = "26.05"; }
             insecurePackagesModule
             inputs.agenix.nixosModules.default
+            agenixIdentityModule
             inputs.nixos-wsl.nixosModules.default
             { wsl.enable = host.config.wsl; }
             inputs.home-manager.nixosModules.home-manager
@@ -141,7 +151,6 @@ in
     {
       mkConfig,
       hostsDirs,
-      inputs,
       packages ? (_: [ ]),
     }:
     let
@@ -152,10 +161,38 @@ in
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
+        ageEdit = pkgs.writeShellScriptBin "age-edit" ''
+          set -euo pipefail
+
+          if [ "$#" -ne 1 ]; then
+            echo "usage: age-edit <file>" >&2
+            exit 1
+          fi
+          file="$1"
+
+          tmp=$(mktemp)
+          trap 'shred -u "$tmp" 2>/dev/null || rm -f "$tmp"' EXIT
+          chmod 600 "$tmp"
+
+          if [ -f "$file" ]; then
+            ${pkgs.age}/bin/age -d -i "${ageIdentityPath}" -o "$tmp" "$file"
+          fi
+
+          ${pkgs.vim}/bin/vim "$tmp"
+
+          ${pkgs.age}/bin/age -e -r "${ageRecipient}" -o "$file.new" "$tmp"
+          mv "$file.new" "$file"
+        '';
       in
       {
         default = pkgs.mkShell {
-          packages = [ inputs.agenix.packages.${system}.default ] ++ packages system;
+          packages = [
+            pkgs.age
+            pkgs.vim
+            ageEdit
+          ]
+          ++ packages system;
         };
       }
     );
