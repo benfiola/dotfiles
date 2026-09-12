@@ -18,16 +18,21 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
   to `services.pipewire`, not its own module — same "bundle infra the
   desktop session wants" precedent, and there's no nixos host in this fleet
   that wants NM without KDE (or KDE without NM) to justify splitting it out.
-  `modules/wireguard` asserts against the real
-  `config.networking.networkmanager.enable` rather than assuming who turns it
-  on, so this isn't load-bearing if that ever changes.
+  `modules/wireguard` doesn't check for this — enabling wireguard on a nixos
+  host without kde just silently produces a NetworkManager connection
+  profile that never applies (no NM running to apply it), no error. Same
+  tradeoff as everywhere else post-unwind (see "fail-fast on unsupported
+  `*.enable`" below); worth remembering if this fleet ever grows a
+  non-KDE nixos host that wants the tunnel.
 - `modules/wireguard` is done (mechanism only). `agenix` is wired in as a
   flake input + nixos module, with a
   `nix develop` devShell exposing the `agenix` CLI. Secrets use a single
   shared operator age key (not per-host, not ssh-host-key-based) delivered
   onto each machine out-of-band (USB) as `/etc/age/host.key` during
-  install — see the comment block at the top of
-  `modules/wireguard/default.nix` for the reasoning.
+  install — one identity file has to exist before a host can decrypt
+  anything at all, and a shared operator key means that file is identical
+  across hosts (provisioned once, copied everywhere) instead of needing a
+  distinct one minted and distributed per host.
 - Still needed before this actually works on a host:
   1. `age-keygen` the real operator key once, replace the placeholder
      pubkey in `secrets/secrets.nix`.
@@ -58,8 +63,8 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
   keyboard/spelling behavior, …); the handful without one (Safari dev menu,
   `NSQuitAlwaysKeepsWindows`, Finder's `WarnOnEmptyTrash`) go through
   `system.defaults.CustomUserPreferences`. `macos.enable` defaults to `true`
-  for darwin hosts in `config.nix`; asserts (in the `home` block, like
-  `kde`/`docker`) if enabled elsewhere.
+  for darwin hosts in `config.nix`, `false` everywhere else — no assertion
+  enforcing that (see "fail-fast on unsupported `*.enable`" below).
 - ~~**`graphical` profile**~~ — done. `bfiola-desktop-linux` sets
   `profile = "graphical"`; the `os` block in `config.nix` enables
   `ghostty`/`fonts` for graphical hosts on every platform, plus
@@ -71,18 +76,33 @@ Porting the remaining `dotfiles-old` Ansible roles into flake modules. Pattern:
   `root_config.sh` tweaks ported to `programs.plasma` via plasma-manager
   (workspace theme, fonts, krunner, shortcuts, krunner plugin disables) on
   the home-manager side.
-- **fail-fast on unsupported `*.enable`** — `modules/apps` (per-app
-  package/cask presence) and `docker` (wsl) still assert; `kde`/`macos` keep
-  their original hand-rolled `platform != "x"` checks. Tried generalizing
-  this to every module (a `platforms = [...]` field consumed generically in
-  `lib.nix`, plus a systemic check that `config.platform` is a recognized
-  value at all) so a host enabling something its platform can't provide
-  would always fail loudly instead of silently no-op-ing — unwound it
-  deliberately: the generic mechanism added real complexity to `lib.nix`
-  (tripped over a genuine Nix module-system footgun getting `pkgs` to still
-  reach wrapped modules) to guard against a platform that isn't on the
-  roadmap, in a repo with an audience of one. Not worth it here; revisit
-  only if a third platform actually shows up.
+- **fail-fast on unsupported `*.enable`** — tried, then fully unwound; none
+  of it exists anymore. Went through three stages: (1) hand-rolled
+  `!(config.X.enable && config.platform != "y")` assertions in
+  `kde`/`macos`/`docker` (wsl-specific) plus per-app package/cask-presence
+  assertions in `modules/apps`; (2) generalized that into a
+  `platforms = [...]` field any module could declare, consumed generically
+  by `lib.nix` (plus a systemic check that `config.platform` itself is a
+  recognized value), so any unsupported combination — including a
+  not-yet-invented third platform — would fail loudly instead of silently
+  no-op-ing; (3) removed all of it, including stage (1)'s original checks.
+  The generic mechanism in particular added real complexity to `lib.nix`
+  (tripped over a genuine Nix module-system footgun: a hand-written wrapper
+  function's own argument pattern determines which specialArgs — `pkgs`
+  included — the module system injects into whatever it wraps, so wrapping
+  silently dropped `pkgs` from every `home` module) to guard against a
+  platform that isn't on the roadmap. And even the narrower, pre-existing
+  checks were validating things a single-user 3-host repo doesn't need
+  validated for it — a misconfigured `*.enable` now just silently produces
+  no effect, which is easy enough to notice and fix by hand.
+  `config.nix` needs platform-correct enables up front; nothing in
+  `modules/` double-checks that anymore. Where a host property really does
+  need to flip other `.enable` flags (wsl disabling docker), that derivation
+  lives in `config.nix` itself now — a `wslNixos` block merged in exactly
+  like `graphicalNixos`/`darwin` already were, keyed off `host.wsl` the same
+  way those are keyed off `profile`/`platform` — rather than each host
+  repeating the override or a module reaching for `config.wsl` at the point
+  of use.
 - **`c` role** — dropped for now; revisit if a global C toolchain is wanted vs
   per-project `nix develop`.
 - ~~**`vscode`**~~ — done (`modules/vscode`). Old role's `vscode-init` shell

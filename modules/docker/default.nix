@@ -23,7 +23,7 @@
     let
       config = host.config;
     in
-    lib.mkIf (config.docker.enable && !config.wsl) {
+    lib.mkIf (config.docker.enable) {
       virtualisation.docker.enable = true;
       users.users.${config.user}.extraGroups = [ "docker" ];
     };

@@ -19,7 +19,7 @@
       hostConfig = host.config;
       tunnel = hostConfig.wireguard.tunnel or null;
     in
-    lib.mkIf (hostConfig.wireguard.enable && !hostConfig.wsl && tunnel != null) (
+    lib.mkIf hostConfig.wireguard.enable (
       let
         secretName = "${tunnel.name}-env";
       in
