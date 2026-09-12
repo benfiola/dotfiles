@@ -1,4 +1,17 @@
+let
+  system =
+    { host, lib, ... }:
+    let
+      config = host.config;
+    in
+    lib.mkIf config.vscode.enable {
+      nixpkgs.config.allowUnfreePackages = [ "vscode" ];
+    };
+in
 {
+  nixos = system;
+  darwin = system;
+
   home =
     {
       host,
@@ -9,7 +22,15 @@
     }:
     let
       config = host.config;
-      marketplace = inputs.nix-vscode-extensions.extensions.${pkgs.system}.vscode-marketplace;
+      pkgsExt = import inputs.nixpkgs {
+        inherit (pkgs) system;
+        config.allowUnfreePackages = [
+          "vscode-extension-anthropic-claude-code"
+          "vscode-extension-ms-vscode-remote-remote-containers"
+        ];
+        overlays = [ inputs.nix-vscode-extensions.overlays.default ];
+      };
+      marketplace = pkgsExt.vscode-marketplace;
     in
     lib.mkIf config.vscode.enable {
       programs.vscode = {
