@@ -9,7 +9,7 @@
     lib.mkIf config.contexts.enable {
       homebrew.casks = [ "contexts" ];
 
-      age.secrets.${nameOf license} = {
+      age.secrets."contexts-${nameOf license}" = {
         file = license;
         path = "/Users/${config.user}/.contexts/${nameOf license}";
         owner = config.user;
