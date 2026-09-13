@@ -52,6 +52,20 @@
         CustomUserPreferences = {
           NSGlobalDomain.WebKitDeveloperExtras = true;
           "com.apple.finder".WarnOnEmptyTrash = false;
+          "com.apple.symbolichotkeys".AppleSymbolicHotKeys = {
+            # spotlight: ctrl + opt + cmd + space
+            "64" = {
+              enabled = true;
+              value = {
+                type = "standard";
+                parameters = [
+                  32
+                  49
+                  1835008
+                ];
+              };
+            };
+          };
           "com.apple.systempreferences".NSQuitAlwaysKeepsWindows = false;
           "com.apple.Safari" = {
             IncludeDevelopMenu = true;
