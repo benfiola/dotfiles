@@ -15,5 +15,7 @@
       prefsDir = "${config.home.homeDirectory}/source/github.com/benfiola/dotfiles/modules/alfred/Alfred.alfredpreferences";
     in
     lib.mkIf hostConfig.alfred.enable {
+      home.file."Library/Application Support/Alfred/Alfred.alfredpreferences".source =
+        config.lib.file.mkOutOfStoreSymlink prefsDir;
     };
 }

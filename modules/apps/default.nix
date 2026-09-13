@@ -7,9 +7,6 @@ let
         id = 1352778147;
       };
     };
-    contexts = {
-      cask = "contexts";
-    };
     discord = {
       package = "vesktop";
       cask = "vesktop";
@@ -18,12 +15,6 @@ let
     gimp = {
       package = "gimp";
       cask = "gimp";
-    };
-    magnet = {
-      mas = {
-        name = "Magnet";
-        id = 441258766;
-      };
     };
     orcaslicer = {
       package = "orca-slicer";
