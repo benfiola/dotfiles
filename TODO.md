@@ -1,0 +1,5 @@
+- Store configuration of 'Alfred'
+- Store configuration of 'Contexts'
+- Store configuration of 'Magnet'
+- Update macOS preferences:
+  - Set librewolf as default browser

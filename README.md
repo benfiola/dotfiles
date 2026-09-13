@@ -15,7 +15,7 @@ Dotfiles expressed as a nix flake.
 7. From dotfiles directory, build derivation: `nix build '.#darwinConfigurations.bfiola-home-laptop.system'`.
 8. From dotfiles directory, activate derivation: `sudo ./result/sw/bin/darwin-rebuild switch --flake '.#bfiola-home-laptop'`.
 
-Subsequent rebuilds use: `sudo darwin-rebuild switch --flake ~/dotfiles#bfiola-home-laptop`.
+Subsequent rebuilds use: `sudo darwin-rebuild switch --flake [path]#[hostname]`
 
 ---
 
