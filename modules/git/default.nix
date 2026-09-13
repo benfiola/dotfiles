@@ -1,15 +1,15 @@
 {
   home =
-    { host, lib, ... }:
+    { host, lib, osConfig, ... }:
     let
       config = host.config;
       allowedSigners = "~/.config/git/allowed_signers";
-      gitDir = if config.platform == "darwin" then "/Users/${config.user}/.git" else "/home/${config.user}/.git";
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
 
       keyPath =
         key:
-        if lib.hasSuffix ".age" (builtins.baseNameOf key) then
-          "${gitDir}/${lib.removeSuffix ".age" (builtins.baseNameOf key)}"
+        if lib.hasSuffix ".age" (baseNameOf key) then
+          osConfig.age.secrets."git-${nameOf key}".path
         else
           "${key}";
 
@@ -52,8 +52,8 @@
     { host, lib, ... }:
     let
       config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
-      ageKeys = lib.filter (path: lib.hasSuffix ".age" (builtins.baseNameOf path)) (
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
+      ageKeys = lib.filter (path: lib.hasSuffix ".age" (baseNameOf path)) (
         map (identity: identity.signingKey) (lib.attrValues config.git.identities)
       );
     in
@@ -63,7 +63,6 @@
           name = "git-${nameOf path}";
           value = {
             file = path;
-            path = "/home/${config.user}/.git/${nameOf path}";
             owner = config.user;
           };
         }) ageKeys
@@ -74,8 +73,8 @@
     { host, lib, ... }:
     let
       config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
-      ageKeys = lib.filter (path: lib.hasSuffix ".age" (builtins.baseNameOf path)) (
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
+      ageKeys = lib.filter (path: lib.hasSuffix ".age" (baseNameOf path)) (
         map (identity: identity.signingKey) (lib.attrValues config.git.identities)
       );
     in
@@ -85,7 +84,6 @@
           name = "git-${nameOf path}";
           value = {
             file = path;
-            path = "/Users/${config.user}/.git/${nameOf path}";
             owner = config.user;
           };
         }) ageKeys

@@ -1,13 +1,13 @@
 {
   home =
-    { host, lib, ... }:
+    { host, lib, osConfig, ... }:
     let
       config = host.config;
-      sshDir = if config.platform == "darwin" then "/Users/${config.user}/.ssh" else "/home/${config.user}/.ssh";
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
       keyPath =
         key:
-        if lib.hasSuffix ".age" (builtins.baseNameOf key) then
-          "${sshDir}/${lib.removeSuffix ".age" (builtins.baseNameOf key)}"
+        if lib.hasSuffix ".age" (baseNameOf key) then
+          osConfig.age.secrets."ssh-${nameOf key}".path
         else
           "${key}";
     in
@@ -30,8 +30,8 @@
     { host, lib, ... }:
     let
       config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
-      ageKeys = lib.filter (path: lib.hasSuffix ".age" (builtins.baseNameOf path)) (
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
+      ageKeys = lib.filter (path: lib.hasSuffix ".age" (baseNameOf path)) (
         map (sshHost: sshHost.key) (lib.attrValues config.ssh.hosts)
       );
     in
@@ -41,7 +41,6 @@
           name = "ssh-${nameOf path}";
           value = {
             file = path;
-            path = "/home/${config.user}/.ssh/${nameOf path}";
             owner = config.user;
           };
         }) ageKeys
@@ -52,8 +51,8 @@
     { host, lib, ... }:
     let
       config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
-      ageKeys = lib.filter (path: lib.hasSuffix ".age" (builtins.baseNameOf path)) (
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
+      ageKeys = lib.filter (path: lib.hasSuffix ".age" (baseNameOf path)) (
         map (sshHost: sshHost.key) (lib.attrValues config.ssh.hosts)
       );
     in
@@ -63,7 +62,6 @@
           name = "ssh-${nameOf path}";
           value = {
             file = path;
-            path = "/Users/${config.user}/.ssh/${nameOf path}";
             owner = config.user;
           };
         }) ageKeys

@@ -8,7 +8,7 @@
     let
       hostConfig = host.config;
       tunnels = hostConfig.wireguard.tunnels;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
     in
     lib.mkMerge [
       (lib.mkIf hostConfig.wireguard.enable {
@@ -20,7 +20,7 @@
             name = nameOf path;
             value = {
               file = path;
-              path = "/Users/${hostConfig.user}/.wireguard/${nameOf path}";
+              path = "/Users/${hostConfig.user}/.dotfiles/wireguard/${nameOf path}";
               owner = hostConfig.user;
             };
           }) tunnels
@@ -38,7 +38,7 @@
     let
       hostConfig = host.config;
       tunnels = hostConfig.wireguard.tunnels;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
     in
     lib.mkIf (hostConfig.wireguard.enable && tunnels != [ ]) {
       environment.systemPackages = [ pkgs.wireguard-tools ];

@@ -3,7 +3,7 @@
     { host, lib, ... }:
     let
       config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (builtins.baseNameOf path);
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
       license = ./license.contexts-license.age;
     in
     lib.mkIf config.contexts.enable {
@@ -11,7 +11,7 @@
 
       age.secrets."contexts-${nameOf license}" = {
         file = license;
-        path = "/Users/${config.user}/.contexts/${nameOf license}";
+        path = "/Users/${config.user}/.dotfiles/contexts/${nameOf license}";
         owner = config.user;
       };
 

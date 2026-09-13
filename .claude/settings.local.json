@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nix flake *)",
+      "Bash(HM=/nix/store/v573js9566ja0r1r1s8pw6y06z2wq5k4-source *)",
+      "Read(//nix/store/v573js9566ja0r1r1s8pw6y06z2wq5k4-source/nixos/**)",
+      "Read(//nix/store/v573js9566ja0r1r1s8pw6y06z2wq5k4-source/**)",
+      "Read(//nix/store/v573js9566ja0r1r1s8pw6y06z2wq5k4-source/nix-darwin/**)",
+      "Bash(git stash *)",
+      "Bash(nix eval *)"
+    ]
+  }
+}
