@@ -1,6 +1,6 @@
 { nixpkgs, nix-darwin }:
 let
-  ageIdentityPath = "/etc/age/host.key";
+  ageIdentityPath = "/etc/age/dotfiles.key";
   ageRecipient = "age1qlrgcllugyaa9dadhjtyylldq0hpjsdxw7qu38v42j3s6ywzmuyqddqxrv";
 
   fileEntries =

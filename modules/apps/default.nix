@@ -1,8 +1,5 @@
 let
   apps = {
-    alfred = {
-      cask = "alfred";
-    };
     bitwarden = {
       package = "bitwarden-desktop";
       mas = {

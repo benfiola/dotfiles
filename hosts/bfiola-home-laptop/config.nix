@@ -16,7 +16,10 @@ mkConfig {
     email = "me@benfiola.com";
     signingKey = localKey;
   };
-  ssh.hosts."github.com-localkey".key = localKey;
+  ssh.hosts."github.com-localkey" = {
+    key = localKey;
+    hostname = "github.com";
+  };
   wireguard.tunnels = [
     ./wireguard-infrastructure.conf.age
     ./wireguard-management.conf.age

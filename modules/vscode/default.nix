@@ -52,6 +52,7 @@ in
 
           userSettings = {
             "chat.disableAIFeatures" = true;
+            "claudeCode.hideOnboarding" = true;
             "claudeCode.preferredLocation" = "sidebar";
             "claudeCode.selectedModel" = "haiku";
             "claudeCode.useCtrlEnterToSend" = true;

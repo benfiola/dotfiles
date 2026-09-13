@@ -9,9 +9,9 @@ Dotfiles expressed as a nix flake.
 1. Create user account.
 2. Install Xcode CLI Tools: `xcode-select --install`.
 3. Sign in to the App Store.
-4. Install Nix: `curl -fsSL https://install.determinate.systems/nix | sh -s -- install`.
+4. Install Nix: `curl -fsSL https://artifacts.nixos.org/nix-installer | sh -s -- install --enable-flakes`.
 5. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
-6. Install age key to `/etc/age/age.key`.
+6. Install age key to `/etc/age/dotfiles.key`.
 7. From dotfiles directory, build derivation: `nix build '.#darwinConfigurations.bfiola-home-laptop.system'`.
 8. From dotfiles directory, activate derivation: `sudo ./result/sw/bin/darwin-rebuild switch --flake '.#bfiola-home-laptop'`.
 
