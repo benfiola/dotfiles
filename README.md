@@ -14,10 +14,27 @@ Dotfiles expressed as a nix flake.
 6. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
 7. Install age key to `/etc/age/dotfiles.key`.
 8. From dotfiles directory, build derivation: `nix build '.#darwinConfigurations.bfiola-home-laptop.system'`.
-9. From dotfiles directory, activate derivation: `sudo ./result/sw/bin/darwin-rebuild switch --flake '.#bfiola-home-laptop'`.
+9. From dotfiles directory, activate derivation: `sudo ./result/sw/bin/darwin-rebuild switch --flake '.#[hostname]'`.
 10. Remove 'Full Disk Access' from Terminal, set 'Full Disk Access' for desired terminal emulator.
 
 Subsequent rebuilds use: `sudo darwin-rebuild switch --flake [path]#[hostname]`
+
+---
+
+## Windows Setup (NixOS-WSL)
+
+1. Ensure WSL2 is enabled.
+2. Download the [NixOS WSL image](https://github.com/nix-community/NixOS-WSL/releases).
+3. Create a NixOS WSL distribution: `wsl --install --from-file nixos.wsl --name [name]`
+4. Launch the distribution.
+5. Enable flakes for bootstrap commands: `sudo nix shell nixpkgs#vim --command vim /etc/nix/nix.conf` and add `experimental-features = nix-command flakes`.
+6. Install age key to `/etc/age/dotfiles.key`.
+7. Clone dotfiles: `nix shell nixpkgs#git --command git clone https://github.com/benfiola/dotfiles ...`
+8. From dotfiles directory, switch to the flake-defined config: `sudo nixos-rebuild switch --flake '.#[hostname]'`
+9. Restart the distribution so the configured user (`wsl.defaultUser`) takes effect: `wsl -t [name]`, then `wsl -d [name]`.
+10. Relocate dotfiles into the new user's home directory: `sudo mv [path] /home/[user]/source/github.com/benfiola/dotfiles && sudo chown -R [user]:users /home/[user]/source/github.com/benfiola/dotfiles`
+
+Subsequent rebuilds use: `sudo nixos-rebuild switch --flake [path]#[hostname]`
 
 ---
 

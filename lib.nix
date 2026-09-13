@@ -82,6 +82,13 @@ in
         age.identityPaths = [ ageIdentityPath ];
       };
 
+      experimentalFeaturesModule = {
+        nix.settings.experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
+      };
+
       mkHomeManagerModule = host: {
         config = nixpkgs.lib.mkMerge [
           (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
@@ -117,6 +124,7 @@ in
               system.primaryUser = host.config.user;
             }
             insecurePackagesModule
+            experimentalFeaturesModule
             inputs.agenix.darwinModules.default
             agenixIdentityModule
             inputs.home-manager.darwinModules.home-manager
@@ -135,10 +143,14 @@ in
           modules = [
             { system.stateVersion = "26.05"; }
             insecurePackagesModule
+            experimentalFeaturesModule
             inputs.agenix.nixosModules.default
             agenixIdentityModule
             inputs.nixos-wsl.nixosModules.default
-            { wsl.enable = host.config.wsl; }
+            {
+              wsl.enable = host.config.wsl;
+              wsl.defaultUser = host.config.user;
+            }
             inputs.home-manager.nixosModules.home-manager
             (mkHomeManagerModule host)
             host.hardware

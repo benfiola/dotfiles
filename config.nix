@@ -18,6 +18,7 @@ let
         arch = "aarch64";
         vmType = "vz";
         rosetta = true;
+        runtime = "docker";
         nestedVirtualization = true;
       };
     };
