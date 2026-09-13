@@ -19,6 +19,7 @@ let
         vmType = "vz";
         rosetta = true;
         runtime = "docker";
+        mounts = [ ];
         nestedVirtualization = true;
       };
     };

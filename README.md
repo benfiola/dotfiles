@@ -27,7 +27,8 @@ Subsequent rebuilds use: `sudo darwin-rebuild switch --flake [path]#[hostname]`
 2. Download the [NixOS WSL image](https://github.com/nix-community/NixOS-WSL/releases).
 3. Create a NixOS WSL distribution: `wsl --install --from-file nixos.wsl --name [name]`
 4. Launch the distribution.
-5. Enable flakes for bootstrap commands: `sudo nix shell nixpkgs#vim --command vim /etc/nix/nix.conf` and add `experimental-features = nix-command flakes`.
+5. Enable flakes for bootstrap commands: `sudo nix shell nixpkgs#vim --extra-experimental-features 'nix-command flakes' --command vim /etc/nixos/configuration.nix` and add `nix.settings.experimental-features = ["nix-command" "flakes"];`.
+6. Update the distribution: `sudo nix-channel --update && sudo nixos-rebuild switch`.   
 6. Install age key to `/etc/age/dotfiles.key`.
 7. Clone dotfiles: `nix shell nixpkgs#git --command git clone https://github.com/benfiola/dotfiles ...`
 8. From dotfiles directory, switch to the flake-defined config: `sudo nixos-rebuild switch --flake '.#[hostname]'`
