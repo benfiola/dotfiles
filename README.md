@@ -57,7 +57,7 @@ Two host-level basics were missing outside of WSL, both fixed in the NixOS branc
 - **Hostname.** Every NixOS host — WSL included — defaulted to nixpkgs' own `"nixos"` unless
   something set it. Nothing did. Now `networking.hostName` defaults (via `mkDefault`, so a
   host can still override it) to the host's directory name under `hosts/`.
-- **`wheel` / sudo.** This one *is* WSL-specific — `nixos-wsl` grants its default user
+- **`wheel` / sudo.** This one _is_ WSL-specific — `nixos-wsl` grants its default user
   `wheel` membership and passwordless sudo, which nothing else does. Bare metal installed
   with only `extraGroups = [ "docker" ]` and no way to sudo. `wheel` is now added
   unconditionally alongside it.
@@ -88,9 +88,9 @@ GPT/UEFI, ESP + LVM root + swap — the same layout as `archlinux-instructions.s
 
 ```bash
 parted /dev/sda -- mktable gpt
-parted /dev/sda -- mkpart ESP fat32 1MB 512MB
+parted /dev/sda -- mkpart ESP fat32 1MB 1024MB
 parted /dev/sda -- set 1 esp on
-parted /dev/sda -- mkpart primary 512MB -8GB
+parted /dev/sda -- mkpart primary 1024MB -8GB
 parted /dev/sda -- set 2 lvm on
 parted /dev/sda -- mkpart primary linux-swap -8GB 100%
 
@@ -135,8 +135,9 @@ cp /mnt/etc/nixos/hardware-configuration.nix /mnt/etc/dotfiles/hosts/[hostname]/
 
 The generated file covers filesystems, swap, initrd modules and `nixpkgs.hostPlatform`.
 Nothing needs to be added for the bootloader — `lib.nix` defaults every non-WSL NixOS host to
-`systemd-boot` + EFI (via `mkDefault`, so this host's `hardware.nix` can still override it, e.g.
-for a legacy BIOS machine that needs GRUB instead).
+`lanzaboote` (systemd-boot + secure boot signing) + EFI (via `mkDefault`, so this host's
+`hardware.nix` can still override it, e.g. for a legacy BIOS machine that needs GRUB instead,
+or one that can't do secure boot at all).
 
 ### 6. Stage it — this is the step that makes the build work
 
@@ -161,7 +162,27 @@ Secrets are decrypted at activation, not at build time — a missing key still b
 installs fine, it just fails the agenix units at boot (wireguard tunnels, local SSH keys).
 If the key is not to hand, set `wireguard.enable = false` for the host and carry on.
 
-### 8. Install
+### 8. Generate secure boot keys
+
+`lanzaboote` signs the boot image with keys it reads from `/var/lib/sbctl` (the
+`pkiBundle` set in `lib.nix`) at install/rebuild time — they need to exist on the target disk
+*before* `nixos-install` runs the bootloader step below, or the install fails with nothing to
+sign with. Key *creation* doesn't require firmware Setup Mode — only *enrolling* them into the
+firmware does, which happens after first boot in step 11 — so it's safe to do now, from the ISO:
+
+```bash
+nix shell nixpkgs#sbctl
+mkdir -p /mnt/var/lib/sbctl /var/lib/sbctl
+mount --bind /mnt/var/lib/sbctl /var/lib/sbctl
+sbctl create-keys
+umount /var/lib/sbctl
+```
+
+The bind mount exists only because `sbctl` always writes to `/var/lib/sbctl` with no `--root`
+flag of its own — this lands the keys on `/mnt` instead of the ISO's tmpfs so they're still
+there after reboot.
+
+### 9. Install
 
 ```bash
 nixos-install --flake /mnt/etc/dotfiles#[hostname]
@@ -169,7 +190,7 @@ nixos-install --flake /mnt/etc/dotfiles#[hostname]
 
 It prompts for a root password at the end. Reboot, remove the USB.
 
-### 9. First boot
+### 10. First boot
 
 Log in as `root` on a TTY (the graphical profile brings up SDDM; use `Ctrl+Alt+F2`), then:
 
@@ -177,7 +198,32 @@ Log in as `root` on a TTY (the graphical profile brings up SDDM; use `Ctrl+Alt+F
 passwd bfiola
 ```
 
-### 10. Commit the hardware configuration
+### 11. Enable secure boot
+
+The system now boots signed but unenforced — Secure Boot is still off in firmware. Once
+you're confident the install is good, enroll the keys and turn enforcement on. This is the
+same `sbctl enroll-keys`/sign dance as `archlinux-instructions.sh`, except signing itself is
+no longer a manual step from here on — `lanzaboote` re-signs the boot image automatically on
+every `nixos-rebuild switch`.
+
+1. Reboot into firmware setup and put Secure Boot into **Setup Mode** (clears the existing
+   Microsoft-only "Windows-compatible" keys the board ships with). The exact path is
+   vendor-specific; on most boards it's Security → Secure Boot → Reset to Setup Mode / Erase
+   Platform Key.
+2. Boot back into NixOS and enroll keys, including Microsoft's certs so OptionROMs (and
+   Windows, if dual-booting) keep working — mirrors the `-m` flag `archlinux-instructions.sh`
+   passes to the same command:
+   ```bash
+   sudo sbctl enroll-keys --microsoft
+   ```
+3. Reboot into firmware again and turn Secure Boot enforcement **on**.
+4. Reboot into NixOS and verify:
+   ```bash
+   bootctl status   # look for "Secure Boot: enabled"
+   sudo sbctl verify
+   ```
+
+### 12. Commit the hardware configuration
 
 Now that the machine boots, from `/etc/dotfiles`:
 
@@ -205,10 +251,10 @@ error: getting status of '/nix/store/...-source/hosts/[hostname]/hardware.nix': 
 
 Three ways out, in order of preference:
 
-| Approach | Effect |
-| --- | --- |
-| `git add [file]` | Staged-but-uncommitted files **are** visible. Builds, warns `Git tree is dirty`. |
-| `git add -N [file]` | Records the path only, leaves contents unstaged. Enough for Nix to see it. |
+| Approach                                      | Effect                                                                                             |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `git add [file]`                              | Staged-but-uncommitted files **are** visible. Builds, warns `Git tree is dirty`.                   |
+| `git add -N [file]`                           | Records the path only, leaves contents unstaged. Enough for Nix to see it.                         |
 | `nix ... 'path:/mnt/etc/dotfiles#[hostname]'` | The `path:` prefix bypasses git entirely and copies the directory as-is, untracked files included. |
 
 So the ordering problem resolves itself: **stage, build, boot, then commit.** A commit is
@@ -232,9 +278,10 @@ To regenerate it on an already-installed machine:
 sudo nixos-generate-config --show-hardware-config > hosts/[hostname]/hardware.nix
 ```
 
-Nothing to re-add for the bootloader — `lib.nix` supplies the `systemd-boot`/EFI default for
-every non-WSL host (see [step 5](#5-install-hardwarenix) above). Only add bootloader options
-here if this host needs to override that default.
+Nothing to re-add for the bootloader — `lib.nix` supplies the `lanzaboote`
+(systemd-boot + secure boot)/EFI default for every non-WSL host (see
+[step 5](#5-install-hardwarenix) above). Only add bootloader options here if this host needs
+to override that default.
 
 ---
 

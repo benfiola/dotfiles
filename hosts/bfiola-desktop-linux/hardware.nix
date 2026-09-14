@@ -1,8 +1,9 @@
 # TODO: generate valid hardware configuration
 #
-# bootloader (systemd-boot + EFI) defaults in lib.nix via mkBootloaderModule;
-# override here (e.g. boot.loader.systemd-boot.enable = false; boot.loader.grub.enable
-# = true;) only if this host turns out to need legacy BIOS/GRUB instead.
+# bootloader (lanzaboote + systemd-boot + EFI, secure boot signed) defaults in lib.nix
+# via mkBootloaderModule; override here (e.g. boot.lanzaboote.enable = false;
+# boot.loader.systemd-boot.enable = true; boot.loader.grub.enable = true;) only if this
+# host turns out to need legacy BIOS/GRUB, or can't do secure boot, instead.
 {
   config,
   lib,

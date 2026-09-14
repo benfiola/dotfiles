@@ -106,8 +106,10 @@ in
       mkBootloaderModule =
         host:
         nixpkgs.lib.mkIf (!host.config.wsl) {
-          boot.loader.systemd-boot.enable = nixpkgs.lib.mkDefault true;
+          boot.loader.systemd-boot.enable = nixpkgs.lib.mkDefault false;
           boot.loader.efi.canTouchEfiVariables = nixpkgs.lib.mkDefault true;
+          boot.lanzaboote.enable = nixpkgs.lib.mkDefault true;
+          boot.lanzaboote.pkiBundle = nixpkgs.lib.mkDefault "/var/lib/sbctl";
         };
 
       mkHomeManagerModule = host: {
@@ -170,6 +172,7 @@ in
             agenixIdentityModule
             inputs.nixos-wsl.nixosModules.default
             (mkWslModule host)
+            inputs.lanzaboote.nixosModules.lanzaboote
             (mkBootloaderModule host)
             inputs.home-manager.nixosModules.home-manager
             (mkHomeManagerModule host)
