@@ -94,7 +94,6 @@ in
           (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
             users.users.${host.config.user} = {
               isNormalUser = nixpkgs.lib.mkDefault true;
-              linger = true;
             };
           })
           (nixpkgs.lib.mkIf (host.config.platform == "darwin") {

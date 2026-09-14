@@ -28,13 +28,16 @@ Subsequent rebuilds use: `sudo darwin-rebuild switch --flake [path]#[hostname]`
 3. Create a NixOS WSL distribution: `wsl --install --from-file nixos.wsl --name [name]`
 4. Launch the distribution.
 5. Update the distribution: `sudo nix-channel --update && sudo nixos-rebuild switch`.
-6. Start nix shell for bootstrap commands: `sudo nix shell nixpkgs#vim nixpkgs#git --extra-experimental-features 'nix-command flakes'`
-7. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
-8. Install age key to `/etc/age/dotfiles.key`.
-9. Exit bootstrap shell.
-10. From dotfiles directory, switch to the flake-defined config: `sudo nixos-rebuild switch --flake '.#[hostname]'`
-11. Restart the distribution so the configured user (`wsl.defaultUser`) takes effect: `wsl -t [name]`, then `wsl -d [name]`.
-12. Relocate dotfiles into the new user's home directory: `sudo mv [path] /home/[user]/source/github.com/benfiola/dotfiles && sudo chown -R [user]:users /home/[user]/source/github.com/benfiola/dotfiles`
+6. Modify the default user: set `wsl.defaultUser` to the desired username via `sudo nixos-rebuild edit`.
+7. Apply changes: `sudo nixos-rebuild boot`
+8. Exit then terminate distribution.
+9. Restart distribution (as root) and immediately exit to apply derivation: `wsl -d [name] --user root exit`
+10. Terminate distribution again.
+11. Start distribution
+12. Start nix shell for bootstrap commands: `sudo nix shell nixpkgs#vim nixpkgs#git --extra-experimental-features 'nix-command flakes'`
+13. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
+14. Install age key to `/etc/age/dotfiles.key`.
+15. From the dotfiles directory, activate derivation: `sudo nixos-rebuild switch --flake [path]#[hostname]`.
 
 Subsequent rebuilds use: `sudo nixos-rebuild switch --flake [path]#[hostname]`
 
