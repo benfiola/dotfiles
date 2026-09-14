@@ -9,7 +9,23 @@ let
     };
 in
 {
-  nixos = system;
+  nixos =
+    {
+      host,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      config = host.config;
+    in
+    lib.mkMerge [
+      (system { inherit host lib; })
+      (lib.mkIf config.wsl {
+        programs.nix-ld.enable = true;
+        environment.systemPackages = [ pkgs.wget ];
+      })
+    ];
   darwin = system;
 
   home =
