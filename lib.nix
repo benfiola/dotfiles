@@ -89,11 +89,34 @@ in
         ];
       };
 
+      nixosStateVersionModule = {
+        system.stateVersion = "26.05";
+      };
+
+      mkDarwinSystemModule = host: {
+        system.stateVersion = 7;
+        system.primaryUser = host.config.user;
+      };
+
+      mkWslModule = host: {
+        wsl.enable = host.config.wsl;
+        wsl.defaultUser = host.config.user;
+      };
+
+      mkBootloaderModule =
+        host:
+        nixpkgs.lib.mkIf (!host.config.wsl) {
+          boot.loader.systemd-boot.enable = nixpkgs.lib.mkDefault true;
+          boot.loader.efi.canTouchEfiVariables = nixpkgs.lib.mkDefault true;
+        };
+
       mkHomeManagerModule = host: {
         config = nixpkgs.lib.mkMerge [
           (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
+            networking.hostName = nixpkgs.lib.mkDefault host.config.hostName;
             users.users.${host.config.user} = {
               isNormalUser = nixpkgs.lib.mkDefault true;
+              extraGroups = [ "wheel" ];
             };
           })
           (nixpkgs.lib.mkIf (host.config.platform == "darwin") {
@@ -121,10 +144,7 @@ in
           specialArgs = { inherit host inputs; };
           system = host.config.system;
           modules = [
-            {
-              system.stateVersion = 7;
-              system.primaryUser = host.config.user;
-            }
+            (mkDarwinSystemModule host)
             insecurePackagesModule
             experimentalFeaturesModule
             inputs.agenix.darwinModules.default
@@ -143,16 +163,14 @@ in
           specialArgs = { inherit host inputs; };
           system = host.config.system;
           modules = [
-            { system.stateVersion = "26.05"; }
+            nixosStateVersionModule
             insecurePackagesModule
             experimentalFeaturesModule
             inputs.agenix.nixosModules.default
             agenixIdentityModule
             inputs.nixos-wsl.nixosModules.default
-            {
-              wsl.enable = host.config.wsl;
-              wsl.defaultUser = host.config.user;
-            }
+            (mkWslModule host)
+            (mkBootloaderModule host)
             inputs.home-manager.nixosModules.home-manager
             (mkHomeManagerModule host)
             host.hardware
