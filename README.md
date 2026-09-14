@@ -27,13 +27,14 @@ Subsequent rebuilds use: `sudo darwin-rebuild switch --flake [path]#[hostname]`
 2. Download the [NixOS WSL image](https://github.com/nix-community/NixOS-WSL/releases).
 3. Create a NixOS WSL distribution: `wsl --install --from-file nixos.wsl --name [name]`
 4. Launch the distribution.
-5. Enable flakes for bootstrap commands: `sudo nix shell nixpkgs#vim --extra-experimental-features 'nix-command flakes' --command vim /etc/nixos/configuration.nix` and add `nix.settings.experimental-features = ["nix-command" "flakes"];`.
-6. Update the distribution: `sudo nix-channel --update && sudo nixos-rebuild switch`.   
-6. Install age key to `/etc/age/dotfiles.key`.
-7. Clone dotfiles: `nix shell nixpkgs#git --command git clone https://github.com/benfiola/dotfiles ...`
-8. From dotfiles directory, switch to the flake-defined config: `sudo nixos-rebuild switch --flake '.#[hostname]'`
-9. Restart the distribution so the configured user (`wsl.defaultUser`) takes effect: `wsl -t [name]`, then `wsl -d [name]`.
-10. Relocate dotfiles into the new user's home directory: `sudo mv [path] /home/[user]/source/github.com/benfiola/dotfiles && sudo chown -R [user]:users /home/[user]/source/github.com/benfiola/dotfiles`
+5. Update the distribution: `sudo nix-channel --update && sudo nixos-rebuild switch`.
+6. Start nix shell for bootstrap commands: `sudo nix shell nixpkgs#vim nixpkgs#git --extra-experimental-features 'nix-command flakes'`
+7. Clone dotfiles: `git clone https://github.com/benfiola/dotfiles ...`
+8. Install age key to `/etc/age/dotfiles.key`.
+9. Exit bootstrap shell.
+10. From dotfiles directory, switch to the flake-defined config: `sudo nixos-rebuild switch --flake '.#[hostname]'`
+11. Restart the distribution so the configured user (`wsl.defaultUser`) takes effect: `wsl -t [name]`, then `wsl -d [name]`.
+12. Relocate dotfiles into the new user's home directory: `sudo mv [path] /home/[user]/source/github.com/benfiola/dotfiles && sudo chown -R [user]:users /home/[user]/source/github.com/benfiola/dotfiles`
 
 Subsequent rebuilds use: `sudo nixos-rebuild switch --flake [path]#[hostname]`
 
