@@ -12,6 +12,8 @@ git clone https://github.com/benfiola/dotfiles ./dotfiles-old
 ARCH="$(uname -m)"
 if [ "${ARCH}" = "aarch64" ]; then
   ARCH="arm64"
+elif [ "${ARCH}" = "x86_64" ]; then
+  ARCH="amd64"
 fi
 
 # download age
