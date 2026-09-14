@@ -27,8 +27,15 @@
     let
       config = host.config;
     in
-    lib.mkIf (config.docker.enable) {
-      virtualisation.docker.enable = true;
-      users.users.${config.user}.extraGroups = [ "docker" ];
-    };
+    lib.mkIf config.docker.enable (
+      lib.mkMerge [
+        { users.users.${config.user}.extraGroups = [ "docker" ]; }
+        (
+          if config.wsl then
+            { wsl.docker-desktop.enable = true; }
+          else
+            { virtualisation.docker.enable = true; }
+        )
+      ]
+    );
 }

@@ -2,7 +2,6 @@
 host:
 let
   profile = host.profile or "";
-  wsl = host.wsl or false;
 
   githubKey = ./modules/ssh/github.com;
 
@@ -85,10 +84,6 @@ let
     wireguard.enable = true;
   };
 
-  wslNixos = {
-    docker.enable = false;
-  };
-
   darwin = {
     alfred.enable = true;
     bitwarden.enable = true;
@@ -110,9 +105,7 @@ let
 
   os =
     if host.platform == "nixos" then
-      lib.recursiveUpdate (lib.optionalAttrs (profile == "graphical") graphicalNixos) (
-        lib.optionalAttrs wsl wslNixos
-      )
+      lib.optionalAttrs (profile == "graphical") graphicalNixos
     else
       darwin;
 in
