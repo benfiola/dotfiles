@@ -92,7 +92,10 @@ in
       mkHomeManagerModule = host: {
         config = nixpkgs.lib.mkMerge [
           (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
-            users.users.${host.config.user}.isNormalUser = nixpkgs.lib.mkDefault true;
+            users.users.${host.config.user} = {
+              isNormalUser = nixpkgs.lib.mkDefault true;
+              linger = true;
+            };
           })
           (nixpkgs.lib.mkIf (host.config.platform == "darwin") {
             users.users.${host.config.user}.home = "/Users/${host.config.user}";
