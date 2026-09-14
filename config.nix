@@ -14,12 +14,9 @@ let
     docker = {
       enable = true;
       colima = {
-        arch = "aarch64";
-        vmType = "vz";
-        rosetta = true;
-        runtime = "docker";
-        mounts = [ ];
-        nestedVirtualization = true;
+        cpu = 2;
+        memory = 2;
+        disk = 100;
       };
     };
     firefox.enable = false;
@@ -46,6 +43,7 @@ let
       computerName = host.hostName;
     };
     magnet.enable = false;
+    nvidia.enable = false;
     orcaslicer.enable = false;
     padctl.enable = false;
     ssh = {

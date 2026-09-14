@@ -18,7 +18,17 @@
       ];
 
       home.file.".colima/_templates/default.yaml" = lib.mkIf (config.docker.colima != { }) {
-        text = lib.generators.toYAML { } config.docker.colima;
+        text = lib.generators.toYAML { } (
+          {
+            arch = "aarch64";
+            vmType = "vz";
+            rosetta = true;
+            runtime = "docker";
+            mounts = [ ];
+            nestedVirtualization = true;
+          }
+          // config.docker.colima
+        );
       };
     };
 

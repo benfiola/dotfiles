@@ -12,6 +12,7 @@ mkConfig {
     email = "me@benfiola.com";
     signingKey = localKey;
   };
+  nvidia.enable = true;
   ssh.hosts."github.com-localkey" = {
     key = localKey;
     hostname = "github.com";
