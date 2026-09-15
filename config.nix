@@ -61,7 +61,10 @@ let
       enable = false;
       tunnels = [ ];
     };
-    wsl = false;
+    wsl = {
+      enable = false;
+      windowsUser = null;
+    };
     yubikey.enable = true;
     zsh.enable = true;
   };
