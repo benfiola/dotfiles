@@ -28,6 +28,8 @@
     [ { device = "/dev/disk/by-uuid/6c214053-6405-4cdb-a8c9-d2b0ea0ed6ec"; }
     ];
 
+  boot.resumeDevice = "/dev/disk/by-uuid/6c214053-6405-4cdb-a8c9-d2b0ea0ed6ec";
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
