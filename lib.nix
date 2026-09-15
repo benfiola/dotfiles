@@ -99,13 +99,13 @@ in
       };
 
       mkWslModule = host: {
-        wsl.enable = host.config.wsl.enable;
+        wsl.enable = host.config.wsl;
         wsl.defaultUser = host.config.user;
       };
 
       mkBootloaderModule =
         host:
-        nixpkgs.lib.mkIf (!host.config.wsl.enable) {
+        nixpkgs.lib.mkIf (!host.config.wsl) {
           boot.loader.systemd-boot.enable = nixpkgs.lib.mkDefault false;
           boot.loader.efi.canTouchEfiVariables = nixpkgs.lib.mkDefault true;
           boot.lanzaboote.enable = nixpkgs.lib.mkDefault true;

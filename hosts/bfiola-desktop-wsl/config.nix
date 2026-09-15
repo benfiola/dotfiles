@@ -5,10 +5,7 @@ in
 mkConfig {
   system = "x86_64-linux";
   platform = "nixos";
-  wsl = {
-    enable = true;
-    windowsUser = "bfiola";
-  };
+  wsl = true;
 
   git.identities."github.com-localkey" = {
     name = "Ben Fiola";

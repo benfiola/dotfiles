@@ -41,7 +41,7 @@
       lib.mkMerge [
         { users.users.${config.user}.extraGroups = [ "docker" ]; }
         (
-          if config.wsl.enable then
+          if config.wsl then
             { wsl.docker-desktop.enable = true; }
           else
             { virtualisation.docker.enable = true; }
