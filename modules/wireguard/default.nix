@@ -41,7 +41,9 @@
       nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
     in
     lib.mkIf (hostConfig.wireguard.enable && tunnels != [ ]) {
-      environment.systemPackages = [ pkgs.wireguard-tools ];
+      environment.systemPackages = [
+        pkgs.wireguard-tools
+      ];
 
       age.secrets = lib.listToAttrs (
         map (path: {
