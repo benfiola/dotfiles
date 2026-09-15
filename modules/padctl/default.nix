@@ -10,6 +10,8 @@
         "uinput"
       ];
 
+      users.users.${config.user}.extraGroups = [ "input" ];
+
       services.udev.extraRules = ''
         # padctl UHID IMU nodes: tag as accelerometer so SDL/Steam recognize
         # them as sensors instead of joysticks.
