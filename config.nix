@@ -3,7 +3,7 @@ host:
 let
   profile = host.profile or "";
 
-  githubKey = ./modules/ssh/github.com;
+  githubKey = ./modules/ssh/github.com.age;
 
   common = {
     alfred.enable = false;

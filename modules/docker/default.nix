@@ -17,15 +17,18 @@
         pkgs.docker-compose
       ];
 
-      home.file.".colima/_templates/default.yaml" = lib.mkIf (config.docker.colima != { }) {
+      home.file.".colima/_templates/default.yaml" = {
         text = lib.generators.toYAML { } (
           {
             arch = "aarch64";
-            vmType = "vz";
-            rosetta = true;
-            runtime = "docker";
+            cpu = 2;
+            disk = 100;
+            memory = 2;
             mounts = [ ];
             nestedVirtualization = true;
+            rosetta = true;
+            runtime = "docker";
+            vmType = "vz";
           }
           // config.docker.colima
         );

@@ -7,9 +7,9 @@
       ...
     }:
     let
-      cfg = host.config;
+      hostConfig = host.config;
     in
-    lib.mkIf cfg.nvidia.enable {
+    lib.mkIf hostConfig.nvidia.enable {
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.graphics.enable = true;
       hardware.nvidia = {

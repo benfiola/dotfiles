@@ -1,3 +1,26 @@
+let
+  gitSecrets =
+    { host, lib, ... }:
+    let
+      config = host.config;
+      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
+      formatOf = identity: identity.format or "ssh";
+      keys = map (identity: identity.signingKey) (
+        lib.filter (identity: formatOf identity == "ssh") (lib.attrValues config.git.identities)
+      );
+    in
+    {
+      age.secrets = lib.listToAttrs (
+        map (path: {
+          name = "git-${nameOf path}";
+          value = {
+            file = path;
+            owner = config.user;
+          };
+        }) keys
+      );
+    };
+in
 {
   home =
     { host, lib, osConfig, ... }:
@@ -6,26 +29,32 @@
       allowedSigners = "~/.config/git/allowed_signers";
       nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
 
-      keyPath =
-        key:
-        if lib.hasSuffix ".age" (baseNameOf key) then
-          osConfig.age.secrets."git-${nameOf key}".path
-        else
-          "${key}";
+      keyPath = key: osConfig.age.secrets."git-${nameOf key}".path;
 
       pubKeyPath = key: lib.removeSuffix ".age" (toString key) + ".pub";
 
+      formatOf = identity: identity.format or "ssh";
+
+      signingContents =
+        identity:
+        if formatOf identity == "x509" then
+          { gpg.format = "x509"; }
+          // lib.optionalAttrs (identity ? program) { gpg.x509.program = identity.program; }
+        else
+          {
+            gpg.format = "ssh";
+            user.signingkey = keyPath identity.signingKey;
+          };
+
       includeFor = alias: identity: {
         condition = "hasconfig:remote.*.url:git@${alias}:*/**";
-        contents = {
-          user = {
-            inherit (identity) name email;
-            signingkey = keyPath identity.signingKey;
-          };
+        contents = lib.recursiveUpdate {
+          user = { inherit (identity) name email; };
           commit.gpgsign = true;
-          gpg.format = "ssh";
-        };
+        } (signingContents identity);
       };
+
+      sshIdentities = lib.filterAttrs (_: identity: formatOf identity == "ssh") config.git.identities;
 
       signerLine =
         _: identity:
@@ -43,50 +72,11 @@
         includes = lib.mapAttrsToList includeFor config.git.identities;
       };
 
-      home.file.".config/git/allowed_signers" = lib.mkIf (config.git.identities != { }) {
-        text = lib.concatStringsSep "\n" (lib.mapAttrsToList signerLine config.git.identities) + "\n";
+      home.file.".config/git/allowed_signers" = lib.mkIf (sshIdentities != { }) {
+        text = lib.concatStringsSep "\n" (lib.mapAttrsToList signerLine sshIdentities) + "\n";
       };
     };
 
-  nixos =
-    { host, lib, ... }:
-    let
-      config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
-      ageKeys = lib.filter (path: lib.hasSuffix ".age" (baseNameOf path)) (
-        map (identity: identity.signingKey) (lib.attrValues config.git.identities)
-      );
-    in
-    lib.mkIf (ageKeys != [ ]) {
-      age.secrets = lib.listToAttrs (
-        map (path: {
-          name = "git-${nameOf path}";
-          value = {
-            file = path;
-            owner = config.user;
-          };
-        }) ageKeys
-      );
-    };
-
-  darwin =
-    { host, lib, ... }:
-    let
-      config = host.config;
-      nameOf = path: lib.removeSuffix ".age" (baseNameOf path);
-      ageKeys = lib.filter (path: lib.hasSuffix ".age" (baseNameOf path)) (
-        map (identity: identity.signingKey) (lib.attrValues config.git.identities)
-      );
-    in
-    lib.mkIf (ageKeys != [ ]) {
-      age.secrets = lib.listToAttrs (
-        map (path: {
-          name = "git-${nameOf path}";
-          value = {
-            file = path;
-            owner = config.user;
-          };
-        }) ageKeys
-      );
-    };
+  nixos = gitSecrets;
+  darwin = gitSecrets;
 }
