@@ -12,6 +12,7 @@
   esp ? "/boot",
   extraConfig ? "",
   additionalFiles ? { },
+  additionalDirs ? { },
   manageNvram ? true,
 }:
 let
@@ -20,7 +21,7 @@ let
 
   confFile = writeText "refind.conf" extraConfig;
 
-  manifest = writeText "refind-manifest" (
+  fileManifest = writeText "refind-manifest" (
     lib.concatStringsSep "\n" (
       [
         "${refind}/share/refind/${binaryName}\t${binaryName}"
@@ -28,6 +29,10 @@ let
       ]
       ++ lib.mapAttrsToList (dest: src: "${src}\t${dest}") additionalFiles
     )
+  );
+
+  dirManifest = writeText "refind-dir-manifest" (
+    lib.concatStringsSep "\n" (lib.mapAttrsToList (dest: src: "${src}\t${dest}") additionalDirs)
   );
 in
 writeShellApplication {
@@ -43,7 +48,8 @@ writeShellApplication {
 
   text = ''
     esp=${lib.escapeShellArg esp}
-    manifest=${lib.escapeShellArg manifest}
+    file_manifest=${lib.escapeShellArg fileManifest}
+    dir_manifest=${lib.escapeShellArg dirManifest}
     label=${lib.escapeShellArg label}
     binary=${lib.escapeShellArg binaryName}
     manage_nvram=${if manageNvram then "1" else "0"}
@@ -60,7 +66,15 @@ writeShellApplication {
       cp -f "$src" "$dest_path.tmp"
       mv -f "$dest_path.tmp" "$dest_path"
       staged_paths+=("$dest_path")
-    done < "$manifest"
+    done < "$file_manifest"
+
+    while IFS=$'\t' read -r src dest; do
+      [ -n "$src" ] || continue
+      dest_path="$refind_dir/$dest"
+      mkdir -p "$(dirname "$dest_path")"
+      rm -rf "$dest_path"
+      cp -r "$src" "$dest_path"
+    done < "$dir_manifest"
 
     # sbctl sign-all only re-signs already-tracked files; enroll new ones here so it picks them up.
     for path in "''${staged_paths[@]}"; do

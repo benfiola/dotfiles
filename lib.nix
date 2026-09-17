@@ -117,12 +117,21 @@ in
         }:
         nixpkgs.lib.mkIf (!host.config.wsl) (
           let
+            refindTheme = pkgs.callPackage ./packages/refind-theme-regular/package.nix {
+              iconSize = "384-144";
+              dark = true;
+            };
+
             refindInstall = pkgs.callPackage ./packages/refind/package.nix {
               esp = config.boot.loader.efi.efiSysMountPoint;
               manageNvram = config.boot.loader.efi.canTouchEfiVariables;
               extraConfig = ''
                 timeout 5
+                include themes/refind-theme-regular/theme.conf
               '';
+              additionalDirs = {
+                "themes/refind-theme-regular" = "${refindTheme}";
+              };
             };
           in
           {
