@@ -8,6 +8,20 @@
     }:
     let
       config = host.config;
+
+      # `package` (path to a package.nix producing $out/extension.xpi) builds to a file:// install_url.
+      builtExtensions = lib.mapAttrs (
+        _id: ext:
+        if ext ? package then
+          let
+            built = pkgs.callPackage ext.package { };
+          in
+          (removeAttrs ext [ "package" ]) // {
+            install_url = "file://${built}/extension.xpi";
+          }
+        else
+          ext
+      ) config.firefox.extensions;
     in
     lib.mkIf config.firefox.enable {
       programs.firefox = {
@@ -23,7 +37,7 @@
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/nord-theme/latest.xpi";
             installation_mode = "force_installed";
           };
-        };
+        } // builtExtensions;
       };
     };
 }

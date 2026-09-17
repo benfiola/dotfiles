@@ -19,7 +19,10 @@ let
         disk = 100;
       };
     };
-    firefox.enable = false;
+    firefox = {
+      enable = false;
+      extensions = { };
+    };
     fonts.enable = false;
     ghostty.enable = false;
     gimp.enable = false;
