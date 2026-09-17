@@ -11,6 +11,7 @@ in
     lib.mkIf config.locale.enable {
       i18n.defaultLocale = defaultLocale;
       time.timeZone = timeZone;
+      time.hardwareClockLocalTime = true;
     };
 
   darwin =

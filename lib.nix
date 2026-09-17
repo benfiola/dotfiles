@@ -129,7 +129,7 @@ in
               manageNvram = config.boot.loader.efi.canTouchEfiVariables;
               extraConfig = ''
                 timeout 5
-                dont_scan_dirs +,EFI/Linux,EFI/systemd,EFI/nixos
+                dont_scan_dirs +,EFI/Linux,EFI/systemd,EFI/nixos,EFI/boot
                 include themes/refind-theme-regular/theme.conf
                 menuentry Linux {
                     icon EFI/refind/themes/refind-theme-regular/icons/${refindIconSize}/os_nixos.png
