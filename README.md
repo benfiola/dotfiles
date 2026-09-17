@@ -226,3 +226,18 @@ NIX_SHOW_STATS=1 nix build '.#<your-config>'
 ```
 
 **Why:** Identify performance bottlenecks and get clearer error messages on evaluation failures.
+
+---
+
+### Generation cleanup
+
+Clean up historic nix generations.
+
+**Example:**
+
+```bash
+# only keep the 5 most recent nix generations
+sudo nix-env -p /nix/var/nix/profiles/system --delete-generations +5
+# clean up the rest
+sudo nix-collect-garbage -d
+```
