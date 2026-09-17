@@ -117,8 +117,10 @@ in
         }:
         nixpkgs.lib.mkIf (!host.config.wsl) (
           let
+            refindIconSize = "384-144";
+
             refindTheme = pkgs.callPackage ./packages/refind-theme-regular/package.nix {
-              iconSize = "384-144";
+              iconSize = refindIconSize;
               dark = true;
             };
 
@@ -127,7 +129,12 @@ in
               manageNvram = config.boot.loader.efi.canTouchEfiVariables;
               extraConfig = ''
                 timeout 5
+                dont_scan_dirs +,EFI/Linux,EFI/systemd,EFI/nixos
                 include themes/refind-theme-regular/theme.conf
+                menuentry Linux {
+                    icon EFI/refind/themes/refind-theme-regular/icons/${refindIconSize}/os_nixos.png
+                    loader EFI/systemd/systemd-bootx64.efi
+                }
               '';
               additionalDirs = {
                 "themes/refind-theme-regular" = "${refindTheme}";
@@ -136,6 +143,7 @@ in
           in
           {
             boot.loader.systemd-boot.enable = nixpkgs.lib.mkDefault false;
+            boot.loader.systemd-boot.configurationLimit = nixpkgs.lib.mkDefault 10;
             boot.loader.efi.canTouchEfiVariables = nixpkgs.lib.mkDefault true;
             boot.lanzaboote.enable = nixpkgs.lib.mkDefault true;
             boot.lanzaboote.pkiBundle = nixpkgs.lib.mkDefault "/var/lib/sbctl";
