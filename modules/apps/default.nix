@@ -30,42 +30,19 @@ let
 in
 {
   nixos =
-    { host, lib, dotfilesLib, ... }:
-    let
-      hostConfig = host.config;
-      resolved = dotfilesLib.mkApps hostConfig apps;
-    in
-    lib.mkIf (hostConfig.platform == "nixos") {
-      dotfiles.insecurePackages = resolved.insecurePackages;
-      nixpkgs.config.allowUnfreePackages = resolved.unfreePackages;
-    };
+    args@{ host, dotfilesLib, ... }:
+    (dotfilesLib.mkApps (args // { inherit apps; })).nixosConfig;
 
   home =
-    {
+    args@{
       host,
-      lib,
       pkgs,
       dotfilesLib,
       ...
     }:
-    let
-      hostConfig = host.config;
-      resolved = dotfilesLib.mkApps hostConfig apps;
-    in
-    lib.mkIf (hostConfig.platform == "nixos") {
-      home.packages = map (name: pkgs.${name}) resolved.packages;
-    };
+    (dotfilesLib.mkApps (args // { inherit apps; })).homeConfig;
 
   darwin =
-    { host, lib, dotfilesLib, ... }:
-    let
-      hostConfig = host.config;
-      resolved = dotfilesLib.mkApps hostConfig apps;
-    in
-    {
-      homebrew.casks = resolved.casks;
-      homebrew.masApps = builtins.listToAttrs (
-        map (masApp: lib.nameValuePair masApp.name masApp.id) resolved.masApps
-      );
-    };
+    args@{ host, dotfilesLib, ... }:
+    (dotfilesLib.mkApps (args // { inherit apps; })).darwinConfig;
 }

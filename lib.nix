@@ -7,18 +7,33 @@ let
     ageSecretName = path: nixpkgs.lib.removeSuffix ".age" (baseNameOf path);
 
     mkApps =
-      config: apps:
+      {
+        host,
+        apps,
+        pkgs ? null,
+        ...
+      }:
       let
+        config = host.config;
         enabled = nixpkgs.lib.filterAttrs (name: _: config.${name}.enable) apps;
         collect =
           field: nixpkgs.lib.flatten (nixpkgs.lib.mapAttrsToList (_: app: app.${field} or [ ]) enabled);
+
+        masApps = collect "masApps";
+        mkIfNixos = nixpkgs.lib.mkIf (config.platform == "nixos");
       in
       {
-        packages = collect "packages";
-        casks = collect "casks";
-        masApps = collect "masApps";
-        insecurePackages = collect "insecurePackages";
-        unfreePackages = collect "unfreePackages";
+        nixosConfig = mkIfNixos {
+          dotfiles.insecurePackages = collect "insecurePackages";
+          nixpkgs.config.allowUnfreePackages = collect "unfreePackages";
+        };
+        homeConfig = mkIfNixos { home.packages = map (name: pkgs.${name}) (collect "packages"); };
+        darwinConfig = {
+          homebrew.casks = collect "casks";
+          homebrew.masApps = builtins.listToAttrs (
+            map (masApp: nixpkgs.lib.nameValuePair masApp.name masApp.id) masApps
+          );
+        };
       };
   };
 
