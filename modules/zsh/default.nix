@@ -19,6 +19,8 @@ in
         enable = true;
 
         initContent = ''
+          bindkey -e
+
           src() {
             mkdir -p "$HOME/source"
             cd "$HOME/source"

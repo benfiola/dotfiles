@@ -1,47 +1,43 @@
 let
   apps = {
     bitwarden = {
-      package = "bitwarden-desktop";
-      mas = {
-        name = "Bitwarden";
-        id = 1352778147;
-      };
+      packages = [ "bitwarden-desktop" ];
+      masApps = [
+        {
+          name = "Bitwarden";
+          id = 1352778147;
+        }
+      ];
     };
     discord = {
-      package = "vesktop";
-      cask = "vesktop";
+      packages = [ "vesktop" ];
+      casks = [ "homebrew/cask/vesktop" ];
       insecurePackages = [ "electron-39.8.10" ];
     };
     gimp = {
-      package = "gimp";
-      cask = "gimp";
+      packages = [ "gimp" ];
+      casks = [ "homebrew/cask/gimp" ];
     };
     tidal = {
-      package = "tidal-hifi";
-      cask = "tidal";
+      packages = [ "tidal-hifi" ];
+      casks = [ "homebrew/cask/tidal" ];
       unfreePackages = [ "castlabs-electron" ];
     };
     whatsapp = {
-      cask = "whatsapp";
+      casks = [ "homebrew/cask/whatsapp" ];
     };
   };
 in
 {
   nixos =
-    { host, lib, ... }:
+    { host, lib, dotfilesLib, ... }:
     let
-      config = host.config;
-      enabled = lib.filterAttrs (name: _: config.${name}.enable) apps;
+      hostConfig = host.config;
+      resolved = dotfilesLib.mkApps hostConfig apps;
     in
-    lib.mkIf (config.platform == "nixos") {
-      dotfiles.insecurePackages = lib.pipe enabled [
-        (lib.mapAttrsToList (_: app: app.insecurePackages or [ ]))
-        lib.flatten
-      ];
-      nixpkgs.config.allowUnfreePackages = lib.pipe enabled [
-        (lib.mapAttrsToList (_: app: app.unfreePackages or [ ]))
-        lib.flatten
-      ];
+    lib.mkIf (hostConfig.platform == "nixos") {
+      dotfiles.insecurePackages = resolved.insecurePackages;
+      nixpkgs.config.allowUnfreePackages = resolved.unfreePackages;
     };
 
   home =
@@ -49,34 +45,27 @@ in
       host,
       lib,
       pkgs,
+      dotfilesLib,
       ...
     }:
     let
-      config = host.config;
-      enabled = lib.filterAttrs (name: _: config.${name}.enable) apps;
+      hostConfig = host.config;
+      resolved = dotfilesLib.mkApps hostConfig apps;
     in
-    lib.mkIf (config.platform == "nixos") {
-      home.packages = lib.pipe enabled [
-        (lib.filterAttrs (_: app: app ? package))
-        (lib.mapAttrsToList (_: app: pkgs.${app.package}))
-      ];
+    lib.mkIf (hostConfig.platform == "nixos") {
+      home.packages = map (name: pkgs.${name}) resolved.packages;
     };
 
   darwin =
-    { host, lib, ... }:
+    { host, lib, dotfilesLib, ... }:
     let
-      config = host.config;
-      enabled = lib.filterAttrs (name: _: config.${name}.enable) apps;
+      hostConfig = host.config;
+      resolved = dotfilesLib.mkApps hostConfig apps;
     in
     {
-      homebrew.casks = lib.pipe enabled [
-        (lib.filterAttrs (_: app: app ? cask))
-        (lib.mapAttrsToList (_: app: app.cask))
-      ];
-      homebrew.masApps = lib.pipe enabled [
-        (lib.filterAttrs (_: app: app ? mas))
-        (lib.mapAttrsToList (_: app: lib.nameValuePair app.mas.name app.mas.id))
-        builtins.listToAttrs
-      ];
+      homebrew.casks = resolved.casks;
+      homebrew.masApps = builtins.listToAttrs (
+        map (masApp: lib.nameValuePair masApp.name masApp.id) resolved.masApps
+      );
     };
 }

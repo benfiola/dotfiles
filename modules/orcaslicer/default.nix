@@ -5,7 +5,7 @@
       hostConfig = host.config;
     in
     lib.mkIf hostConfig.orcaslicer.enable {
-      homebrew.casks = [ "orcaslicer" ];
+      homebrew.casks = [ "homebrew/cask/orcaslicer" ];
     };
 
   home =

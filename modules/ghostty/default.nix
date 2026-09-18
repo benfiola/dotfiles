@@ -5,7 +5,7 @@
       config = host.config;
     in
     lib.mkIf config.ghostty.enable {
-      homebrew.casks = [ "ghostty" ];
+      homebrew.casks = [ "homebrew/cask/ghostty" ];
     };
 
   home =

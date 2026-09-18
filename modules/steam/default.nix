@@ -18,7 +18,7 @@
       config = host.config;
     in
     lib.mkIf config.steam.enable {
-      homebrew.casks = [ "steam" ];
+      homebrew.casks = [ "homebrew/cask/steam" ];
     };
 
   home =

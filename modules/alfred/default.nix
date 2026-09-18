@@ -5,7 +5,7 @@
       config = host.config;
     in
     lib.mkIf config.alfred.enable {
-      homebrew.casks = [ "alfred" ];
+      homebrew.casks = [ "homebrew/cask/alfred" ];
     };
 
   home =

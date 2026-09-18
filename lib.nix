@@ -5,6 +5,21 @@ let
 
   dotfilesLib = {
     ageSecretName = path: nixpkgs.lib.removeSuffix ".age" (baseNameOf path);
+
+    mkApps =
+      config: apps:
+      let
+        enabled = nixpkgs.lib.filterAttrs (name: _: config.${name}.enable) apps;
+        collect =
+          field: nixpkgs.lib.flatten (nixpkgs.lib.mapAttrsToList (_: app: app.${field} or [ ]) enabled);
+      in
+      {
+        packages = collect "packages";
+        casks = collect "casks";
+        masApps = collect "masApps";
+        insecurePackages = collect "insecurePackages";
+        unfreePackages = collect "unfreePackages";
+      };
   };
 
   fileEntries =

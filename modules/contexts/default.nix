@@ -8,7 +8,7 @@
       license = ./license.contexts-license.age;
     in
     lib.mkIf hostConfig.contexts.enable {
-      homebrew.casks = [ "contexts" ];
+      homebrew.casks = [ "homebrew/cask/contexts" ];
 
       age.secrets."contexts-${nameOf license}" = {
         file = license;
