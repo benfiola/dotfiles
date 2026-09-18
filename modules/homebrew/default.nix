@@ -23,6 +23,26 @@
       };
 
       config = lib.mkIf hostConfig.homebrew.enable {
+        # patch nix-homebrew to use system git
+        system.activationScripts.homebrew.text = lib.mkOrder 750 (
+          lib.concatMapStrings (
+            prefix:
+            lib.optionalString prefix.enable ''
+              bin_brew="${prefix.prefix}/bin/brew"
+              if [ -L "$bin_brew" ]; then
+                generated="$(readlink -f "$bin_brew")"
+                patched="${prefix.library}/.dotfiles-brew-system-git"
+                sed -E \
+                  -e 's#PATH="[^:"]*git-minimal[^:"]*:#PATH="#' \
+                  -e 's#:[^:"]*git-minimal[^:"]*(:|")#\1#' \
+                  "$generated" > "$patched"
+                chmod +x "$patched"
+                ln -sf "$patched" "$bin_brew"
+              fi
+            ''
+          ) (builtins.attrValues config.nix-homebrew.prefixes)
+        );
+
         nix-homebrew = {
           enable = true;
           user = hostConfig.user;
