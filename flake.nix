@@ -25,7 +25,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    nix-homebrew.url = "github:benfiola/nix-homebrew?ref=use-system-git";
 
     padctl = {
       url = "github:BANANASJIM/padctl";
