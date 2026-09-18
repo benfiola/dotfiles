@@ -19,5 +19,6 @@ runCommand "homebrew-tap" { } (
 )
 // {
   tapName = "${namespace}/homebrew-${repo}";
+  tapTrustName = "${namespace}/${repo}";
   caskNames = map (name: "${namespace}/${repo}/${name}") (builtins.attrNames casks);
 }

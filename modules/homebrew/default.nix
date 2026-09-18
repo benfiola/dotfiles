@@ -39,9 +39,9 @@
             }
           );
 
-          taps = lib.mkIf (customCasks != { }) {
-            "${customCasksTap.tapName}" = customCasksTap;
-          };
+          taps."${customCasksTap.tapName}" = customCasksTap;
+
+          trust.taps = [ customCasksTap.tapTrustName ];
         };
 
         homebrew = {
