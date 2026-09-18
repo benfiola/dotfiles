@@ -26,7 +26,7 @@
     lib.mkIf config.firefox.enable {
       programs.firefox = {
         enable = true;
-        package = pkgs.librewolf-bin;
+        package = pkgs.librewolf;
 
         policies.ExtensionSettings = {
           "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
