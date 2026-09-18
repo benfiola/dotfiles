@@ -23,6 +23,14 @@
       };
 
       config = lib.mkIf hostConfig.homebrew.enable {
+        nixpkgs.overlays = [
+          (final: prev: {
+            gitMinimal = final.writeShellScriptBin "git" ''
+              exec /usr/bin/git "$@"
+            '';
+          })
+        ];
+
         nix-homebrew = {
           enable = true;
           user = hostConfig.user;
