@@ -26,7 +26,7 @@
         nix-homebrew = {
           enable = true;
           user = hostConfig.user;
-          autoMigrate = true;
+          useSystemGit = true;
 
           package = lib.mkIf (hostConfig.homebrew.repoUrl != null) (
             let
