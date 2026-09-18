@@ -33,7 +33,7 @@ in
         settings = lib.mapAttrs (alias: sshHost: {
           HostName = sshHost.hostname or alias;
           IdentityFile = keyPath sshHost.key;
-          IdentitiesOnly = true;
+          IdentitiesOnly = false;
           AddKeysToAgent = "yes";
         }) config.ssh.hosts;
       };
