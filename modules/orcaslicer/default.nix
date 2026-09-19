@@ -2,9 +2,9 @@
   darwin =
     { host, lib, ... }:
     let
-      hostConfig = host.config;
+      config = host.config;
     in
-    lib.mkIf hostConfig.orcaslicer.enable {
+    lib.mkIf config.orcaslicer.enable {
       homebrew.casks = [ "homebrew/cask/orcaslicer" ];
     };
 
@@ -16,9 +16,9 @@
       ...
     }:
     let
-      hostConfig = host.config;
+      config = host.config;
     in
-    lib.mkIf (hostConfig.platform == "nixos" && hostConfig.orcaslicer.enable) {
+    lib.mkIf (config.platform == "nixos" && config.orcaslicer.enable) {
       home.packages = [ (pkgs.callPackage ../../packages/orcaslicer/package.nix { }) ];
     };
 }

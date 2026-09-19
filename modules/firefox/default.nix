@@ -24,7 +24,8 @@
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/nord-theme/latest.xpi";
           installation_mode = "force_installed";
         };
-      } // lib.filterAttrs (_id: ext: !(ext ? package)) config.firefox.extensions;
+      }
+      // lib.filterAttrs (_id: ext: !(ext ? package)) config.firefox.extensions;
 
       librewolf = pkgs.librewolf.override {
         nixExtensions = if localExtensions == [ ] then null else localExtensions;

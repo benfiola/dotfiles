@@ -1,6 +1,11 @@
 let
   gitSecrets =
-    { host, lib, dotfilesLib, ... }:
+    {
+      host,
+      lib,
+      dotfilesLib,
+      ...
+    }:
     let
       config = host.config;
       nameOf = dotfilesLib.ageSecretName;
@@ -23,7 +28,13 @@ let
 in
 {
   home =
-    { host, lib, osConfig, dotfilesLib, ... }:
+    {
+      host,
+      lib,
+      osConfig,
+      dotfilesLib,
+      ...
+    }:
     let
       config = host.config;
       allowedSigners = "~/.config/git/allowed_signers";

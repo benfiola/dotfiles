@@ -1,6 +1,12 @@
 {
   darwin =
-    { host, lib, config, dotfilesLib, ... }:
+    {
+      host,
+      lib,
+      config,
+      dotfilesLib,
+      ...
+    }:
     let
       hostConfig = host.config;
       home = config.users.users.${hostConfig.user}.home;

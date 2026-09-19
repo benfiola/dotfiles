@@ -37,13 +37,25 @@ let
       "${confFile}"
       "refind.conf"
     ]
-  ] ++ lib.mapAttrsToList (dest: src: [ "${src}" dest ]) additionalFiles;
+  ]
+  ++ lib.mapAttrsToList (dest: src: [
+    "${src}"
+    dest
+  ]) additionalFiles;
 
-  dirs = lib.mapAttrsToList (dest: src: [ "${src}" dest ]) additionalDirs;
+  dirs = lib.mapAttrsToList (dest: src: [
+    "${src}"
+    dest
+  ]) additionalDirs;
 
   configFile = writeText "refind-install-config.json" (
     builtins.toJSON {
-      inherit esp label files dirs;
+      inherit
+        esp
+        label
+        files
+        dirs
+        ;
       binary = binaryName;
       manage_nvram = manageNvram;
     }

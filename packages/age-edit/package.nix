@@ -35,4 +35,9 @@ writeShellApplication {
     age -e -r "${recipient}" -o "$file.new" "$tmp"
     mv "$file.new" "$file"
   '';
+
+  meta = {
+    description = "Edit an age-encrypted file in place using vim";
+    mainProgram = "age-edit";
+  };
 }

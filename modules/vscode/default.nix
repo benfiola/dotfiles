@@ -55,15 +55,15 @@ in
         mutableExtensionsDir = false;
 
         profiles.default = {
-          extensions = with marketplace; [
-            anthropic.claude-code
-            arcticicestudio.nord-visual-studio-code
-            esbenp.prettier-vscode
-            ms-azuretools.vscode-containers
-            ms-vscode-remote.remote-containers
-            pkief.material-icon-theme
-            rohit-gohri.format-code-action
-            usernamehw.errorlens
+          extensions = [
+            marketplace.anthropic.claude-code
+            marketplace.arcticicestudio.nord-visual-studio-code
+            marketplace.esbenp.prettier-vscode
+            marketplace.ms-azuretools.vscode-containers
+            marketplace.ms-vscode-remote.remote-containers
+            marketplace.pkief.material-icon-theme
+            marketplace.rohit-gohri.format-code-action
+            marketplace.usernamehw.errorlens
           ];
 
           userSettings = {

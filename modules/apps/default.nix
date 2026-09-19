@@ -30,8 +30,7 @@ let
 in
 {
   nixos =
-    args@{ host, dotfilesLib, ... }:
-    (dotfilesLib.mkApps (args // { inherit apps; })).nixosConfig;
+    args@{ host, dotfilesLib, ... }: (dotfilesLib.mkApps (args // { inherit apps; })).nixosConfig;
 
   home =
     args@{
@@ -43,6 +42,5 @@ in
     (dotfilesLib.mkApps (args // { inherit apps; })).homeConfig;
 
   darwin =
-    args@{ host, dotfilesLib, ... }:
-    (dotfilesLib.mkApps (args // { inherit apps; })).darwinConfig;
+    args@{ host, dotfilesLib, ... }: (dotfilesLib.mkApps (args // { inherit apps; })).darwinConfig;
 }

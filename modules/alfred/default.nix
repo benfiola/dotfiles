@@ -9,7 +9,12 @@
     };
 
   home =
-    { host, lib, config, ... }:
+    {
+      host,
+      lib,
+      config,
+      ...
+    }:
     let
       hostConfig = host.config;
       prefsDir = "${config.home.homeDirectory}/source/github.com/benfiola/dotfiles/modules/alfred/Alfred.alfredpreferences";

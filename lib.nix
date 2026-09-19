@@ -132,10 +132,15 @@ in
         system.primaryUser = host.config.user;
       };
 
-      mkWslModule = host: {
-        wsl.enable = host.config.wsl;
-        wsl.defaultUser = host.config.user;
-      };
+      mkWslModule =
+        host:
+        let
+          config = host.config;
+        in
+        {
+          wsl.enable = config.wsl;
+          wsl.defaultUser = config.user;
+        };
 
       mkBootloaderModule =
         host:
@@ -198,32 +203,37 @@ in
           }
         );
 
-      mkHomeManagerModule = host: {
-        config = nixpkgs.lib.mkMerge [
-          (nixpkgs.lib.mkIf (host.config.platform == "nixos") {
-            networking.hostName = nixpkgs.lib.mkDefault host.config.hostName;
-            users.users.${host.config.user} = {
-              isNormalUser = nixpkgs.lib.mkDefault true;
-              extraGroups = [ "wheel" ];
-            };
-          })
-          (nixpkgs.lib.mkIf (host.config.platform == "darwin") {
-            users.users.${host.config.user}.home = "/Users/${host.config.user}";
-          })
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit host inputs dotfilesLib; };
-            home-manager.sharedModules = [
-              inputs.plasma-manager.homeModules.plasma-manager
-            ];
-            home-manager.users.${host.config.user} = {
-              home.stateVersion = "26.05";
-              imports = modulesByInput "home";
-            };
-          }
-        ];
-      };
+      mkHomeManagerModule =
+        host:
+        let
+          config = host.config;
+        in
+        {
+          config = nixpkgs.lib.mkMerge [
+            (nixpkgs.lib.mkIf (config.platform == "nixos") {
+              networking.hostName = nixpkgs.lib.mkDefault config.hostName;
+              users.users.${config.user} = {
+                isNormalUser = nixpkgs.lib.mkDefault true;
+                extraGroups = [ "wheel" ];
+              };
+            })
+            (nixpkgs.lib.mkIf (config.platform == "darwin") {
+              users.users.${config.user}.home = "/Users/${config.user}";
+            })
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit host inputs dotfilesLib; };
+              home-manager.sharedModules = [
+                inputs.plasma-manager.homeModules.plasma-manager
+              ];
+              home-manager.users.${config.user} = {
+                home.stateVersion = "26.05";
+                imports = modulesByInput "home";
+              };
+            }
+          ];
+        };
     in
     {
       darwinConfigurations = nixpkgs.lib.mapAttrs (

@@ -52,22 +52,21 @@ stdenv.mkDerivation (finalAttrs: {
     sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
   };
 
-  passthru.setupScript =
-    writeShellScript "open-bamboo-networking-orcaslicer-setup" ''
-      plugins="$HOME/.config/OrcaSlicer/plugins"
-      mkdir -p "$plugins"
-      ln -sf "${finalAttrs.finalPackage}/lib/libbambu_networking_${finalAttrs.pluginVersion}.so" "$plugins/"
-      ln -sf "${finalAttrs.finalPackage}/lib/libBambuSource.so" "$plugins/"
+  passthru.setupScript = writeShellScript "open-bamboo-networking-orcaslicer-setup" ''
+    plugins="$HOME/.config/OrcaSlicer/plugins"
+    mkdir -p "$plugins"
+    ln -sf "${finalAttrs.finalPackage}/lib/libbambu_networking_${finalAttrs.pluginVersion}.so" "$plugins/"
+    ln -sf "${finalAttrs.finalPackage}/lib/libBambuSource.so" "$plugins/"
 
-      conf="$HOME/.config/OrcaSlicer/OrcaSlicer.conf"
-      if [ -f "$conf" ]; then
-        ${lib.getExe jq} \
-          --arg version "${finalAttrs.pluginVersion}" \
-          '.app.installed_networking = true
-           | .app.network_plugin_version = $version
-           | .app.network_plugin_remind_later = true' \
-          "$conf" > "$conf.tmp"
-        mv -f "$conf.tmp" "$conf"
-      fi
-    '';
+    conf="$HOME/.config/OrcaSlicer/OrcaSlicer.conf"
+    if [ -f "$conf" ]; then
+      ${lib.getExe jq} \
+        --arg version "${finalAttrs.pluginVersion}" \
+        '.app.installed_networking = true
+         | .app.network_plugin_version = $version
+         | .app.network_plugin_remind_later = true' \
+        "$conf" > "$conf.tmp"
+      mv -f "$conf.tmp" "$conf"
+    fi
+  '';
 })
