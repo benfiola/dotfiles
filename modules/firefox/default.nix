@@ -36,6 +36,7 @@
         package = librewolf;
 
         policies.ExtensionSettings = hostedExtensions;
+        policies.Certificates.ImportEnterpriseRoots = true;
       };
     };
 }
