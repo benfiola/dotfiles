@@ -197,11 +197,11 @@
         "brew-src": "brew-src"
       },
       "locked": {
-        "lastModified": 1789843060,
-        "narHash": "sha256-Gx7LEpNA2Ud8u6mYwXU1oasmUyn5EIOk59x46dUll/k=",
+        "lastModified": 1789855671,
+        "narHash": "sha256-0cxcksH4KIQGCK2Ws9izFF6FImyahK19LQQfpu8ijRI=",
         "owner": "benfiola",
         "repo": "nix-homebrew",
-        "rev": "8f29926e1d2220f0971f4ff32e918af5f6b40832",
+        "rev": "a5164d0c0a919efd5bd6044f0a1874662aa83bd2",
         "type": "github"
       },
       "original": {
