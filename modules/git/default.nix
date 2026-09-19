@@ -38,8 +38,9 @@ in
       signingContents =
         identity:
         if formatOf identity == "x509" then
-          { gpg.format = "x509"; }
-          // lib.optionalAttrs (identity ? program) { gpg.x509.program = identity.program; }
+          lib.recursiveUpdate { gpg.format = "x509"; } (
+            lib.optionalAttrs (identity ? program) { gpg.x509.program = identity.program; }
+          )
         else
           {
             gpg.format = "ssh";
