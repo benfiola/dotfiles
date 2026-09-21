@@ -34,6 +34,11 @@ let
           }
           {
             platform = "darwin";
+            field = "brews";
+            apply = brews: { homebrew.brews = brews; };
+          }
+          {
+            platform = "darwin";
             field = "masApps";
             apply = masApps: {
               homebrew.masApps = builtins.listToAttrs (
