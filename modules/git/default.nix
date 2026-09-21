@@ -75,6 +75,7 @@ in
     lib.mkIf config.git.enable {
       programs.git = {
         enable = true;
+        package = lib.mkIf (config.platform == "darwin") null;
         settings = {
           init.defaultBranch = "main";
           push.autoSetupRemote = true;
