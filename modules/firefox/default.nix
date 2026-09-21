@@ -36,6 +36,10 @@
 
         policies.ExtensionSettings = hostedExtensions;
         policies.Certificates.ImportEnterpriseRoots = true;
+        policies.Preferences."xpinstall.signatures.required" = {
+          Value = false;
+          Status = "locked";
+        };
       };
     };
 }
