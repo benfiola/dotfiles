@@ -24,6 +24,7 @@ let
       extensions = { };
     };
     fonts.enable = false;
+    gh.enable = true;
     ghostty.enable = false;
     gimp.enable = false;
     git = {
