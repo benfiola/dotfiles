@@ -1,33 +1,41 @@
 let
   apps = {
     alfred = {
-      casks = [ "homebrew/cask/alfred" ];
+      darwin.casks = [ "homebrew/cask/alfred" ];
     };
     bitwarden = {
-      packages = [ "bitwarden-desktop" ];
-      masApps = [
+      darwin.masApps = [
         {
           name = "Bitwarden";
           id = 1352778147;
         }
       ];
+      nixos.packages = [ "bitwarden-desktop" ];
     };
     discord = {
-      packages = [ "vesktop" ];
-      casks = [ "homebrew/cask/vesktop" ];
-      insecurePackages = [ "electron-39.8.10" ];
+      darwin.casks = [ "homebrew/cask/vesktop" ];
+      nixos = {
+        packages = [ "vesktop" ];
+        insecurePackages = [ "electron-39.8.10" ];
+      };
+    };
+    gh = {
+      darwin.packages = [ "gh" ];
+      nixos.packages = [ "gh" ];
     };
     gimp = {
-      packages = [ "gimp" ];
-      casks = [ "homebrew/cask/gimp" ];
+      darwin.casks = [ "homebrew/cask/gimp" ];
+      nixos.packages = [ "gimp" ];
     };
     tidal = {
-      packages = [ "tidal-hifi" ];
-      casks = [ "homebrew/cask/tidal" ];
-      unfreePackages = [ "castlabs-electron" ];
+      darwin.casks = [ "homebrew/cask/tidal" ];
+      nixos = {
+        packages = [ "tidal-hifi" ];
+        unfreePackages = [ "castlabs-electron" ];
+      };
     };
     whatsapp = {
-      casks = [ "homebrew/cask/whatsapp" ];
+      darwin.casks = [ "homebrew/cask/whatsapp" ];
     };
   };
 in

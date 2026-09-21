@@ -11,29 +11,67 @@ let
         host,
         apps,
         pkgs ? null,
+        extraAppSources ? [ ],
         ...
       }:
       let
         config = host.config;
         enabled = nixpkgs.lib.filterAttrs (name: _: config.${name}.enable) apps;
-        collect =
-          field: nixpkgs.lib.flatten (nixpkgs.lib.mapAttrsToList (_: app: app.${field} or [ ]) enabled);
 
-        masApps = collect "masApps";
-        mkIfNixos = nixpkgs.lib.mkIf (config.platform == "nixos");
+        appsFor = platform: nixpkgs.lib.mapAttrs (_: app: app.${platform} or { }) enabled;
+
+        collect =
+          platformApps: field:
+          nixpkgs.lib.flatten (
+            nixpkgs.lib.mapAttrsToList (_: app: app.${field} or [ ]) platformApps
+          );
+
+        appSources = [
+          {
+            platform = "darwin";
+            field = "casks";
+            apply = casks: { homebrew.casks = casks; };
+          }
+          {
+            platform = "darwin";
+            field = "masApps";
+            apply = masApps: {
+              homebrew.masApps = builtins.listToAttrs (
+                map (masApp: nixpkgs.lib.nameValuePair masApp.name masApp.id) masApps
+              );
+            };
+          }
+          {
+            platform = "nixos";
+            field = "insecurePackages";
+            apply = packages: { dotfiles.insecurePackages = packages; };
+          }
+          {
+            platform = "nixos";
+            field = "unfreePackages";
+            apply = packages: { nixpkgs.config.allowUnfreePackages = packages; };
+          }
+          {
+            platform = "home";
+            field = "packages";
+            apply = packages: { home.packages = map (name: pkgs.${name}) packages; };
+          }
+        ] ++ extraAppSources;
+
+        renderPlatform =
+          platform:
+          let
+            platformApps = if platform == "home" then appsFor config.platform else appsFor platform;
+            sources = builtins.filter (source: source.platform == platform) appSources;
+          in
+          nixpkgs.lib.foldl' nixpkgs.lib.recursiveUpdate { } (
+            map (source: source.apply (collect platformApps source.field)) sources
+          );
       in
       {
-        nixosConfig = mkIfNixos {
-          dotfiles.insecurePackages = collect "insecurePackages";
-          nixpkgs.config.allowUnfreePackages = collect "unfreePackages";
-        };
-        homeConfig = mkIfNixos { home.packages = map (name: pkgs.${name}) (collect "packages"); };
-        darwinConfig = {
-          homebrew.casks = collect "casks";
-          homebrew.masApps = builtins.listToAttrs (
-            map (masApp: nixpkgs.lib.nameValuePair masApp.name masApp.id) masApps
-          );
-        };
+        nixosConfig = nixpkgs.lib.mkIf (config.platform == "nixos") (renderPlatform "nixos");
+        homeConfig = renderPlatform "home";
+        darwinConfig = renderPlatform "darwin";
       };
   };
 
