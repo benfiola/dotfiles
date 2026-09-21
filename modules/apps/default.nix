@@ -1,5 +1,8 @@
 let
   apps = {
+    alfred = {
+      casks = [ "homebrew/cask/alfred" ];
+    };
     bitwarden = {
       packages = [ "bitwarden-desktop" ];
       masApps = [
