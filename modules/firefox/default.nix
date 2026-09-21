@@ -26,15 +26,13 @@
         };
       }
       // lib.filterAttrs (_id: ext: !(ext ? package)) config.firefox.extensions;
-
-      librewolf = pkgs.librewolf.override {
-        nixExtensions = if localExtensions == [ ] then null else localExtensions;
-      };
     in
     lib.mkIf config.firefox.enable {
       programs.firefox = {
         enable = true;
-        package = librewolf;
+        package = pkgs.librewolf;
+
+        globalExtensions = localExtensions;
 
         policies.ExtensionSettings = hostedExtensions;
         policies.Certificates.ImportEnterpriseRoots = true;
