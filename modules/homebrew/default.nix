@@ -26,7 +26,7 @@
         nix-homebrew = {
           enable = true;
           user = hostConfig.user;
-          useSystemGit = true;
+          extraEnv.HOMEBREW_GIT = "/usr/bin/git";
 
           package = lib.mkIf (hostConfig.homebrew.repoUrl != null) (
             let
