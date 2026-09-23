@@ -19,10 +19,6 @@ let
         insecurePackages = [ "electron-39.8.10" ];
       };
     };
-    gh = {
-      darwin.packages = [ "gh" ];
-      nixos.packages = [ "gh" ];
-    };
     gimp = {
       darwin.casks = [ "homebrew/cask/gimp" ];
       nixos.packages = [ "gimp" ];

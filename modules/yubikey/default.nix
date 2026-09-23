@@ -1,18 +1,4 @@
 {
-  home =
-    {
-      host,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      config = host.config;
-    in
-    lib.mkIf config.yubikey.enable {
-      home.packages = [ pkgs.yubikey-manager ];
-    };
-
   nixos =
     {
       host,

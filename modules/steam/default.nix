@@ -34,7 +34,6 @@
     lib.mkIf (config.steam.enable && config.platform == "nixos") {
       home.packages = [
         pkgs.wineWow64Packages.staging
-        pkgs.winetricks
         pkgs.protonup-qt
       ];
     };
