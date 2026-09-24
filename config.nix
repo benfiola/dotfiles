@@ -61,7 +61,7 @@ let
     vscode.enable = false;
     whatsapp.enable = false;
     wireguard = {
-      enable = false;
+      enable = true;
       tunnels = [ ];
     };
     wsl = false;
@@ -82,7 +82,6 @@ let
     steam.enable = true;
     tidal.enable = true;
     vscode.enable = true;
-    wireguard.enable = true;
   };
 
   darwin = {
@@ -101,7 +100,6 @@ let
     tidal.enable = true;
     vscode.enable = true;
     whatsapp.enable = true;
-    wireguard.enable = true;
   };
 
   os =
