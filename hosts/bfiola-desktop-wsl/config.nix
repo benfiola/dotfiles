@@ -16,4 +16,8 @@ mkConfig {
     key = localKey;
     hostname = "github.com";
   };
+  wireguard.tunnels = [
+    ./wireguard-infrastructure.conf.age
+    ./wireguard-management.conf.age
+  ];
 }
