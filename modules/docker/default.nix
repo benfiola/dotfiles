@@ -47,7 +47,12 @@
           if config.wsl then
             { wsl.docker-desktop.enable = true; }
           else
-            { virtualisation.docker.enable = true; }
+            {
+              virtualisation.docker = {
+                enable = true;
+                daemon.settings.mtu = 1420;
+              };
+            }
         )
       ]
     );
