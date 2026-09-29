@@ -23,7 +23,10 @@ in
       config = host.config;
     in
     lib.mkIf config.claude.enable {
-      home.packages = [ pkgs.claude-code ];
+      home.packages = [
+        pkgs.claude-code
+        (pkgs.callPackage ../../packages/claude-cleanup/package.nix { })
+      ];
       home.file.".claude/CLAUDE.md".source = ./CLAUDE.md;
     };
 }
