@@ -8,7 +8,12 @@ let
   common = {
     alfred.enable = false;
     bitwarden.enable = false;
-    claude.enable = true;
+    claude = {
+      enable = true;
+      cask = null;
+      claudeMd = ./modules/claude/CLAUDE.md;
+      extraPackages = [ ];
+    };
     contexts.enable = false;
     discord.enable = false;
     docker = {

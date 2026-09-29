@@ -3,8 +3,12 @@ let
   ageIdentityPath = "/etc/age/dotfiles.key";
   ageRecipient = "age1qlrgcllugyaa9dadhjtyylldq0hpjsdxw7qu38v42j3s6ywzmuyqddqxrv";
 
+  resolvePackages = pkgs: names: map (name: pkgs.${name}) names;
+
   dotfilesLib = {
     ageSecretName = path: nixpkgs.lib.removeSuffix ".age" (baseNameOf path);
+
+    inherit resolvePackages;
 
     mkApps =
       {
@@ -59,7 +63,7 @@ let
           {
             platform = "home";
             field = "packages";
-            apply = packages: { home.packages = map (name: pkgs.${name}) packages; };
+            apply = packages: { home.packages = resolvePackages pkgs packages; };
           }
         ] ++ extraAppSources;
 
