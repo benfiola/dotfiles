@@ -100,7 +100,6 @@ func Run[T any](p Picker[T]) (result T, ok bool, err error) {
 }
 
 func runProgram(m tea.Model) error {
-	lipgloss.SetDefaultRenderer(lipgloss.NewRenderer(os.Stderr))
 	_, err := tea.NewProgram(m, tea.WithOutput(os.Stderr), tea.WithAltScreen()).Run()
 	return err
 }
@@ -143,10 +142,18 @@ type model[T any] struct {
 	result *T
 }
 
+// Screens draw on stderr, so styles must follow its color support and not stdout's, which a
+// shell function may have captured.
+var renderer = lipgloss.NewRenderer(os.Stderr)
+
+func init() {
+	lipgloss.SetDefaultRenderer(renderer)
+}
+
 var (
-	boldStyle     = lipgloss.NewStyle().Bold(true)
-	selectedStyle = lipgloss.NewStyle().Reverse(true)
-	warnStyle     = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("1"))
+	boldStyle     = renderer.NewStyle().Bold(true)
+	selectedStyle = renderer.NewStyle().Reverse(true)
+	warnStyle     = renderer.NewStyle().Bold(true).Foreground(lipgloss.Color("1"))
 )
 
 func (m *model[T]) setItems(items []T) {
