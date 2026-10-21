@@ -7,6 +7,7 @@ let
 
   common = {
     alfred.enable = false;
+    bf.enable = true;
     bitwarden.enable = false;
     claude = {
       enable = true;

@@ -35,11 +35,9 @@ in
       config = host.config;
     in
     lib.mkIf config.claude.enable {
-      home.packages = [
-        (pkgs.callPackage ../../packages/claude-cleanup/package.nix { })
-      ]
-      ++ lib.optional (config.claude.cask == null) pkgs.claude-code
-      ++ dotfilesLib.resolvePackages pkgs config.claude.extraPackages;
+      home.packages =
+        lib.optional (config.claude.cask == null) pkgs.claude-code
+        ++ dotfilesLib.resolvePackages pkgs config.claude.extraPackages;
       home.file.".claude/CLAUDE.md".source = config.claude.claudeMd;
     };
 }

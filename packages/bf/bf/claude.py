@@ -1,4 +1,4 @@
-"""Browse and delete Claude Code session transcripts."""
+"""Browse, resume, rename and delete Claude Code sessions."""
 import curses
 import datetime
 import json
@@ -44,6 +44,14 @@ class Session:
                             pass
         return total
 
+    def rename(self, title):
+        # mirrors the two entries claude appends for /rename; the last ones win
+        with open(self.jsonl_path, "a") as f:
+            for entry_type, key in (("custom-title", "customTitle"), ("agent-name", "agentName")):
+                entry = {"type": entry_type, key: title, "sessionId": self.session_id}
+                f.write(json.dumps(entry, separators=(",", ":")) + "\n")
+        self.title = title
+
     def delete(self):
         os.remove(self.jsonl_path)
         for d in (self.data_dir, self.file_history_dir):
@@ -54,6 +62,8 @@ class Session:
 def load_session(jsonl_path, project_dir):
     sess = Session(jsonl_path, project_dir)
     first_user_text = None
+    ai_title = None
+    custom_title = None
     try:
         with open(jsonl_path, "r", errors="replace") as f:
             for line in f:
@@ -72,7 +82,9 @@ def load_session(jsonl_path, project_dir):
 
                 etype = entry.get("type")
                 if etype == "ai-title" and entry.get("aiTitle"):
-                    sess.title = entry["aiTitle"]
+                    ai_title = entry["aiTitle"]
+                elif etype == "custom-title" and entry.get("customTitle"):
+                    custom_title = entry["customTitle"]
 
                 if first_user_text is None and etype == "user":
                     msg = entry.get("message", {})
@@ -87,6 +99,7 @@ def load_session(jsonl_path, project_dir):
     except OSError:
         pass
 
+    sess.title = custom_title or ai_title
     if not sess.title:
         if first_user_text:
             text = " ".join(first_user_text.split())
@@ -134,7 +147,7 @@ def render(stdscr, sessions, top, idx, status):
     visible = max(1, list_height // ROW_HEIGHT)
 
     stdscr.erase()
-    header = " Claude sessions   (enter=delete  r=resume  q=quit)"
+    header = " Claude sessions   (enter=resume  r=rename  d=delete  q=quit)"
     stdscr.addstr(0, 0, header[: width - 1], curses.A_BOLD)
     stdscr.hline(1, 0, curses.ACS_HLINE, width)
 
@@ -176,6 +189,30 @@ def prompt_delete_confirm(stdscr, sess):
     curses.noecho()
     curses.curs_set(0)
     return answer == "y"
+
+
+def prompt_rename(stdscr, sess):
+    # returns None if cancelled with escape
+    height, width = stdscr.getmaxyx()
+    prompt = "Rename: "
+    text = sess.title
+    curses.curs_set(1)
+    try:
+        while True:
+            stdscr.move(height - 1, 0)
+            stdscr.clrtoeol()
+            stdscr.addstr(height - 1, 0, (prompt + text)[-(width - 1):])
+            key = stdscr.get_wch()
+            if key in ("\n", "\r", curses.KEY_ENTER):
+                return text.strip()
+            elif key == "\x1b":
+                return None
+            elif key in ("\x7f", "\b", curses.KEY_BACKSPACE):
+                text = text[:-1]
+            elif isinstance(key, str) and key.isprintable():
+                text += key
+    finally:
+        curses.curs_set(0)
 
 
 def resume_session(stdscr, sess):
@@ -237,11 +274,22 @@ def run_ui(stdscr, sessions):
             idx -= visible
         elif ch in (ord("q"), 27):
             return None
-        elif ch in (ord("r"),):
+        elif ch in (curses.KEY_ENTER, 10, 13):
             resume_session(stdscr, sessions[idx])
             sessions[idx] = load_session(sessions[idx].jsonl_path, sessions[idx].project_dir)
             status = f"Returned from session {sessions[idx].session_id}."
-        elif ch in (curses.KEY_ENTER, 10, 13, ord("d"), curses.KEY_DC):
+        elif ch == ord("r"):
+            sess = sessions[idx]
+            title = prompt_rename(stdscr, sess)
+            if title:
+                try:
+                    sess.rename(title)
+                    status = f"Renamed session {sess.session_id}."
+                except OSError as e:
+                    status = f"Failed to rename: {e}"
+            else:
+                status = "Cancelled."
+        elif ch in (ord("d"), curses.KEY_DC):
             sess = sessions[idx]
             if prompt_delete_confirm(stdscr, sess):
                 try:
@@ -254,13 +302,9 @@ def run_ui(stdscr, sessions):
                 status = "Cancelled."
 
 
-def main():
+def manage_sessions():
     sessions = discover_sessions()
-    curses.wrapper(run_ui, sessions)
-
-
-if __name__ == "__main__":
     try:
-        main()
+        curses.wrapper(run_ui, sessions)
     except KeyboardInterrupt:
         sys.exit(1)
