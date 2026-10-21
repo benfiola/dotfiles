@@ -101,7 +101,11 @@ func (o Options) remove(h *tui.Handle[Worktree], w Worktree) {
 	if warning := deleteWarning(w); warning != "" {
 		detail = " (" + warning + ")"
 	}
-	h.Confirm(fmt.Sprintf("delete %s%s?", filepath.Base(w.Path), detail), func() {
+	name := w.Branch
+	if name == detached {
+		name = filepath.Base(w.Path)
+	}
+	h.Confirm(fmt.Sprintf("delete %s%s?", name, detail), func() {
 		if _, err := git(w.Repo, "worktree", "remove", "--force", w.Path); err != nil {
 			h.Message("delete failed: " + err.Error())
 		}
