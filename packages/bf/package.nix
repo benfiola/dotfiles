@@ -1,10 +1,14 @@
-{ python3Packages }:
+{ buildGoModule }:
 
-python3Packages.buildPythonPackage {
+buildGoModule {
   pname = "bf";
   version = "0";
-  pyproject = true;
   src = ./.;
-  build-system = [ python3Packages.setuptools ];
+  vendorHash = "sha256-GV3a60b6rcK5eD7qMIqgRd+hOgTujcGhgJp4Hb9feAc=";
+  subPackages = [ "cmd/bf" ];
+  ldflags = [
+    "-s"
+    "-w"
+  ];
   meta.mainProgram = "bf";
 }
